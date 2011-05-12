@@ -44,7 +44,7 @@ public class LittleEndianInputStream extends FilterInputStream {
         // only need to test last byte read
         // if byte1 is -1 so is byte2
         if (byte2 == -1) throw new EOFException();
-        return (short) (((byte2 << 24) >>> 16) + (byte1 << 24) >>> 24);
+        return (short) (((byte2 << 24) >>> 16) + ((byte1 << 24) >>> 24));
     }
 
     public int readUnsignedShort() throws IOException {
