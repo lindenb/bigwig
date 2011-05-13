@@ -22,7 +22,7 @@
     <mkdir dir="${dist}"/>
 
     <!-- Put everything in ${build} into the BigWig.jar file -->
-    <jar jarfile="${dist}/BigWig.jar">
+    <jar jarfile="${dist}/BigWig.jar" manifest="META-INF/MANIFEST.MF">
       <fileset dir="${build}" />
       <fileset dir="." includes="**/*.jar"/>
     </jar>
