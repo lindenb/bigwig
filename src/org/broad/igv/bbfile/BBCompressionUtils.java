@@ -19,7 +19,6 @@ package org.broad.igv.bbfile;
 import org.apache.log4j.Logger;
 
 import java.util.zip.Inflater;
-import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -65,7 +64,7 @@ public class BBCompressionUtils {
         ByteArrayOutputStream bos = new ByteArrayOutputStream((int) (1.5 * inbuf.length));
 
         // Decompress the data
-       byte[] outbuf = new byte[4 * inbuf.length];
+        byte[] outbuf = new byte[uncompressBufSize];
 
         while (rem > 0) {
 
