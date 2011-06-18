@@ -19,19 +19,19 @@ public class ZoomDataRecord {
 
     public static final int RECORD_SIZE = 32;
 
-    private int mZoomLevel;         // zoom level associated with data
-    private int mRecordNumber;      // record number
+    private int zoomLevel;         // zoom level associated with data
+    private int recordNumber;      // record number
 
     // chromosome region statistics (useful for calculating mean and standard deviation)
-    private String mChromName;      // chromosome/contig name
-    private int mChromId;           // Numerical ID for mChromosome/contig
-    private int mChromStart;        // starting base position  (from 0)
-    private int mChromEnd;          // ending base position
-    private int mValidCount;        // number of bases with data
-    private float mMinVal;          // minimum value for file data
-    private float mMaxVal;          // maximum value for file data
-    private float mSumData;         // sum of all squares of file data values
-    private float mSumSquares;      // sum of squares of file data values
+    private String chromName;      // chromosome/contig name
+    private int chromId;           // Numerical ID for mChromosome/contig
+    private int chromStart;        // starting base position  (from 0)
+    private int chromEnd;          // ending base position
+    private int basesCovered;        // number of bases with data
+    private float minVal;          // minimum value for file data
+    private float maxVal;          // maximum value for file data
+    private float sumData;         // sum of all squares of file data values
+    private float sumSquares;      // sum of squares of file data values
 
     /*
     *   Constructor for filling in zoom data record class.
@@ -53,77 +53,77 @@ public class ZoomDataRecord {
     public ZoomDataRecord(int zoomLevel, int recordNumber, String chromName, int chromId, int chromStart, int chromEnd,
             int validCount, float minVal, float maxVal, float sumData, float sumSquares ){
 
-        mZoomLevel = zoomLevel;
-        mRecordNumber = recordNumber;
-        mChromName = chromName;
-        mChromId = chromId;
-        mChromStart = chromStart;
-        mChromEnd = chromEnd;
-        mValidCount = validCount;
-        mMinVal = minVal;
-        mMaxVal = maxVal;
-        mSumData = sumData;
-        mSumSquares = sumSquares;
+        this.zoomLevel = zoomLevel;
+        this.recordNumber = recordNumber;
+        this.chromName = chromName;
+        this.chromId = chromId;
+        this.chromStart = chromStart;
+        this.chromEnd = chromEnd;
+        this.basesCovered = validCount;
+        this.minVal = minVal;
+        this.maxVal = maxVal;
+        this.sumData = sumData;
+        this.sumSquares = sumSquares;
     }
 
     public int getZoomLevel() {
-        return mZoomLevel;
+        return zoomLevel;
     }
 
     public int getRecordNumber() {
-        return mRecordNumber;
+        return recordNumber;
     }
 
-     public String getmChromName() {
-        return mChromName;
+     public String getChromName() {
+        return chromName;
     }
 
      public int getChromId() {
-        return mChromId;
+        return chromId;
     }
 
     public int getChromStart() {
-        return mChromStart;
+        return chromStart;
     }
 
     public int getChromEnd() {
-        return mChromEnd;
+        return chromEnd;
     }
 
-    public int getValidCount() {
-        return mValidCount;
+    public int getBasesCovered() {
+        return basesCovered;
     }
 
     public float getMinVal() {
-        return mMinVal;
+        return minVal;
     }
 
     public float getMaxVal() {
-        return mMaxVal;
+        return maxVal;
     }
 
     public float getSumData() {
-        return mSumData;
+        return sumData;
     }
 
     public float getSumSquares() {
-        return mSumSquares;
+        return sumSquares;
     }
 
     public void print(){
 
         // Table P - zoom data record
-       log.info("Zoom data record (Table DD) number " + mRecordNumber +
-               " for zoom level " + mZoomLevel);
-        log.info("ChromName = " + mChromName);
-        log.info("ChromId = " + mChromId);
-        log.info("ChromStart = " + mChromStart);
-        log.info("ChromEnd = " + mChromEnd);
-        log.info("ValidCount = " + mValidCount);
-        log.info("MinVal = " + mMinVal);
-        log.info("MaxVal = " + mMaxVal);
-        log.info("Sum of data values = " + mSumData);
-        log.info("Sum of squares values = " + mSumSquares);
+       log.info("Zoom data record (Table DD) number " + recordNumber +
+               " for zoom level " + zoomLevel);
+        log.info("ChromName = " + chromName);
+        log.info("ChromId = " + chromId);
+        log.info("ChromStart = " + chromStart);
+        log.info("ChromEnd = " + chromEnd);
+        log.info("ValidCount = " + basesCovered);
+        log.info("MinVal = " + minVal);
+        log.info("MaxVal = " + maxVal);
+        log.info("Sum of data values = " + sumData);
+        log.info("Sum of squares values = " + sumSquares);
     }
 }
 
