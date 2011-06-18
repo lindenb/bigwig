@@ -28,7 +28,7 @@ public class BBFileReaderTest {
         // time the B+/R+ chromosome an zoom level tree construction
         long time = System.currentTimeMillis(), time_prev = time;
 
-         bbReader = new BBFileReader("test/chr21.bb");
+         bbReader = new BBFileReader("test/data/chr21.bb");
 
         // get the time mark
         time = System.currentTimeMillis();
