@@ -861,12 +861,12 @@ public class BBFileReader {
                                                    String endChromosome, int endBase) {
 
         // find the chromosome ID's using the name to get a valid name key, then associated ID
-        String startChromKey = mChromosomeIDTree.getChromosomeKey(startChromosome, startBase);
+        String startChromKey = mChromosomeIDTree.getChromosomeKey(startChromosome);
         int startChromID = mChromosomeIDTree.getChromosomeID(startChromKey);
         if (startChromID < 0)       // mChromosome not in data?
             return null;
 
-        String endChromKey = mChromosomeIDTree.getChromosomeKey(endChromosome, endBase);
+        String endChromKey = mChromosomeIDTree.getChromosomeKey(endChromosome);
         int endChromID = mChromosomeIDTree.getChromosomeID(endChromKey);
         if (endChromID < 0)       // mChromosome not in data?
             return null;

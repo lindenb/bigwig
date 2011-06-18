@@ -194,12 +194,15 @@ public class BPTree {
     *
     *   Note:  how to generate a search key based on multi-chromosomes TBD
     * */
-    public String getChromosomeKey(String chromosome, int startBase) {
+    public String getChromosomeKey(String chromosome) {
 
+        return chromosome;
+        // TODO -- original implementation below, but "chromosome" is not guaranteed to be any particular lengh.
+        // TODO -- why is this substring done at all?
         // Encode a key for search of a region of the B+ tree for data
-        String chromKey = chromosome.substring(0, mKeySize);
+       // String chromKey = chromosome.substring(0, mKeySize);
 
-        return chromKey;
+       // return chromKey;
     }
 
     /*
