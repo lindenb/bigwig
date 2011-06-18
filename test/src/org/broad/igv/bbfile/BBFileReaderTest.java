@@ -340,7 +340,7 @@ public class BBFileReaderTest {
         record += String.format("ChromId = %d, ", zoomDataRecord.getChromId());
         record += String.format("ChromStart = %d, ", zoomDataRecord.getChromStart());
         record += String.format("ChromEnd = %d, ", zoomDataRecord.getChromEnd());
-        record += String.format("ValidCount = %d\n", zoomDataRecord.getValidCount());
+        record += String.format("ValidCount = %d\n", zoomDataRecord.getBasesCovered());
         record += String.format("MinVal = %f, ", zoomDataRecord.getMinVal());
         record += String.format("MaxVal = %f, ", zoomDataRecord.getMaxVal());
         record += String.format("Sum values = %f, ", zoomDataRecord.getSumData());
