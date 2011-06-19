@@ -26,27 +26,27 @@ public class BigBedDataBlock {
  private static Logger log = Logger.getLogger(BigBedDataBlock.class);
 
     // Bed data block access variables   - for reading in bed records from a file
-    private SeekableStream mBBFis;  // file input stream handle
-    private long mFileOffset;       // Bed data block file offset
-    private long mDataBlockSize;     // byte size for data block specified in the R+ leaf
-    private boolean mIsLowToHigh;   // if true, data is low to high byte order; else high to low
+    private SeekableStream fis;  // file input stream handle
+    private long fileOffset;       // Bed data block file offset
+    private long dataBlockSize;     // byte size for data block specified in the R+ leaf
+    private boolean isLowToHigh;   // if true, data is low to high byte order; else high to low
 
     // defines the bigBed/bigWig source chromosomes
-    private HashMap<Integer, String> mChromosomeMap;  // map of chromosome ID's and corresponding names
-    private RPTreeLeafNodeItem mLeafHitItem;   // R+ tree leaf item containing data block location
+    private HashMap<Integer, String> chromosomeMap;  // map of chromosome ID's and corresponding names
+    private RPTreeLeafNodeItem leafHitItem;   // R+ tree leaf item containing data block location
 
     // Provides uncompressed byte stream data reader
-    private byte[] mBedBuffer;  // buffer containing leaf block data uncompressed
-    private int mRemDataSize;   // number of unread data bytes
-    private long mDataSizeRead;     // number of bytes read from the decompressed mWigBuffer
+    private byte[] bedBuffer;  // buffer containing leaf block data uncompressed
+    private int remDataSize;   // number of unread data bytes
+    private long dataSizeRead;     // number of bytes read from the decompressed mWigBuffer
 
     // byte stream readers
-    private LittleEndianInputStream mLbdis;    // low to high byte stream reader
-    private DataInputStream mBdis;       // high to low byte stream reader
+    private LittleEndianInputStream lbdis;    // low to high byte stream reader
+    private DataInputStream dis;       // high to low byte stream reader
 
     // Bed data extraction members
-    private ArrayList<BedFeature> mBedFeatureList; // array of BigBed data
-    private int mItemsSelected;    // number of Bed features selected from this section
+    private ArrayList<BedFeature> bedFeatureList; // array of BigBed data
+    private int nItemsSelected;    // number of Bed features selected from this section
 
     /*
     *   Constructor for Bed data block reader.
@@ -60,44 +60,44 @@ public class BigBedDataBlock {
     * */
     public BigBedDataBlock(SeekableStream fis, RPTreeLeafNodeItem leafHitItem,
             HashMap<Integer, String> chromosomeMap, boolean isLowToHigh, int uncompressBufSize){
-        mBBFis = fis;
-        mLeafHitItem = leafHitItem;
-        mChromosomeMap = chromosomeMap;
-        mIsLowToHigh = isLowToHigh;
+        this.fis = fis;
+        this.leafHitItem = leafHitItem;
+        this.chromosomeMap = chromosomeMap;
+        this.isLowToHigh = isLowToHigh;
 
         int bytesRead;
-        mDataBlockSize = mLeafHitItem.geDataSize();
-        byte[] buffer = new byte[(int) mDataBlockSize];
+        dataBlockSize = this.leafHitItem.geDataSize();
+        byte[] buffer = new byte[(int) dataBlockSize];
 
-        mFileOffset = mLeafHitItem.getDataOffset();
+        fileOffset = this.leafHitItem.getDataOffset();
 
         // read Bed data block into a buffer
         try {
-            mBBFis.seek(mFileOffset);
+            this.fis.seek(fileOffset);
             bytesRead = fis.read(buffer);
 
             // decompress if necessary - the buffer size is 0 for uncompressed data
             // Note:  BBFile Table C specifies a decompression buffer size
             if(uncompressBufSize > 0)
-              mBedBuffer = BBCompressionUtils.decompress(buffer, uncompressBufSize);
+              bedBuffer = BBCompressionUtils.decompress(buffer, uncompressBufSize);
             else
-              mBedBuffer = buffer;    // use uncompressed read buffer directly
+              bedBuffer = buffer;    // use uncompressed read buffer directly
 
        }catch(IOException ex) {
-            long itemIndex = mLeafHitItem.getItemIndex();
+            long itemIndex = this.leafHitItem.getItemIndex();
             String error = String.format("Error reading Bed data for leaf item %d \n", itemIndex);
             log.error(error, ex);
             throw new RuntimeException(error, ex);
        }
 
         // wrap the bed buffer as an input stream
-        if(mIsLowToHigh)
-            mLbdis = new LittleEndianInputStream(new ByteArrayInputStream(mBedBuffer));
+        if(this.isLowToHigh)
+            lbdis = new LittleEndianInputStream(new ByteArrayInputStream(bedBuffer));
         else
-            mBdis = new DataInputStream(new ByteArrayInputStream(mBedBuffer));
+            dis = new DataInputStream(new ByteArrayInputStream(bedBuffer));
 
         // initialize unread data size
-        mRemDataSize = mBedBuffer.length;
+        remDataSize = bedBuffer.length;
 
         // use methods getBedData or getNextFeature to extract block data
     }
@@ -128,35 +128,35 @@ public class BigBedDataBlock {
         int minItemSize = 3 * 4 + 1;
 
         // allocate the bed feature array list
-        mBedFeatureList = new ArrayList<BedFeature>();
+        bedFeatureList = new ArrayList<BedFeature>();
 
         // check if all leaf items are selection hits
-        RPChromosomeRegion itemRegion = new RPChromosomeRegion( mLeafHitItem.getChromosomeBounds());
+        RPChromosomeRegion itemRegion = new RPChromosomeRegion( leafHitItem.getChromosomeBounds());
         int leafHitValue = itemRegion.compareRegions(selectionRegion);
         
         try {
-            for(int index = 0; mRemDataSize > 0; ++index) {
+            for(int index = 0; remDataSize > 0; ++index) {
                 itemNumber = index + 1;
 
                 // read in BigBed item fields - BBFile Table I
-                if(mIsLowToHigh){
-                    chromID = mLbdis.readInt();
-                    chromStart= mLbdis.readInt();
-                    chromEnd = mLbdis.readInt();
-                    restOfFields = mLbdis.readString();
+                if(isLowToHigh){
+                    chromID = lbdis.readInt();
+                    chromStart= lbdis.readInt();
+                    chromEnd = lbdis.readInt();
+                    restOfFields = lbdis.readString();
                 }
                 else{
-                    chromID = mBdis.readInt();
-                    chromStart= mBdis.readInt();
-                    chromEnd = mBdis.readInt();
-                    restOfFields = mBdis.readUTF();
+                    chromID = dis.readInt();
+                    chromStart= dis.readInt();
+                    chromEnd = dis.readInt();
+                    restOfFields = dis.readUTF();
                 }
 
                 if(leafHitValue == 0) {     // contained leaf region items always added
-                    String chromosome = mChromosomeMap.get(chromID);
+                    String chromosome = chromosomeMap.get(chromID);
                     BedFeature bbItem = new BedFeature(itemNumber, chromosome,
                          chromStart, chromEnd, restOfFields);
-                    mBedFeatureList.add(bbItem);
+                    bedFeatureList.add(bbItem);
                 }
                 else {                      // test for hit
                     itemRegion = new RPChromosomeRegion(chromID, chromStart, chromID, chromEnd);
@@ -166,16 +166,16 @@ public class BigBedDataBlock {
                     if(!contained && Math.abs(itemHitValue) < 2 ||
                             itemHitValue == 0) {
                         // add bed feature to item selection list
-                        String chromosome = mChromosomeMap.get(chromID);
+                        String chromosome = chromosomeMap.get(chromID);
                         BedFeature bbItem = new BedFeature(itemNumber, chromosome,
                              chromStart, chromEnd, restOfFields);
-                        mBedFeatureList.add(bbItem);
+                        bedFeatureList.add(bbItem);
                     }
                 }
 
                 // compute data block remainder from size of item read
                 // todo: check that restOfFields.length() does not also include 0 byte terminator
-                mRemDataSize -= minItemSize + restOfFields.length();
+                remDataSize -= minItemSize + restOfFields.length();
             }
 
         }catch(IOException ex) {
@@ -186,16 +186,16 @@ public class BigBedDataBlock {
                 throw new RuntimeException("Read error for Bed data item " + itemNumber);
         }
 
-        return mBedFeatureList;
+        return bedFeatureList;
     }
 
     public void print() {
 
-        log.info("BigBed data for " + mBedFeatureList.size() + " items");
+        log.info("BigBed data for " + bedFeatureList.size() + " items");
 
-        for(int index = 0; index <= mBedFeatureList.size(); ++index) {
+        for(int index = 0; index <= bedFeatureList.size(); ++index) {
             // BigBed data items print themselves
-            mBedFeatureList.get(index).print();
+            bedFeatureList.get(index).print();
          }
     }
 }

@@ -13,46 +13,46 @@ public class WigItem {
 
     private static Logger log = Logger.getLogger(WigItem.class);
 
-    private int mItemIndex;         // wig section item index number
-    private String mChromosome;     // mChromosome name
-    private int mStartBase;         // mStartBase base position for feature
-    private int mEndBase;           // mEndBase base position for feature
-    private float mWigValue;        // wig value
+    private int itemIndex;         // wig section item index number
+    private String chromosome;     // mChromosome name
+    private int startBase;         // mStartBase base position for feature
+    private int endBase;           // mEndBase base position for feature
+    private float wigValue;        // wig value
 
     public WigItem(int itemIndex, String chromosome, int startBase, int endBase, float wigValue){
 
-        mItemIndex = itemIndex;
-        mChromosome = chromosome;
-        mStartBase = startBase;
-        mEndBase = endBase;
-        mWigValue = wigValue;
+        this.itemIndex = itemIndex;
+        this.chromosome = chromosome;
+        this.startBase = startBase;
+        this.endBase = endBase;
+        this.wigValue = wigValue;
     }
 
     public int getItemNumber(){
-        return mItemIndex;
+        return itemIndex;
     }
 
     public String getChromosome() {
-        return mChromosome;
+        return chromosome;
     }
 
     public int getStartBase() {
-        return mStartBase;
+        return startBase;
     }
 
     public int getEndBase() {
-        return mEndBase;
+        return endBase;
     }
 
     public float getWigValue() {
-        return mWigValue;
+        return wigValue;
     }
 
      public void print(){
-       log.info("Wig item index " + mItemIndex);
-       log.info("mChromosome name: " + mChromosome);
-       log.info("mChromosome start base = " + mStartBase);
-       log.info("mChromosome end base = " + mEndBase);
-       log.info("Wig value: \n" + mWigValue);
+       log.info("Wig item index " + itemIndex);
+       log.info("mChromosome name: " + chromosome);
+       log.info("mChromosome start base = " + startBase);
+       log.info("mChromosome end base = " + endBase);
+       log.info("Wig value: \n" + wigValue);
    }
 }
