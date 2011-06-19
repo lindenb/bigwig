@@ -14,6 +14,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class BBFileReaderTest {
@@ -21,14 +22,15 @@ public class BBFileReaderTest {
     static BBFileHeader bbFileHdr;
     static long time_prev;
     static final int MaxIterations = 40000;
+    private static final String filename = "test/data/chr21.bb";
 
     @BeforeClass
-    public static void setupClass() {
+    public static void setupClass() throws IOException {
 
         // time the B+/R+ chromosome an zoom level tree construction
         long time = System.currentTimeMillis(), time_prev = time;
 
-         bbReader = new BBFileReader("test/data/chr21.bb");
+         bbReader = new BBFileReader(filename);
 
         // get the time mark
         time = System.currentTimeMillis();
@@ -63,7 +65,7 @@ public class BBFileReaderTest {
         RPChromosomeRegion chromosomeBounds;
 
         //********************** examine Big Binary tree info ********************
-        String filename = bbReader.getBBFilePath();
+
         boolean isBigBed = bbReader.isBigBedFile();
         boolean isBigWig = bbReader.isBigWigFile();
         if (isBigBed)
