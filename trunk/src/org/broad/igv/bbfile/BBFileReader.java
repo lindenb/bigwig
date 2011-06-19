@@ -14,7 +14,6 @@ import org.broad.tribble.util.SeekableFileStream;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /*
 *   Broad Institute Interactive Genome Viewer Big Binary File (BBFile) Reader
@@ -104,7 +103,6 @@ public class BBFileReader {
     // R+ tree
     private long chromDataTreeOffset;  // file offset to mChromosome data R+ tree
     private RPTree chromosomeDataTree;     // Container for the mChromosome data R+ tree
-    private final Iterator<WigItem> emptyWigIterator;
 
 
     public BBFileReader(String path) throws IOException {
@@ -187,19 +185,6 @@ public class BBFileReader {
         }
 
 
-        emptyWigIterator = new Iterator<WigItem>() {
-            public boolean hasNext() {
-                return false;  //To change body of implemented methods use File | Settings | File Templates.
-            }
-
-            public WigItem next() {
-                return null;  //To change body of implemented methods use File | Settings | File Templates.
-            }
-
-            public void remove() {
-                //To change body of implemented methods use File | Settings | File Templates.
-            }
-        };
     }
 
     /*
@@ -661,7 +646,7 @@ public class BBFileReader {
      * 1) An empty iterator is returned if region has no data available
      * 2) A null object is returned if the file is not BigWig.(see isBigWigFile method)
      */
-    public Iterator<WigItem> getBigWigIterator(String startChromosome, int startBase,
+    public BigWigIterator getBigWigIterator(String startChromosome, int startBase,
                                             String endChromosome, int endBase, boolean contained) {
 
         if (!isBigWigFile())
@@ -672,9 +657,8 @@ public class BBFileReader {
                 endChromosome, endBase);
 
         // check for valid selection region
-        if (selectionRegion == null) {
-            return emptyWigIterator;
-        }
+        if (selectionRegion == null)
+            throw new RuntimeException("Error finding BigWigIterator region: chromosome not found \n");
 
         // compose an iterator
         BigWigIterator wigIterator = new BigWigIterator(fis, chromosomeIDTree, chromosomeDataTree,

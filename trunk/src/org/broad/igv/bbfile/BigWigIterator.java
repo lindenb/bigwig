@@ -72,10 +72,10 @@ public class BigWigIterator implements Iterator<WigItem> {
 
         // set up hit list and first data block read
         int hitCount = getHitRegion(selectionRegion, contained);
-        if(hitCount == 0) {
-            System.out.println("No hits for region: " + selectionRegion);
-        }
-  
+        if(hitCount == 0)   // no hits - no point in fetching data
+            throw new RuntimeException("No wig data found in the selection region");
+
+        // Ready for next() data extraction
     }
     
      /*
@@ -89,10 +89,6 @@ public class BigWigIterator implements Iterator<WigItem> {
      * */
      public boolean hasNext() {
 
-         if(mWigItemList == null) {
-             return false;
-         }
-         
         // first check if current segment can be read for next Wig item
         if(mWigItemIndex < mWigItemList.size())
             return true;
