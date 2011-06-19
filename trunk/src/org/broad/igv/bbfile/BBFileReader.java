@@ -758,9 +758,10 @@ public class BBFileReader {
         RPChromosomeRegion selectionRegion = getChromosomeBounds(startChromosome, startBase,
                 endChromosome, endBase);
 
-        // check for valid selection region
-        if (selectionRegion == null)
-            throw new RuntimeException("Error: ZoomLevelIterator selection region is null\n");
+        // check for valid selection region  
+        if (selectionRegion == null)  {
+            return ZoomLevelIterator.EmptyIterator.theInstance;
+        }
 
         /// compose an iterator
         ZoomLevelIterator zoomIterator = new ZoomLevelIterator(fis, chromosomeIDTree,

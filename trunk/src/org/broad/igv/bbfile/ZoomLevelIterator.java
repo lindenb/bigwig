@@ -32,7 +32,7 @@ public class ZoomLevelIterator {
     private RPTree mZoomDataTree;  // R+ zoom data locations tree
 
     // chromosome region extraction items
-     private ArrayList<RPTreeLeafNodeItem> mLeafHitList; // array of leaf hits for selection region items
+    private ArrayList<RPTreeLeafNodeItem> mLeafHitList; // array of leaf hits for selection region items
     private HashMap<Integer, String> mChromosomeMap;  // map of chromosome ID's and corresponding names
     private int mLeafItemIndex;   // index of current leaf item being processed from leaf hit list
     RPTreeLeafNodeItem mLeafHitItem;   // leaf item being processed by next
@@ -44,27 +44,34 @@ public class ZoomLevelIterator {
     private int mZoomRecordIndex;    // index of next zoom data record from the list
 
     /**
-     * Constructs a zoom level iterator over the specified chromosome region
-     *
-     * Parameters:
-     *      fis - file input stream handle
-     *      chromIDTree - B+ index tree returns chromId for chromosome name key
-     *      zoomLevelTree - zoom level R+ chromosome index tree
-     *      zoomLevel - zoom level represented by the R+ tree
-      *     selectionRegion - chromosome region for selection of Bed feature extraction
-     *      consists of:
-     *          startChromID - ID of start chromosome
-     *          startBase - starting base position for features
-     *          endChromID - ID of end chromosome
-     *          endBase - starting base position for features
-     *      contained - specifies bed features must be contained by region, if true;
-     *          else return any intersecting region features
+     * Default constructor.  This is provided to support return of a subclassed  "empty" iterator
      */
-      public ZoomLevelIterator(SeekableStream fis, BPTree chromIDTree, RPTree zoomDataTree,
-                int zoomLevel, RPChromosomeRegion selectionRegion, boolean contained) {
+    public ZoomLevelIterator() {
+
+    }
+
+    /**
+     * Constructs a zoom level iterator over the specified chromosome region
+     * <p/>
+     * Parameters:
+     * fis - file input stream handle
+     * chromIDTree - B+ index tree returns chromId for chromosome name key
+     * zoomLevelTree - zoom level R+ chromosome index tree
+     * zoomLevel - zoom level represented by the R+ tree
+     * selectionRegion - chromosome region for selection of Bed feature extraction
+     * consists of:
+     * startChromID - ID of start chromosome
+     * startBase - starting base position for features
+     * endChromID - ID of end chromosome
+     * endBase - starting base position for features
+     * contained - specifies bed features must be contained by region, if true;
+     * else return any intersecting region features
+     */
+    public ZoomLevelIterator(SeekableStream fis, BPTree chromIDTree, RPTree zoomDataTree,
+                             int zoomLevel, RPChromosomeRegion selectionRegion, boolean contained) {
 
         // check for valid selection region
-        if(selectionRegion == null)
+        if (selectionRegion == null)
             throw new RuntimeException("Error: ZoomLevelIterator selection region is null\n");
 
         mBBFis = fis;
@@ -76,7 +83,7 @@ public class ZoomLevelIterator {
 
         // set up hit list and read in the first data block
         int hitCount = getHitRegion(selectionRegion, contained);
-        if(hitCount == 0)   // no hits - no point in fetching data
+        if (hitCount == 0)   // no hits - no point in fetching data
             throw new RuntimeException("No zoom data found in the selection region");
 
         // Ready for next() data extraction
@@ -91,46 +98,46 @@ public class ZoomLevelIterator {
      *  Note: If "next" method is called for a false condition,
      *      an UnsupportedOperationException will be thrown.
      * */
-     public boolean hasNext() {
+
+    public boolean hasNext() {
 
         // first check if current data block can be read for next
-        if(mZoomRecordIndex < mZoomRecordList.size())
+        if (mZoomRecordIndex < mZoomRecordList.size())
             return true;
 
-        // need to fetch next data block
-        else if(mLeafItemIndex < mLeafHitList.size())
+            // need to fetch next data block
+        else if (mLeafItemIndex < mLeafHitList.size())
             return true;
 
-         else
+        else
             return false;
     }
 
     /**
-     *  Method returns the current bed feature and advances to the next bed record.
-     *
-     *  Returns:
-     *      Bed feature for current BigBed data record.
-     *
-     *  Note: If "next" method is called when a "next item" does not exist,
-     *      an UnsupportedOperationException will be thrown.
-    */
+     * Method returns the current bed feature and advances to the next bed record.
+     * <p/>
+     * Returns:
+     * Bed feature for current BigBed data record.
+     * <p/>
+     * Note: If "next" method is called when a "next item" does not exist,
+     * an UnsupportedOperationException will be thrown.
+     */
     public ZoomDataRecord next() {
 
         // Is there a need to fetch next data block?
-        if(mZoomRecordIndex < mZoomRecordList.size())
-            return(mZoomRecordList.get(mZoomRecordIndex++));
+        if (mZoomRecordIndex < mZoomRecordList.size())
+            return (mZoomRecordList.get(mZoomRecordIndex++));
 
-        // attempt to get next leaf item data block
+            // attempt to get next leaf item data block
         else {
             int nHits = getHitRegion(mSelectionRegion, mIsContained);
 
-            if(nHits > 0){
+            if (nHits > 0) {
                 // Note: getDataBlock initializes bed feature index to 0
-                return(mZoomRecordList.get(mZoomRecordIndex++)); // return 1st Data Block item
-            }
-            else{
+                return (mZoomRecordList.get(mZoomRecordIndex++)); // return 1st Data Block item
+            } else {
                 String result = String.format("Failed to find data for zoom region (%d,%d,%d,%d)\n",
-                    mHitRegion.getStartChromID(),  mHitRegion.getStartBase(),
+                        mHitRegion.getStartChromID(), mHitRegion.getStartBase(),
                         mHitRegion.getEndChromID(), mHitRegion.getEndBase());
                 log.error(result);
 
@@ -146,19 +153,21 @@ public class ZoomLevelIterator {
     }
 
     // ************ ZoomLevelIterator specific methods *******************
-     /*
-    *   Method returns the zoom level assigned to the iterator.
-    *
-    *   Returns:
-    *       Number of leaf node hits allowed at a time
-    * */
+    /*
+   *   Method returns the zoom level assigned to the iterator.
+   *
+   *   Returns:
+   *       Number of leaf node hits allowed at a time
+   * */
+
     public int getZoomLevel() {
-           return mZoomLevel;
-     }
+        return mZoomLevel;
+    }
 
     /*
     *   Method returns the iterator selection region.
     * */
+
     public RPChromosomeRegion getSelectionRegion() {
         return mSelectionRegion;
     }
@@ -179,15 +188,16 @@ public class ZoomLevelIterator {
     *   Returns:
     *       number of chromosome regions found in the selection region
     * */
+
     public int setSelectionRegion(RPChromosomeRegion selectionRegion,
-                                                 boolean contained) {
+                                  boolean contained) {
         mSelectionRegion = selectionRegion;
         mIsContained = contained;
 
         // set up hit list and first data block read
         mLeafHitList = null;    // Must nullify existing hit list first!
         int hitCount = getHitRegion(selectionRegion, contained);
-        if(hitCount == 0)   // no hits - no point in fetching data
+        if (hitCount == 0)   // no hits - no point in fetching data
             throw new RuntimeException("No wig data found in the selection region");
 
         // Ready for next() data extraction
@@ -204,6 +214,7 @@ public class ZoomLevelIterator {
     *       Boolean indicates items must be contained in selection region if true,
     *       else may intersect the selection region if false
     * */
+
     public boolean isContained() {
         return mIsContained;
     }
@@ -214,6 +225,7 @@ public class ZoomLevelIterator {
     *   Returns:
     *       File input stream handle
     * */
+
     public SeekableStream getBBFis() {
         return mBBFis;
     }
@@ -225,6 +237,7 @@ public class ZoomLevelIterator {
     *   Returns:
     *       B+ chromosome index tree
     * */
+
     public BPTree getChromosomeIDTree() {
         return mChromIDTree;
     }
@@ -236,6 +249,7 @@ public class ZoomLevelIterator {
     *   Returns:
     *       R+ chromosome data locations tree
     * */
+
     public RPTree getZoomDataTree() {
         return mZoomDataTree;
     }
@@ -255,20 +269,20 @@ public class ZoomLevelIterator {
     *   Returns:
     *       number of R+ chromosome data hits
     * */
+
     private int getHitRegion(RPChromosomeRegion hitRegion, boolean contained) {
 
         int hitCount = 0;
 
         // check if new hit list is needed
         // Note: getHitList will reset mLeafItemIndex to 0, the beginning of new hit list
-        if(mLeafHitList == null ){   //|| mLeafItemIndex >= mLeafHitList.size()){
+        if (mLeafHitList == null) {   //|| mLeafItemIndex >= mLeafHitList.size()){
             hitCount = getHitList(hitRegion, contained);
-            if(hitCount == 0)
+            if (hitCount == 0)
                 return 0;   // no hit data found
-        }
-        else {
-            hitCount =  mLeafHitList.size() - mLeafItemIndex;
-            if(hitCount == 0)
+        } else {
+            hitCount = mLeafHitList.size() - mLeafItemIndex;
+            if (hitCount == 0)
                 return 0;   // hit list exhausted
         }
 
@@ -277,7 +291,7 @@ public class ZoomLevelIterator {
 
         // try next item - probably intersection issue
         // Note: recursive call until a block is valid or hit list exhuasted
-        if(!mDataBlockRead)
+        if (!mDataBlockRead)
             hitCount = getHitRegion(hitRegion, contained);
 
         return hitCount;
@@ -298,26 +312,27 @@ public class ZoomLevelIterator {
     *   Returns:
     *       number of R+ chromosome data hits
     * */
+
     private int getHitList(RPChromosomeRegion hitRegion, boolean contained) {
 
         // hit list for hit region; subject to mMaxLeafHits limitation
-         mLeafHitList = mZoomDataTree.getChromosomeDataHits(hitRegion, contained);
+        mLeafHitList = mZoomDataTree.getChromosomeDataHits(hitRegion, contained);
 
         // check if any leaf items were selected
         int nHits = mLeafHitList.size();
-        if(nHits == 0)
+        if (nHits == 0)
             return 0;   // no data hits found
         else
-             mLeafItemIndex = 0;    // reset hit item index to start of list
+            mLeafItemIndex = 0;    // reset hit item index to start of list
 
         // find hit bounds
         int startChromID = mLeafHitList.get(0).getChromosomeBounds().getStartChromID();
         int startBase = mLeafHitList.get(0).getChromosomeBounds().getStartBase();
-        int endChromID = mLeafHitList.get(nHits-1).getChromosomeBounds().getEndChromID();
-        int endBase = mLeafHitList.get(nHits-1).getChromosomeBounds().getEndBase();
+        int endChromID = mLeafHitList.get(nHits - 1).getChromosomeBounds().getEndChromID();
+        int endBase = mLeafHitList.get(nHits - 1).getChromosomeBounds().getEndBase();
 
         // save hit region definition; not currently used but useful for debug
-        mHitRegion = new  RPChromosomeRegion(startChromID, startBase, endChromID, endBase);
+        mHitRegion = new RPChromosomeRegion(startChromID, startBase, endChromID, endBase);
 
         return nHits;
     }
@@ -331,11 +346,12 @@ public class ZoomLevelIterator {
     *   Returns:
     *       Successful Zoom data block set up: true or false.
     * */
-    private boolean getDataBlock(int leafItemIndex){
+
+    private boolean getDataBlock(int leafItemIndex) {
 
         // check for valid data block
-        if(mLeafHitList == null || leafItemIndex >= mLeafHitList.size())
-                return false;
+        if (mLeafHitList == null || leafItemIndex >= mLeafHitList.size())
+            return false;
 
         // Perform a block read for indexed leaf item
         mLeafHitItem = mLeafHitList.get(leafItemIndex);
@@ -350,17 +366,28 @@ public class ZoomLevelIterator {
 
         // decompress leaf item data block for feature extraction
         mZoomDataBlock = new ZoomDataBlock(mZoomLevel, mBBFis, mLeafHitItem, mChromosomeMap,
-                        isLowToHigh, uncompressBufSize);
+                isLowToHigh, uncompressBufSize);
 
         // get data block zoom data record list and set next index to first item
-        mZoomRecordList =  mZoomDataBlock.getZoomData(mSelectionRegion, mIsContained);
+        mZoomRecordList = mZoomDataBlock.getZoomData(mSelectionRegion, mIsContained);
         mZoomRecordIndex = 0;
 
         // data block items available for iterator
-        if(mZoomRecordList.size() > 0)
+        if (mZoomRecordList.size() > 0)
             return true;
         else
             return false;
+    }
+
+
+    public static class EmptyIterator extends ZoomLevelIterator {
+
+        static EmptyIterator theInstance = new EmptyIterator();
+
+        @Override
+        public boolean hasNext() {
+            return false;
+        }
     }
 
 }
