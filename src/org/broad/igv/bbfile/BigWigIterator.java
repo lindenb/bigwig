@@ -19,6 +19,8 @@ public class BigWigIterator implements Iterator<WigItem> {
 
     private static Logger log = Logger.getLogger(BigWigIterator.class);
 
+    boolean empty = false;
+
     //specification of chromosome selection region
     private RPChromosomeRegion mSelectionRegion;  // selection region for iterator
     private boolean mIsContained;     // if true, features must be fully contained by selection region
@@ -43,25 +45,25 @@ public class BigWigIterator implements Iterator<WigItem> {
 
     /**
      * Constructor for a BigWig iterator over the specified chromosome region
-     *
+     * <p/>
      * Parameters:
-     *      fis - file input stream handle
-     *      chromIDTree - B+ chromosome index tree provides chromosome ID's for chromosome names
-     *      chromDataTree - R+ chromosome data locations tree
-     *      selectionRegion - chromosome region for selection of Wig feature extraction
-     *      consists of:
-     *          startChromID - ID of start chromosome
-     *          startBase - starting base position for values
-     *          endChromID - ID of end chromosome
-     *          endBase - ending base position for values
-     *      contained - specifies wig values must be contained by region, if true;
-     *          else return any intersecting region values
-    */
+     * fis - file input stream handle
+     * chromIDTree - B+ chromosome index tree provides chromosome ID's for chromosome names
+     * chromDataTree - R+ chromosome data locations tree
+     * selectionRegion - chromosome region for selection of Wig feature extraction
+     * consists of:
+     * startChromID - ID of start chromosome
+     * startBase - starting base position for values
+     * endChromID - ID of end chromosome
+     * endBase - ending base position for values
+     * contained - specifies wig values must be contained by region, if true;
+     * else return any intersecting region values
+     */
     public BigWigIterator(SeekableStream fis, BPTree chromIDTree, RPTree chromDataTree,
-            RPChromosomeRegion selectionRegion, boolean contained) {
+                          RPChromosomeRegion selectionRegion, boolean contained) {
 
         // check for valid selection region
-        if(selectionRegion == null)
+        if (selectionRegion == null)
             throw new RuntimeException("Error: BigWigIterator selection region is null\n");
 
         mBBFis = fis;
@@ -72,61 +74,64 @@ public class BigWigIterator implements Iterator<WigItem> {
 
         // set up hit list and first data block read
         int hitCount = getHitRegion(selectionRegion, contained);
-        if(hitCount == 0)   // no hits - no point in fetching data
-            throw new RuntimeException("No wig data found in the selection region");
+        if (hitCount == 0) {
+            empty = true;
+        }
 
         // Ready for next() data extraction
     }
-    
-     /*
-     *  Method returns status on a "next item" being available.
-     *
-     *  Return:
-     *      True if a "next item" exists; else false.
-     *
-     *  Note: If "next" method is called for a false condition,
-     *      an NoSuchElementException will be thrown.
-     * */
-     public boolean hasNext() {
+
+    /*
+   *  Method returns status on a "next item" being available.
+   *
+   *  Return:
+   *      True if a "next item" exists; else false.
+   *
+   *  Note: If "next" method is called for a false condition,
+   *      an NoSuchElementException will be thrown.
+   * */
+
+    public boolean hasNext() {
+
+        if (empty) return false;
 
         // first check if current segment can be read for next Wig item
-        if(mWigItemIndex < mWigItemList.size())
+        if (mWigItemIndex < mWigItemList.size())
             return true;
 
-        // need to fetch next data block
-        else if(mLeafItemIndex < mLeafHitList.size())
+            // need to fetch next data block
+        else if (mLeafItemIndex < mLeafHitList.size())
             return true;
 
-         else
+        else
             return false;
     }
 
     /**
-     *  Method returns the current Wig item and advances to the next Wig record.
-     *
-     *  Returns:
-     *      Wig item for current BigWig data record.
-     *
-     *  Note: If "next" method is called when a "next item" does not exist,
-     *      an NoSuchElementException will be thrown.
-    */
+     * Method returns the current Wig item and advances to the next Wig record.
+     * <p/>
+     * Returns:
+     * Wig item for current BigWig data record.
+     * <p/>
+     * Note: If "next" method is called when a "next item" does not exist,
+     * an NoSuchElementException will be thrown.
+     */
     public WigItem next() {
 
         // return next Wig item in list
-        if(mWigItemIndex < mWigItemList.size())
-            return(mWigItemList.get(mWigItemIndex++));
+        if (mWigItemIndex < mWigItemList.size())
+            return (mWigItemList.get(mWigItemIndex++));
 
-        // attempt to get next leaf item data block
+            // attempt to get next leaf item data block
         else {
             int nHits = getHitRegion(mSelectionRegion, mIsContained);
 
-            if(nHits > 0){
+            if (nHits > 0) {
                 // Note: getDataBlock initializes bed feature index to 0
-                return(mWigItemList.get(mWigItemIndex++)); // return 1st Data Block item
-            }
-            else{
-                 String result = String.format("Failed to find data for wig region (%d,%d,%d,%d)\n",
-                    mHitRegion.getStartChromID(),  mHitRegion.getStartBase(),
+                return (mWigItemList.get(mWigItemIndex++)); // return 1st Data Block item
+            } else {
+                String result = String.format("Failed to find data for wig region (%d,%d,%d,%d)\n",
+                        mHitRegion.getStartChromID(), mHitRegion.getStartBase(),
                         mHitRegion.getEndChromID(), mHitRegion.getEndBase());
                 log.error(result);
 
@@ -145,6 +150,7 @@ public class BigWigIterator implements Iterator<WigItem> {
     /*
     *   Method returns the iterator selection region.
     * */
+
     public RPChromosomeRegion getSelectionRegion() {
         return mSelectionRegion;
     }
@@ -165,15 +171,16 @@ public class BigWigIterator implements Iterator<WigItem> {
     *   Returns:
     *       number of chromosome regions found in the selection region
     * */
+
     public int setSelectionRegion(RPChromosomeRegion selectionRegion,
-                                                 boolean contained) {
+                                  boolean contained) {
         mSelectionRegion = selectionRegion;
         mIsContained = contained;
 
         // set up hit list and first data block read
         mLeafHitList = null;    // Must nullify existing hit list first!
         int hitCount = getHitRegion(selectionRegion, contained);
-        if(hitCount == 0)   // no hits - no point in fetching data
+        if (hitCount == 0)   // no hits - no point in fetching data
             throw new RuntimeException("No wig data found in the selection region");
 
         // Ready for next() data extraction
@@ -189,6 +196,7 @@ public class BigWigIterator implements Iterator<WigItem> {
     *       Boolean indicates items must be contained in selection region if true,
     *       else may intersect the selection region if false
     * */
+
     public boolean isContained() {
         return mIsContained;
     }
@@ -199,6 +207,7 @@ public class BigWigIterator implements Iterator<WigItem> {
     *   Returns:
     *       File input stream handle
     * */
+
     public SeekableStream getBBFis() {
         return mBBFis;
     }
@@ -210,6 +219,7 @@ public class BigWigIterator implements Iterator<WigItem> {
     *   Returns:
     *       B+ chromosome index tree
     * */
+
     public BPTree getChromosomeIDTree() {
         return mChromIDTree;
     }
@@ -221,6 +231,7 @@ public class BigWigIterator implements Iterator<WigItem> {
     *   Returns:
     *       R+ chromosome data locations tree
     * */
+
     public RPTree getChromosomeDataTree() {
         return mChromDataTree;
     }
@@ -240,19 +251,19 @@ public class BigWigIterator implements Iterator<WigItem> {
     *   Returns:
     *       number of R+ chromosome data hits
     * */
+
     private int getHitRegion(RPChromosomeRegion hitRegion, boolean contained) {
 
         int hitCount = 0;
 
         // check if new hit list is needed
-        if(mLeafHitList == null){
+        if (mLeafHitList == null) {
             hitCount = getHitList(hitRegion, contained);
-            if(hitCount == 0)
+            if (hitCount == 0)
                 return 0;   // no hit data found
-        }
-        else {
-            hitCount =  mLeafHitList.size() - mLeafItemIndex;
-            if(hitCount == 0)
+        } else {
+            hitCount = mLeafHitList.size() - mLeafItemIndex;
+            if (hitCount == 0)
                 return 0;   // hit list exhausted
         }
 
@@ -261,7 +272,7 @@ public class BigWigIterator implements Iterator<WigItem> {
 
         // try next item - probably intersection issue
         // Note: recursive call until a block is valid or hit list exhuasted
-        if(!mDataBlockRead)
+        if (!mDataBlockRead)
             hitCount = getHitRegion(hitRegion, contained);
 
         return hitCount;
@@ -282,26 +293,27 @@ public class BigWigIterator implements Iterator<WigItem> {
     *   Returns:
     *       number of R+ chromosome data hits
     * */
+
     private int getHitList(RPChromosomeRegion hitRegion, boolean contained) {
 
         // hit list for hit region; subject to mMaxLeafHits limitation
-         mLeafHitList = mChromDataTree.getChromosomeDataHits(hitRegion, contained);
+        mLeafHitList = mChromDataTree.getChromosomeDataHits(hitRegion, contained);
 
         // check if any leaf items were selected
         int nHits = mLeafHitList.size();
-        if(nHits == 0)
+        if (nHits == 0)
             return 0;
         else
-             mLeafItemIndex = 0;    // reset hit item index to start of list
+            mLeafItemIndex = 0;    // reset hit item index to start of list
 
         // find hit bounds from first and last hit items
         int startChromID = mLeafHitList.get(0).getChromosomeBounds().getStartChromID();
         int startBase = mLeafHitList.get(0).getChromosomeBounds().getStartBase();
-        int endChromID = mLeafHitList.get(nHits-1).getChromosomeBounds().getEndChromID();
-        int endBase = mLeafHitList.get(nHits-1).getChromosomeBounds().getEndBase();
+        int endChromID = mLeafHitList.get(nHits - 1).getChromosomeBounds().getEndChromID();
+        int endBase = mLeafHitList.get(nHits - 1).getChromosomeBounds().getEndBase();
 
         // save hit region; not currently used but useful for debug
-        mHitRegion = new  RPChromosomeRegion(startChromID, startBase, endChromID, endBase);
+        mHitRegion = new RPChromosomeRegion(startChromID, startBase, endChromID, endBase);
 
         return nHits;
     }
@@ -315,11 +327,12 @@ public class BigWigIterator implements Iterator<WigItem> {
     *   Returns:
     *       Successful Bed feature data block set up: true or false.
     * */
-    private boolean getDataBlock(int leafItemIndex){
+
+    private boolean getDataBlock(int leafItemIndex) {
 
         // check for valid data block
-        if(leafItemIndex >= mLeafHitList.size())
-                return false;
+        if (leafItemIndex >= mLeafHitList.size())
+            return false;
 
         // Perform a block read for indexed leaf item
         mLeafHitItem = mLeafHitList.get(leafItemIndex);
@@ -337,11 +350,11 @@ public class BigWigIterator implements Iterator<WigItem> {
                 uncompressBufSize);
 
         // get section Wig item list and set next index to first item
-        mWigItemList =  mWigDataBlock.getWigData(mSelectionRegion, mIsContained);
+        mWigItemList = mWigDataBlock.getWigData(mSelectionRegion, mIsContained);
         mWigItemIndex = 0;
 
         // data block items available for iterator
-        if(mWigItemList.size() > 0)
+        if (mWigItemList.size() > 0)
             return true;
         else
             return false;
