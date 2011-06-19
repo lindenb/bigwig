@@ -12,10 +12,7 @@ import org.apache.log4j.Logger;
 import org.broad.tribble.util.SeekableStream;
 import org.broad.tribble.util.SeekableFileStream;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 
 /*
@@ -77,115 +74,116 @@ public class BBFileReader {
     private static Logger log = Logger.getLogger(BBFileReader.class);
 
     // Defines the Big Binary File (BBFile) access
-    private String mBBFilePath;         // BBFile source file/pathname
-    private SeekableStream mBBFis;      // BBFile input stream handle
-    private long mFileOffset;           // file offset for next item to be read
+    private String path;         // BBFile source file/pathname
+    private SeekableStream fis;      // BBFile input stream handle
+    private long fileOffset;           // file offset for next item to be read
 
-    private BBFileHeader mBBFileHeader; // Big Binary file header
-    private int mDataCount;             // Number of data records in the file - Table BB
-    private boolean mIsLowToHigh;       // BBFile binary data format: low to high or high to low
-    private int mUncompressBufSize;     // buffer byte size for data decompression; 0 for uncompressed
+    private BBFileHeader fileHeader; // Big Binary file header
+    private int dataCount;             // Number of data records in the file - Table BB
+    private boolean isLowToHigh;       // BBFile binary data format: low to high or high to low
+    private int uncompressBufSize;     // buffer byte size for data decompression; 0 for uncompressed
 
     // AutoSQL String defines custom BigBed formats
-    private long mAutoSqlOffset;
-    private String mAutoSqlFormat;
+    private long autoSqlOffset;
+    private String autoSqlFormat;
 
     // This section defines the zoom items if zoom data exists
-    private int mZoomLevelCount;       // number of zoom levels defined
-    private long mZoomLevelOffset;      // file offset to zoom level headers
-    private BBZoomLevels mZoomLevels;   // zoom level headers and data locations
+    private int zoomLevelCount;       // number of zoom levels defined
+    private long zoomLevelOffset;      // file offset to zoom level headers
+    private BBZoomLevels zoomLevels;   // zoom level headers and data locations
 
     // Total Summary Block - file statistical info
     private long mTotalSummaryBlockOffset;
-    private BBTotalSummaryBlock mTotalSummaryBlock;
+    private BBTotalSummaryBlock totalSummaryBlock;
 
     // B+ tree
-    private long mChromIDTreeOffset; // file offset to mChromosome index B+ tree
-    private BPTree mChromosomeIDTree;     // Container for the mChromosome index B+ tree
+    private long chromIDTreeOffset; // file offset to mChromosome index B+ tree
+    private BPTree chromosomeIDTree;     // Container for the mChromosome index B+ tree
 
     // R+ tree
-    private long mChromDataTreeOffset;  // file offset to mChromosome data R+ tree
-    private RPTree mChromosomeDataTree;     // Container for the mChromosome data R+ tree
+    private long chromDataTreeOffset;  // file offset to mChromosome data R+ tree
+    private RPTree chromosomeDataTree;     // Container for the mChromosome data R+ tree
 
-    public BBFileReader(String path) {
+
+    public BBFileReader(String path) throws IOException {
+        this(path, new SeekableFileStream(new File(path)));
+
+    }
+
+    public BBFileReader(String path, SeekableStream stream) {
+
+
         log.info("Opening BBFile source  " + path);
-        mBBFilePath = path;
+        this.path = path;
+        fis = stream;
 
-        // Verify the path
-        try {
-            mBBFis = new SeekableFileStream(new File(path));
+        // read in file header
+        fileOffset = BBFILE_HEADER_OFFSET;
+        fileHeader = new BBFileHeader(path, fis, fileOffset);
+        fileHeader.print();
 
-            // read in file header
-            mFileOffset = BBFILE_HEADER_OFFSET;
-            mBBFileHeader = new BBFileHeader(path, mBBFis, mFileOffset);
-            mBBFileHeader.print();
-
-            if (!mBBFileHeader.isHeaderOK()) {
-                log.error("BBFile header is unrecognized type, header magic = " +
-                        mBBFileHeader.getMagic());
-                throw new RuntimeException("Error reading BBFile header for: " + path);
-            }
-
-            // get data characteristics
-            mIsLowToHigh = mBBFileHeader.isLowToHigh();
-            mUncompressBufSize = mBBFileHeader.getUncompressBuffSize();
-
-            // update file offset past BBFile header
-            mFileOffset += BBFileHeader.BBFILE_HEADER_SIZE;
-
-            // get zoom level count from file header
-            mZoomLevelCount = mBBFileHeader.getZoomLevels();
-
-            // extract zoom level headers and zoom data records
-            // Note: zoom headers Table D immediately follow the BBFile Header
-            if (mZoomLevelCount > 0) {
-
-                mZoomLevelOffset = mFileOffset;
-
-                mZoomLevels = new BBZoomLevels(mBBFis, mZoomLevelOffset, mZoomLevelCount,
-                        mIsLowToHigh, mUncompressBufSize);
-
-                // end of zoom level headers - compare with next BBFile item location
-                mFileOffset += mZoomLevelCount * BBZoomLevelHeader.ZOOM_LEVEL_HEADER_SIZE;
-            }
-
-            // get the AutoSQL custom BigBed fields
-            mAutoSqlOffset = mBBFileHeader.getAutoSqlOffset();
-            if (mAutoSqlOffset != 0) {
-                // read in .as entry
-                // mFileOffset = mAutoSqlOffset + sizeof(.as format field);
-            }
-
-            // get the Total Summary Block (Table DD)
-            mFileOffset = mBBFileHeader.getTotalSummaryOffset();
-            if (mBBFileHeader.getVersion() >= 2 && mFileOffset > 0) {
-                mTotalSummaryBlock = new BBTotalSummaryBlock(mBBFis, mFileOffset, mIsLowToHigh);
-                mFileOffset += BBTotalSummaryBlock.TOTAL_SUMMARY_BLOCK_SIZE;
-            }
-
-            // get Chromosome Data B+ Tree (Table E, F, G, H) : should always exist
-            mChromIDTreeOffset = mBBFileHeader.getChromosomeTreeOffset();
-            if (mChromIDTreeOffset != 0) {
-                mFileOffset = mChromIDTreeOffset;
-                mChromosomeIDTree = new BPTree(mBBFis, mFileOffset, mIsLowToHigh);
-            }
-
-            // get number of data records indexed by the R+ chromosome data location tree
-            mFileOffset = mBBFileHeader.getFullDataOffset();
-            mDataCount = getDataCount(mBBFis, mFileOffset);
-
-            // get R+ chromosome data location tree (Tables K, L, M, N)
-            mChromDataTreeOffset = mBBFileHeader.getFullIndexOffset();
-            if (mChromDataTreeOffset != 0) {
-                mFileOffset = mChromDataTreeOffset;
-                mChromosomeDataTree = new RPTree(mBBFis, mFileOffset, mIsLowToHigh,
-                        mUncompressBufSize);
-            }
-
-        } catch (IOException ex) {
-            log.error("Error reading BBFile: " + path, ex);
-            throw new RuntimeException("Error reading BBFile: " + path, ex);
+        if (!fileHeader.isHeaderOK()) {
+            log.error("BBFile header is unrecognized type, header magic = " +
+                    fileHeader.getMagic());
+            throw new RuntimeException("Error reading BBFile header for: " + path);
         }
+
+        // get data characteristics
+        isLowToHigh = fileHeader.isLowToHigh();
+        uncompressBufSize = fileHeader.getUncompressBuffSize();
+
+        // update file offset past BBFile header
+        fileOffset += BBFileHeader.BBFILE_HEADER_SIZE;
+
+        // get zoom level count from file header
+        zoomLevelCount = fileHeader.getZoomLevels();
+
+        // extract zoom level headers and zoom data records
+        // Note: zoom headers Table D immediately follow the BBFile Header
+        if (zoomLevelCount > 0) {
+
+            zoomLevelOffset = fileOffset;
+
+            zoomLevels = new BBZoomLevels(fis, zoomLevelOffset, zoomLevelCount,
+                    isLowToHigh, uncompressBufSize);
+
+            // end of zoom level headers - compare with next BBFile item location
+            fileOffset += zoomLevelCount * BBZoomLevelHeader.ZOOM_LEVEL_HEADER_SIZE;
+        }
+
+        // get the AutoSQL custom BigBed fields
+        autoSqlOffset = fileHeader.getAutoSqlOffset();
+        if (autoSqlOffset != 0) {
+            // read in .as entry
+            // mFileOffset = mAutoSqlOffset + sizeof(.as format field);
+        }
+
+        // get the Total Summary Block (Table DD)
+        fileOffset = fileHeader.getTotalSummaryOffset();
+        if (fileHeader.getVersion() >= 2 && fileOffset > 0) {
+            totalSummaryBlock = new BBTotalSummaryBlock(fis, fileOffset, isLowToHigh);
+            fileOffset += BBTotalSummaryBlock.TOTAL_SUMMARY_BLOCK_SIZE;
+        }
+
+        // get Chromosome Data B+ Tree (Table E, F, G, H) : should always exist
+        chromIDTreeOffset = fileHeader.getChromosomeTreeOffset();
+        if (chromIDTreeOffset != 0) {
+            fileOffset = chromIDTreeOffset;
+            chromosomeIDTree = new BPTree(fis, fileOffset, isLowToHigh);
+        }
+
+        // get number of data records indexed by the R+ chromosome data location tree
+        fileOffset = fileHeader.getFullDataOffset();
+        dataCount = getDataCount(fis, fileOffset);
+
+        // get R+ chromosome data location tree (Tables K, L, M, N)
+        chromDataTreeOffset = fileHeader.getFullIndexOffset();
+        if (chromDataTreeOffset != 0) {
+            fileOffset = chromDataTreeOffset;
+            chromosomeDataTree = new RPTree(fis, fileOffset, isLowToHigh,
+                    uncompressBufSize);
+        }
+
 
     }
 
@@ -197,7 +195,7 @@ public class BBFileReader {
     * */
 
     public String getBBFilePath() {
-        return mBBFilePath;
+        return path;
     }
 
     /*
@@ -208,7 +206,7 @@ public class BBFileReader {
     * */
 
     public SeekableStream getBBFis() {
-        return mBBFis;
+        return fis;
     }
 
     /*
@@ -220,7 +218,7 @@ public class BBFileReader {
     * */
 
     public BBFileHeader getBBFileHeader() {
-        return mBBFileHeader;
+        return fileHeader;
     }
 
     /*
@@ -232,7 +230,7 @@ public class BBFileReader {
     * */
 
     public boolean isBigBedFile() {
-        return mBBFileHeader.isBigBed();
+        return fileHeader.isBigBed();
     }
 
     /*
@@ -244,7 +242,7 @@ public class BBFileReader {
     * */
 
     public boolean isBigWigFile() {
-        return mBBFileHeader.isBigWig();
+        return fileHeader.isBigWig();
     }
 
     /*
@@ -257,7 +255,7 @@ public class BBFileReader {
     * */
 
     public int getDataCount() {
-        return mDataCount;
+        return dataCount;
     }
 
     /*
@@ -270,7 +268,7 @@ public class BBFileReader {
     * */
 
     public long getChromosomeNameCount() {
-        return mChromosomeIDTree.getItemCount();
+        return chromosomeIDTree.getItemCount();
     }
 
     /*
@@ -283,7 +281,7 @@ public class BBFileReader {
     * */
 
     public long getChromosomeRegionCount() {
-        return mChromosomeDataTree.getItemCount();
+        return chromosomeDataTree.getItemCount();
     }
 
     /*
@@ -294,7 +292,7 @@ public class BBFileReader {
    * */
 
     public int getDecompressionBufSize() {
-        return mUncompressBufSize;
+        return uncompressBufSize;
     }
 
     /*
@@ -308,7 +306,7 @@ public class BBFileReader {
     * */
 
     public boolean isLowToHigh() {
-        return mIsLowToHigh;
+        return isLowToHigh;
     }
 
     /*
@@ -319,7 +317,7 @@ public class BBFileReader {
     * */
 
     public BBTotalSummaryBlock getTotalSummaryBlock() {
-        return mTotalSummaryBlock;
+        return totalSummaryBlock;
     }
 
     /*
@@ -330,7 +328,7 @@ public class BBFileReader {
     * */
 
     public BPTree getChromosomeIDTree() {
-        return mChromosomeIDTree;
+        return chromosomeIDTree;
     }
 
     /*
@@ -341,7 +339,7 @@ public class BBFileReader {
     * */
 
     public RPTree getChromosomeDataTree() {
-        return mChromosomeDataTree;
+        return chromosomeDataTree;
     }
 
     /*
@@ -352,7 +350,7 @@ public class BBFileReader {
     * */
 
     public int getZoomLevelCount() {
-        return mZoomLevelCount;
+        return zoomLevelCount;
     }
 
     /*
@@ -364,7 +362,7 @@ public class BBFileReader {
     * */
 
     public BBZoomLevels getZoomLevels() {
-        return mZoomLevels;
+        return zoomLevels;
     }
 
     /*
@@ -383,7 +381,7 @@ public class BBFileReader {
                                                  int endChromID) {
 
         RPChromosomeRegion chromosomeBounds =
-                mZoomLevels.getZoomLevelRPTree(zoomLevel).getChromosomeRegion(startChromID, endChromID);
+                zoomLevels.getZoomLevelRPTree(zoomLevel).getChromosomeRegion(startChromID, endChromID);
 
         return chromosomeBounds;
     }
@@ -401,7 +399,7 @@ public class BBFileReader {
     public RPChromosomeRegion getZoomLevelBounds(int zoomLevel) {
 
         RPChromosomeRegion chromosomeBounds =
-                mZoomLevels.getZoomLevelRPTree(zoomLevel).getChromosomeBounds();
+                zoomLevels.getZoomLevelRPTree(zoomLevel).getChromosomeBounds();
 
         return chromosomeBounds;
     }
@@ -418,7 +416,7 @@ public class BBFileReader {
 
     public int getZoomLevelRecordCount(int zoomLevel) {
 
-        return mZoomLevels.getZoomLevelFormats().get(zoomLevel - 1).getZoomRecordCount();
+        return zoomLevels.getZoomLevelFormats().get(zoomLevel - 1).getZoomRecordCount();
     }
 
     /*
@@ -430,7 +428,7 @@ public class BBFileReader {
 
     public String getChromosomeName(int chromID) {
 
-        String chromosomeName = mChromosomeIDTree.getChromosomeName(chromID);
+        String chromosomeName = chromosomeIDTree.getChromosomeName(chromID);
         return chromosomeName;
     }
 
@@ -443,7 +441,7 @@ public class BBFileReader {
 
     public ArrayList<String> getChromosomeNames() {
 
-        ArrayList<String> chromosomeList = mChromosomeIDTree.getChromosomeNames();
+        ArrayList<String> chromosomeList = chromosomeIDTree.getChromosomeNames();
         return chromosomeList;
     }
 
@@ -461,7 +459,7 @@ public class BBFileReader {
 
     public int getChromosomeID(String chromosomeKey) {
 
-        int chromosomeID = mChromosomeIDTree.getChromosomeID(chromosomeKey);
+        int chromosomeID = chromosomeIDTree.getChromosomeID(chromosomeKey);
 
         return chromosomeID;
     }
@@ -480,7 +478,7 @@ public class BBFileReader {
     public RPChromosomeRegion getChromosomeBounds(int startChromID, int endChromID) {
 
         RPChromosomeRegion chromosomeBounds =
-                mChromosomeDataTree.getChromosomeRegion(startChromID, endChromID);
+                chromosomeDataTree.getChromosomeRegion(startChromID, endChromID);
 
         return chromosomeBounds;
     }
@@ -494,7 +492,7 @@ public class BBFileReader {
 
     public RPChromosomeRegion getChromosomeBounds() {
 
-        RPChromosomeRegion chromosomeBounds = mChromosomeDataTree.getChromosomeBounds();
+        RPChromosomeRegion chromosomeBounds = chromosomeDataTree.getChromosomeBounds();
 
         return chromosomeBounds;
     }
@@ -508,7 +506,7 @@ public class BBFileReader {
 
     public ArrayList<RPChromosomeRegion> getChromosomeRegions() {
 
-        ArrayList<RPChromosomeRegion> regionList = mChromosomeDataTree.getAllChromosomeRegions();
+        ArrayList<RPChromosomeRegion> regionList = chromosomeDataTree.getAllChromosomeRegions();
 
         return regionList;
     }
@@ -525,7 +523,7 @@ public class BBFileReader {
     public ArrayList<RPChromosomeRegion> getZoomLevelRegions(int zoomLevel) {
 
         ArrayList<RPChromosomeRegion> regionList =
-                mZoomLevels.getZoomLevelRPTree(zoomLevel).getAllChromosomeRegions();
+                zoomLevels.getZoomLevelRPTree(zoomLevel).getAllChromosomeRegions();
 
         return regionList;
     }
@@ -564,7 +562,7 @@ public class BBFileReader {
             throw new RuntimeException("Error finding BigBedIterator region: chromosome not found \n");
 
         // compose an iterator
-        BigBedIterator bedIterator = new BigBedIterator(mBBFis, mChromosomeIDTree, mChromosomeDataTree,
+        BigBedIterator bedIterator = new BigBedIterator(fis, chromosomeIDTree, chromosomeDataTree,
                 selectionRegion, contained);
 
         return bedIterator;
@@ -587,11 +585,11 @@ public class BBFileReader {
             return null;
 
         // get all region bounds
-        RPChromosomeRegion selectionRegion = mChromosomeDataTree.getChromosomeBounds();
+        RPChromosomeRegion selectionRegion = chromosomeDataTree.getChromosomeBounds();
 
         // compose an iterator
         boolean contained = true;   /// all regions are contained
-        BigBedIterator bedIterator = new BigBedIterator(mBBFis, mChromosomeIDTree, mChromosomeDataTree,
+        BigBedIterator bedIterator = new BigBedIterator(fis, chromosomeIDTree, chromosomeDataTree,
                 selectionRegion, contained);
 
         return bedIterator;
@@ -623,7 +621,7 @@ public class BBFileReader {
             return null;
 
         // compose an iterator
-        BigBedIterator bedIterator = new BigBedIterator(mBBFis, mChromosomeIDTree, mChromosomeDataTree,
+        BigBedIterator bedIterator = new BigBedIterator(fis, chromosomeIDTree, chromosomeDataTree,
                 selectionRegion, contained);
 
         return bedIterator;
@@ -663,7 +661,7 @@ public class BBFileReader {
             throw new RuntimeException("Error finding BigWigIterator region: chromosome not found \n");
 
         // compose an iterator
-        BigWigIterator wigIterator = new BigWigIterator(mBBFis, mChromosomeIDTree, mChromosomeDataTree,
+        BigWigIterator wigIterator = new BigWigIterator(fis, chromosomeIDTree, chromosomeDataTree,
                 selectionRegion, contained);
 
         return wigIterator;
@@ -686,11 +684,11 @@ public class BBFileReader {
             return null;
 
         // get all regions bounds
-        RPChromosomeRegion selectionRegion = mChromosomeDataTree.getChromosomeBounds();
+        RPChromosomeRegion selectionRegion = chromosomeDataTree.getChromosomeBounds();
 
         // compose an iterator
         boolean contained = true;       // all regions are contained
-        BigWigIterator wigIterator = new BigWigIterator(mBBFis, mChromosomeIDTree, mChromosomeDataTree,
+        BigWigIterator wigIterator = new BigWigIterator(fis, chromosomeIDTree, chromosomeDataTree,
                 selectionRegion, contained);
 
         return wigIterator;
@@ -722,7 +720,7 @@ public class BBFileReader {
             return null;
 
         // compose an iterator
-        BigWigIterator wigIterator = new BigWigIterator(mBBFis, mChromosomeIDTree, mChromosomeDataTree,
+        BigWigIterator wigIterator = new BigWigIterator(fis, chromosomeIDTree, chromosomeDataTree,
                 selectionRegion, contained);
 
         return wigIterator;
@@ -750,11 +748,11 @@ public class BBFileReader {
     public ZoomLevelIterator getZoomLevelIterator(int zoomLevel, String startChromosome, int startBase,
                                                   String endChromosome, int endBase, boolean contained) {
         // check for valid zoom level
-        if (zoomLevel < 1 || zoomLevel > mZoomLevelCount)
+        if (zoomLevel < 1 || zoomLevel > zoomLevelCount)
             throw new RuntimeException("Error: ZoomLevelIterator zoom level is out of range\n");
 
         // get the appropriate zoom level R+ zoom data index tree
-        RPTree zoomDataTree = mZoomLevels.getZoomLevelRPTree(zoomLevel);
+        RPTree zoomDataTree = zoomLevels.getZoomLevelRPTree(zoomLevel);
 
         // go from chromosome names to chromosome ID region
         RPChromosomeRegion selectionRegion = getChromosomeBounds(startChromosome, startBase,
@@ -765,7 +763,7 @@ public class BBFileReader {
             throw new RuntimeException("Error: ZoomLevelIterator selection region is null\n");
 
         /// compose an iterator
-        ZoomLevelIterator zoomIterator = new ZoomLevelIterator(mBBFis, mChromosomeIDTree,
+        ZoomLevelIterator zoomIterator = new ZoomLevelIterator(fis, chromosomeIDTree,
                 zoomDataTree, zoomLevel, selectionRegion, contained);
 
         return zoomIterator;
@@ -787,18 +785,18 @@ public class BBFileReader {
     public ZoomLevelIterator getZoomLevelIterator(int zoomLevel) {
 
         // check for valid zoom level
-        if (zoomLevel < 1 || zoomLevel > mZoomLevelCount)
+        if (zoomLevel < 1 || zoomLevel > zoomLevelCount)
             throw new RuntimeException("Error: ZoomLevelIterator zoom level is out of range\n");
 
         // get the appropriate zoom level R+ zoom data index tree
-        RPTree zoomDataTree = mZoomLevels.getZoomLevelRPTree(zoomLevel);
+        RPTree zoomDataTree = zoomLevels.getZoomLevelRPTree(zoomLevel);
 
         // get all regions bounds
         RPChromosomeRegion selectionRegion = zoomDataTree.getChromosomeBounds();
 
         // compose an iterator
         boolean contained = true;   //all regions are contained
-        ZoomLevelIterator zoomIterator = new ZoomLevelIterator(mBBFis, mChromosomeIDTree,
+        ZoomLevelIterator zoomIterator = new ZoomLevelIterator(fis, chromosomeIDTree,
                 zoomDataTree, zoomLevel, selectionRegion, contained);
 
         return zoomIterator;
@@ -827,14 +825,14 @@ public class BBFileReader {
     public ZoomLevelIterator getZoomLevelIterator(int zoomLevel, RPChromosomeRegion selectionRegion,
                                                   boolean contained) {
         // check for valid zoom level
-        if (zoomLevel < 1 || zoomLevel > mZoomLevelCount)
+        if (zoomLevel < 1 || zoomLevel > zoomLevelCount)
             throw new RuntimeException("Error: ZoomLevelIterator zoom level is out of range\n");
 
         // get the appropriate zoom level R+ zoom data index tree
-        RPTree zoomDataTree = mZoomLevels.getZoomLevelRPTree(zoomLevel);
+        RPTree zoomDataTree = zoomLevels.getZoomLevelRPTree(zoomLevel);
 
         /// compose an iterator
-        ZoomLevelIterator zoomIterator = new ZoomLevelIterator(mBBFis, mChromosomeIDTree,
+        ZoomLevelIterator zoomIterator = new ZoomLevelIterator(fis, chromosomeIDTree,
                 zoomDataTree, zoomLevel, selectionRegion, contained);
 
         return zoomIterator;
@@ -861,13 +859,13 @@ public class BBFileReader {
                                                    String endChromosome, int endBase) {
 
         // find the chromosome ID's using the name to get a valid name key, then associated ID
-        String startChromKey = mChromosomeIDTree.getChromosomeKey(startChromosome);
-        int startChromID = mChromosomeIDTree.getChromosomeID(startChromKey);
+        String startChromKey = chromosomeIDTree.getChromosomeKey(startChromosome);
+        int startChromID = chromosomeIDTree.getChromosomeID(startChromKey);
         if (startChromID < 0)       // mChromosome not in data?
             return null;
 
-        String endChromKey = mChromosomeIDTree.getChromosomeKey(endChromosome);
-        int endChromID = mChromosomeIDTree.getChromosomeID(endChromKey);
+        String endChromKey = chromosomeIDTree.getChromosomeKey(endChromosome);
+        int endChromID = chromosomeIDTree.getChromosomeID(endChromKey);
         if (endChromID < 0)       // mChromosome not in data?
             return null;
 
@@ -899,12 +897,12 @@ public class BBFileReader {
 
         try {
             // read dataCount into a buffer
-            mBBFis.seek(fileOffset);
-            bytesRead = mBBFis.read(buffer);
+            this.fis.seek(fileOffset);
+            bytesRead = this.fis.read(buffer);
 
             // decode data count with proper byte stream reader
             // first assume byte order is low to high
-            if (mIsLowToHigh) {
+            if (isLowToHigh) {
                 lbdis = new LittleEndianInputStream(new ByteArrayInputStream(buffer));
                 dataCount = lbdis.readInt();
             } else {
