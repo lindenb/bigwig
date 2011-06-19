@@ -18,6 +18,9 @@ public class ZoomLevelIterator {
 
     private static Logger log = Logger.getLogger(ZoomDataBlock.class);
 
+
+    private boolean empty = false;
+
     // zoom level for zoom data
     private int mZoomLevel;
 
@@ -83,8 +86,9 @@ public class ZoomLevelIterator {
 
         // set up hit list and read in the first data block
         int hitCount = getHitRegion(selectionRegion, contained);
-        if (hitCount == 0)   // no hits - no point in fetching data
-            throw new RuntimeException("No zoom data found in the selection region");
+        if (hitCount == 0) {
+            empty = true;
+        }
 
         // Ready for next() data extraction
     }
@@ -100,6 +104,9 @@ public class ZoomLevelIterator {
      * */
 
     public boolean hasNext() {
+
+        if (empty)
+            return false;
 
         // first check if current data block can be read for next
         if (mZoomRecordIndex < mZoomRecordList.size())
