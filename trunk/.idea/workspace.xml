@@ -5,8 +5,8 @@
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/org/broad/tribble" />
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/org/broad/tribble/util" />
     </list>
-    <ignored path="bbfile.iws" />
     <ignored path=".idea/workspace.xml" />
+    <ignored path="bbfile.iws" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,20 +23,7 @@
   </component>
   <component name="DebuggerManager">
     <line_breakpoints>
-      <breakpoint url="file://$PROJECT_DIR$/test/src/org/broad/igv/bbfile/BWCoverageTest.java" line="73" class="org.broad.igv.bbfile.BWCoverageTest" package="org.broad.igv.bbfile">
-        <option name="ENABLED" value="true" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BBFileReader.java" line="144" class="org.broad.igv.bbfile.BBFileReader" package="org.broad.igv.bbfile">
+      <breakpoint url="file://$PROJECT_DIR$/test/src/org/broad/igv/bbfile/BWCoverageTest.java" line="75" class="org.broad.igv.bbfile.BWCoverageTest" package="org.broad.igv.bbfile">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -91,64 +78,19 @@
   <component name="FileColors" enabled="true" enabledForTabs="true" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="BBFileReader.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BBFileReader.java">
+      <file leaf-file-name="BigWigSection.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BigWigSection.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="144" column="0" selection-start="5769" selection-end="5769" vertical-scroll-proportion="0.0">
+            <state line="209" column="41" selection-start="8812" selection-end="8812" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BBFileReaderMain.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BBFileReaderMain.java">
+      <file leaf-file-name="SeekableFileStream.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/broad/tribble/util/SeekableFileStream.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="13" selection-start="206" selection-end="206" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BBTotalSummaryBlock.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BBTotalSummaryBlock.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="56" column="12" selection-start="1898" selection-end="1898" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BigWigIterator.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BigWigIterator.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="96" column="39" selection-start="4108" selection-end="4108" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BBZoomLevelFormat.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BBZoomLevelFormat.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="50" column="20" selection-start="1858" selection-end="1858" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BBZoomLevelHeader.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BBZoomLevelHeader.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="133" column="26" selection-start="3846" selection-end="3864" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BBZoomLevels.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BBZoomLevels.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="67" column="22" selection-start="2449" selection-end="2449" vertical-scroll-proportion="0.0">
+            <state line="32" column="13" selection-start="1401" selection-end="1401" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -157,25 +99,70 @@
       <file leaf-file-name="BWCoverageTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test/src/org/broad/igv/bbfile/BWCoverageTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="69" column="21" selection-start="2219" selection-end="2224" vertical-scroll-proportion="0.0">
+            <state line="80" column="0" selection-start="2313" selection-end="2495" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ZoomDataRecord.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/ZoomDataRecord.java">
+      <file leaf-file-name="BBFileReader.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BBFileReader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="92" column="30" selection-start="3021" selection-end="3021" vertical-scroll-proportion="0.0">
+            <state line="116" column="32" selection-start="4582" selection-end="4582" vertical-scroll-proportion="0.025815217">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BBFileHeader.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="VarStepTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/src/org/broad/igv/bbfile/VarStepTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="19" column="40" selection-start="443" selection-end="443" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BBFileHeader.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BBFileHeader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="142" column="8" selection-start="5238" selection-end="5238" vertical-scroll-proportion="1.4612452">
+            <state line="43" column="4" selection-start="1369" selection-end="1369" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BBFileReaderTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/src/org/broad/igv/bbfile/BBFileReaderTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="67" column="0" selection-start="2024" selection-end="2024" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BPTree.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BPTree.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="104" column="55" selection-start="4303" selection-end="4303" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BPTreeHeader.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BPTreeHeader.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="163" column="44" selection-start="4967" selection-end="4967" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BPTreeLeafNodeItem.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BPTreeLeafNodeItem.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="35" column="18" selection-start="1158" selection-end="1158" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -191,21 +178,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/org/broad/igv/bbfile/BBFileReaderTest.java" />
-        <option value="$PROJECT_DIR$/src/org/broad/tribble/util/SeekableStream.java" />
-        <option value="$PROJECT_DIR$/src/org/broad/tribble/util/SeekableFileStream.java" />
-        <option value="$PROJECT_DIR$/src/org/broad/tribble/util/LittleEndianInputStream.java" />
-        <option value="$PROJECT_DIR$/test/org/broad/igv/bbflie/BBFileReaderTest.java" />
-        <option value="$PROJECT_DIR$/test/src/org/broad/igv/bbfile/BBFileReaderTest.java" />
-        <option value="$PROJECT_DIR$/test/src/org/broad/igv/bbfile/VarStepTest.java" />
-        <option value="$PROJECT_DIR$/src/org/broad/igv/bbfile/BPTree.java" />
-        <option value="$PROJECT_DIR$/src/org/broad/igv/bbfile/BBFileReader.java" />
-        <option value="$PROJECT_DIR$/src/org/broad/igv/bbfile/BBZoomLevelFormat.java" />
-        <option value="$PROJECT_DIR$/test/src/org/broad/igv/bbfile/BWCoverageTest.java" />
-        <option value="$PROJECT_DIR$/src/org/broad/igv/bbfile/BBFileHeader.java" />
-        <option value="$PROJECT_DIR$/src/org/broad/igv/bbfile/BBTotalSummaryBlock.java" />
         <option value="$PROJECT_DIR$/src/org/broad/igv/bbfile/ZoomDataRecord.java" />
+        <option value="$PROJECT_DIR$/src/org/broad/igv/bbfile/BBTotalSummaryBlock.java" />
+        <option value="$PROJECT_DIR$/src/org/broad/igv/bbfile/BBZoomLevelFormat.java" />
         <option value="$PROJECT_DIR$/src/org/broad/igv/bbfile/BBZoomLevelHeader.java" />
+        <option value="$PROJECT_DIR$/src/org/broad/igv/bbfile/BBZoomLevels.java" />
+        <option value="$PROJECT_DIR$/src/org/broad/igv/bbfile/BedFeature.java" />
+        <option value="$PROJECT_DIR$/src/org/broad/igv/bbfile/BigBedDataBlock.java" />
+        <option value="$PROJECT_DIR$/src/org/broad/igv/bbfile/WigItem.java" />
+        <option value="$PROJECT_DIR$/src/org/broad/igv/bbfile/BPTreeLeafNodeItem.java" />
+        <option value="$PROJECT_DIR$/src/org/broad/igv/bbfile/BPTreeHeader.java" />
+        <option value="$PROJECT_DIR$/src/org/broad/igv/bbfile/BPTree.java" />
+        <option value="$PROJECT_DIR$/src/org/broad/igv/bbfile/BBFileHeader.java" />
+        <option value="$PROJECT_DIR$/test/src/org/broad/igv/bbfile/BBFileReaderTest.java" />
+        <option value="$PROJECT_DIR$/test/src/org/broad/igv/bbfile/BWCoverageTest.java" />
+        <option value="$PROJECT_DIR$/test/src/org/broad/igv/bbfile/VarStepTest.java" />
+        <option value="$PROJECT_DIR$/src/org/broad/igv/bbfile/BBFileReader.java" />
       </list>
     </option>
   </component>
@@ -246,8 +234,8 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Favorites" />
       <pane id="Scope" />
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -263,46 +251,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="bigwig" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="bigwig" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="bigwig" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="test" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="bbfile" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="bigwig" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="bigwig" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="test" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="data" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -348,7 +296,7 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Favorites" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -370,13 +318,14 @@
   </component>
   <component name="RecentsManager">
     <key name="IntroduceConstantDialog.RECENTS_KEY">
+      <recent name="org.broad.igv.bbfile.BBFileReaderTest" />
       <recent name="org.broad.igv.bbfile.BWCoverageTest" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/test" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.BWCoverageTest.test">
+  <component name="RunManager" selected="JUnit.BWCoverageTest">
     <configuration default="false" name="BBFileReaderTest" type="JUnit" factoryName="JUnit" temporary="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
         <pattern>
@@ -496,7 +445,13 @@
         <value defaultName="moduleWithDependencies" />
       </option>
       <envs />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="64865" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Debug" />
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
@@ -704,27 +659,27 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="32" y="22" width="1550" height="956" extended-state="0" />
+    <frame x="119" y="79" width="1481" height="905" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3277512" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.47129187" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3277512" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32611465" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.31179214" sideWeight="0.33133972" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28631285" sideWeight="0.35414013" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="JProfiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.31179214" sideWeight="0.6602871" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28631285" sideWeight="0.6369427" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="DB Browser" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.35885167" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.35796177" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3277512" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -765,112 +720,88 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BPTree.java">
+    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BBZoomLevelHeader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="196" column="66" selection-start="6632" selection-end="6632" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/src/org/broad/igv/bbfile/BBFileReaderTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="23" selection-start="399" selection-end="411" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/ZoomDataBlock.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="13" selection-start="576" selection-end="576" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/ZoomLevelIterator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="116" column="25" selection-start="4662" selection-end="4676" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BBCompressionUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="13" selection-start="1614" selection-end="1614" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BBFileBinaryOutput.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="13" selection-start="321" selection-end="321" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BBFileReaderMain.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="13" selection-start="206" selection-end="206" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BBZoomLevelFormat.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="50" column="20" selection-start="1858" selection-end="1858" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BBFileReader.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="144" column="0" selection-start="5769" selection-end="5769" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="39" column="28" selection-start="1280" selection-end="1291" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BBZoomLevels.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="67" column="22" selection-start="2449" selection-end="2449" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="45" column="45" selection-start="1526" selection-end="1541" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BBTotalSummaryBlock.java">
+    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BedFeature.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="56" column="12" selection-start="1898" selection-end="1898" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="56" column="31" selection-start="2198" selection-end="2210" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BigWigIterator.java">
+    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BigBedDataBlock.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="96" column="39" selection-start="4108" selection-end="4108" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="48" column="30" selection-start="1905" selection-end="1919" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/ZoomDataRecord.java">
+    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/ZoomDataBlock.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="92" column="30" selection-start="3021" selection-end="3021" vertical-scroll-proportion="0.0">
+        <state line="22" column="13" selection-start="576" selection-end="576" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/WigItem.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="21" column="14" selection-start="645" selection-end="652" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BigWigSection.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="209" column="41" selection-start="8812" selection-end="8812" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/broad/tribble/util/SeekableFileStream.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="32" column="13" selection-start="1401" selection-end="1401" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BBFileHeader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="43" column="4" selection-start="1369" selection-end="1369" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/src/org/broad/igv/bbfile/BBFileReaderTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="67" column="0" selection-start="2024" selection-end="2024" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BPTree.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="104" column="55" selection-start="4303" selection-end="4303" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BPTreeHeader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="163" column="44" selection-start="4967" selection-end="4967" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BPTreeLeafNodeItem.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="35" column="18" selection-start="1158" selection-end="1158" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/src/org/broad/igv/bbfile/VarStepTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="40" selection-start="443" selection-end="443" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/src/org/broad/igv/bbfile/BWCoverageTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="69" column="21" selection-start="2219" selection-end="2224" vertical-scroll-proportion="0.0">
+        <state line="80" column="0" selection-start="2313" selection-end="2495" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BBZoomLevelHeader.java">
+    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BBFileReader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="133" column="26" selection-start="3846" selection-end="3864" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/broad/igv/bbfile/BBFileHeader.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="142" column="8" selection-start="5238" selection-end="5238" vertical-scroll-proportion="1.4612452">
+        <state line="116" column="32" selection-start="4582" selection-end="4582" vertical-scroll-proportion="0.025815217">
           <folding />
         </state>
       </provider>
