@@ -48,53 +48,53 @@ public class BedFeature {
 
     private static Logger log = Logger.getLogger(BedFeature.class);
 
-    private int mItemIndex;     // data record index
+    private int itemIndex;     // data record index
 
     // BBFile Table I - BigBed data format
-    private String mChromosome;      // mChromosome/contig name
-    private int mStartBase;         // starting base for item
-    private int mEndBase;           // ending base for item
-    private String mRestOfFields;    // string containing custom fields
+    private String chromosome;      // mChromosome/contig name
+    private int startBase;         // starting base for item
+    private int endBase;           // ending base for item
+    private String restOfFields;    // string containing custom fields
 
     public BedFeature(int itemIndex, String chromosome, int startBase, int endBase, String restOfFileds){
 
-       mItemIndex = itemIndex;
-       mChromosome =  chromosome;
-       mStartBase =  startBase;
-       mEndBase = endBase;
-       mRestOfFields = restOfFileds;
+       this.itemIndex = itemIndex;
+       this.chromosome =  chromosome;
+       this.startBase =  startBase;
+       this.endBase = endBase;
+       restOfFields = restOfFileds;
    }
 
    // returns the data record index
    public int getItemIndex() {
-       return mItemIndex;
+       return itemIndex;
    }
 
    // returns the mChromosome ID (0, 1, etc.)
    public String getChromosome() {
-       return mChromosome;
+       return chromosome;
    }
 
    // returns the mChromosome mStartBase base position
    public int getStartBase(){
-       return mStartBase;
+       return startBase;
    }
 
    // returns the mChromosome mEndBase base position
    public int getEndBase() {
-       return mEndBase;
+       return endBase;
    }
 
     public String getRestOfFields(){
-        return mRestOfFields;
+        return restOfFields;
     }
 
    public void print(){
 
-       log.info("BigBed feature item " + mItemIndex);
-       log.info("mChromosome name: " + mChromosome);
-       log.info("mChromosome start base= " + mStartBase);
-       log.info("mChromosome end base = " + mEndBase);
-       log.info("Rest of fields: \n" + mRestOfFields);
+       log.info("BigBed feature item " + itemIndex);
+       log.info("mChromosome name: " + chromosome);
+       log.info("mChromosome start base= " + startBase);
+       log.info("mChromosome end base = " + endBase);
+       log.info("Rest of fields: \n" + restOfFields);
    }
 }

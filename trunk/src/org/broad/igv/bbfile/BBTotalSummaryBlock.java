@@ -26,15 +26,15 @@ public class BBTotalSummaryBlock {
     public static final int TOTAL_SUMMARY_BLOCK_SIZE = 40;
 
     // defines the R+ Tree access
-    private SeekableStream mBBFis;      // BBFile handle
-    private long mSummaryBlockOffset;   // file offset to TotalSummaryBlock
+    private SeekableStream fis;      // BBFile handle
+    private long summaryBlockOffset;   // file offset to TotalSummaryBlock
 
     // File data statistics for calculating mean and standard deviation
-    private long mBasesCovered;     // number of bases with data
-    private float mMinVal;          // minimum value for file data
-    private float mMaxVal;          // maximum value for file data
-    private float mSumData;         // sum of all squares of file data values
-    private float mSumSquares;      // sum of all squares of file data values
+    private long basesCovered;     // number of bases with data
+    private float minVal;          // minimum value for file data
+    private float maxVal;          // maximum value for file data
+    private float sumData;         // sum of all squares of file data values
+    private float sumSquares;      // sum of all squares of file data values
 
     /*
    *   Constructor for reading in TotalSummaryBlock from BBFile
@@ -54,13 +54,13 @@ public class BBTotalSummaryBlock {
         int bytesRead;
 
         // save the seekable file handle  and B+ Tree file offset
-        mBBFis = fis;
-        mSummaryBlockOffset = fileOffset;
+        this.fis = fis;
+        summaryBlockOffset = fileOffset;
 
         try {
             // Read TotalSummaryBlock header into a buffer
-            mBBFis.seek(fileOffset);
-            bytesRead = mBBFis.read(buffer);
+            this.fis.seek(fileOffset);
+            bytesRead = this.fis.read(buffer);
 
             // decode header
             if(isLowToHigh)
@@ -70,18 +70,18 @@ public class BBTotalSummaryBlock {
 
             // Get TotalSummaryBlcok information
             if(isLowToHigh){
-                mBasesCovered = lbdis.readLong();
-                mMinVal = lbdis.readFloat();
-                mMaxVal = lbdis.readFloat();
-                mSumData = lbdis.readFloat();
-                mSumSquares = lbdis.readFloat();   
+                basesCovered = lbdis.readLong();
+                minVal = lbdis.readFloat();
+                maxVal = lbdis.readFloat();
+                sumData = lbdis.readFloat();
+                sumSquares = lbdis.readFloat();
             }
             else {
-                mBasesCovered = bdis.readLong();
-                mMinVal = bdis.readFloat();
-                mMaxVal = bdis.readFloat();
-                mSumData = bdis.readFloat();
-                mSumSquares = bdis.readFloat();
+                basesCovered = bdis.readLong();
+                minVal = bdis.readFloat();
+                maxVal = bdis.readFloat();
+                sumData = bdis.readFloat();
+                sumSquares = bdis.readFloat();
             }
 
         }catch(IOException ex) {
@@ -97,11 +97,11 @@ public class BBTotalSummaryBlock {
     public BBTotalSummaryBlock(long basesCovered, float minVal, float maxVal,
                                float sumData, float sumSquares){
 
-        mBasesCovered = basesCovered;
-        mMinVal = minVal;
-        mMaxVal = maxVal;
-        mSumData = sumData;
-        mSumSquares = sumSquares;
+        this.basesCovered = basesCovered;
+        this.minVal = minVal;
+        this.maxVal = maxVal;
+        this.sumData = sumData;
+        this.sumSquares = sumSquares;
 
     }
 
@@ -110,42 +110,42 @@ public class BBTotalSummaryBlock {
     }
 
     public SeekableStream getMBBFis() {
-        return mBBFis;
+        return fis;
     }
 
     public long getSummaryBlockOffset() {
-        return mSummaryBlockOffset;
+        return summaryBlockOffset;
     }
 
      public long getBasesCovered() {
-        return mBasesCovered;
+        return basesCovered;
     }
 
     public float getMinVal() {
-        return mMinVal;
+        return minVal;
     }
 
     public float getMaxVal() {
-        return mMaxVal;
+        return maxVal;
     }
 
     public float getSumData() {
-        return mSumData;
+        return sumData;
     }
 
     public float getSumSquares() {
-        return mSumSquares;
+        return sumSquares;
     }
 
     public void printTotalSummaryBlock(){
 
         // Table D - Zoom Level Header information
         log.info("BBFile TotalSummaryBlock (Table DD):");
-        log.info("Number of bases covered= " + mBasesCovered);
-        log.info("MinVal = " + mMinVal);
-        log.info("MaxVal = " + mMaxVal);
-        log.info("Sum of data values = "+ mSumData);
-        log.info("Sum of squares values = " + mSumSquares);
+        log.info("Number of bases covered= " + basesCovered);
+        log.info("MinVal = " + minVal);
+        log.info("MaxVal = " + maxVal);
+        log.info("Sum of data values = "+ sumData);
+        log.info("Sum of squares values = " + sumSquares);
     }
 
 }

@@ -29,15 +29,15 @@ public class BBZoomLevelHeader {
     static public final int ZOOM_LEVEL_HEADER_SIZE = 24;
 
     // Defines the Big Binary File (BBFile) access
-    private SeekableStream mBBFis;          // BBFile input stream handle
-    private long mZoomLevelHeaderOffset;    // file location for zoom level header
-    int mZoomLevel;     // the zoom level for this information
+    private SeekableStream fis;          // BBFile input stream handle
+    private long zoomLevelHeaderOffset;    // file location for zoom level header
+    int zoomLevel;     // the zoom level for this information
 
     // zoom level header information - BBFile Table D
-    private int mReductionLevel;   // number of bases summerized
-    private int mReserved;         // reserved, currently 0
-    private long mDataOffset;      // file position of zoom data
-    private long mIndexOffset;     // file position for index of zoomed data
+    private int reductionLevel;   // number of bases summerized
+    private int reserved;         // reserved, currently 0
+    private long dataOffset;      // file position of zoom data
+    private long indexOffset;     // file position for index of zoomed data
 
     /*
     *   Constructor reads zoom level header
@@ -51,11 +51,11 @@ public class BBZoomLevelHeader {
     public BBZoomLevelHeader(SeekableStream fis, long fileOffset, int zoomLevel,
                              boolean isLowToHigh){
 
-        mBBFis = fis;
-        mZoomLevelHeaderOffset = fileOffset;
-        mZoomLevel = zoomLevel;
+        this.fis = fis;
+        zoomLevelHeaderOffset = fileOffset;
+        this.zoomLevel = zoomLevel;
 
-        readZoomLevelHeader(mZoomLevelHeaderOffset, mZoomLevel, isLowToHigh);
+        readZoomLevelHeader(zoomLevelHeaderOffset, this.zoomLevel, isLowToHigh);
     }
     /*
     *   Constructor loads zoom level header according to parameter specification.
@@ -64,11 +64,11 @@ public class BBZoomLevelHeader {
     * */
     public BBZoomLevelHeader(int zoomLevel, int reductionLevel, int reserved,
                              long dataOffset, long indexOffset){
-        mZoomLevel = zoomLevel;
-        mReductionLevel = reductionLevel;
-        mReserved = reserved;
-        mDataOffset = dataOffset;
-        mIndexOffset = indexOffset;
+        this.zoomLevel = zoomLevel;
+        this.reductionLevel = reductionLevel;
+        this.reserved = reserved;
+        this.dataOffset = dataOffset;
+        this.indexOffset = indexOffset;
     }
 
     /*
@@ -78,7 +78,7 @@ public class BBZoomLevelHeader {
     *       zoom level
     * */
     public int getZoomLevel() {
-        return mZoomLevel;
+        return zoomLevel;
     }
 
     /*
@@ -88,7 +88,7 @@ public class BBZoomLevelHeader {
     *       reduction level
     * * */
     public int getReductionLevel() {
-        return mReductionLevel;
+        return reductionLevel;
     }
 
     /*
@@ -98,7 +98,7 @@ public class BBZoomLevelHeader {
     *       reserved value
     * * */
     public int getReserved() {
-        return mReserved;
+        return reserved;
     }
 
     /*
@@ -108,7 +108,7 @@ public class BBZoomLevelHeader {
     *       zoom level data file location
     * */
     public long getDataOffset() {
-        return mDataOffset;
+        return dataOffset;
     }
 
     /*
@@ -118,7 +118,7 @@ public class BBZoomLevelHeader {
     *       R+ index tree file location
     * */
     public long getIndexOffset() {
-        return mIndexOffset;
+        return indexOffset;
     }
 
     /*
@@ -127,11 +127,11 @@ public class BBZoomLevelHeader {
     public void print(){
 
         // Table D - Zoom Level Header information
-        System.out.println("Zoom level " + mZoomLevel + " header Table D: ");
-        System.out.println("Number of zoom level bases = " + mReductionLevel);
-        System.out.println("Reserved = " + mReserved);
-        System.out.println("Zoom data offset = " + mDataOffset);
-        System.out.println("Zoom index offset = " + mIndexOffset);
+        System.out.println("Zoom level " + zoomLevel + " header Table D: ");
+        System.out.println("Number of zoom level bases = " + reductionLevel);
+        System.out.println("Reserved = " + reserved);
+        System.out.println("Zoom data offset = " + dataOffset);
+        System.out.println("Zoom index offset = " + indexOffset);
     }
 
     /*
@@ -153,8 +153,8 @@ public class BBZoomLevelHeader {
             try {
 
             // Read zoom header into a buffer
-            mBBFis.seek(fileOffset);
-            bytesRead = mBBFis.read(buffer);
+            fis.seek(fileOffset);
+            bytesRead = fis.read(buffer);
 
             // decode header
             if(isLowToHigh)
@@ -164,16 +164,16 @@ public class BBZoomLevelHeader {
 
             // Get zoom level information
             if(isLowToHigh){
-                mReductionLevel = lbdis.readInt();
-                mReserved = lbdis.readInt();
-                mDataOffset = lbdis.readLong();
-                mIndexOffset = lbdis.readLong();
+                reductionLevel = lbdis.readInt();
+                reserved = lbdis.readInt();
+                dataOffset = lbdis.readLong();
+                indexOffset = lbdis.readLong();
             }
             else {
-                mReductionLevel = bdis.readInt();
-                mReserved = bdis.readInt();
-                mDataOffset = bdis.readLong();
-                mIndexOffset = bdis.readLong();
+                reductionLevel = bdis.readInt();
+                reserved = bdis.readInt();
+                dataOffset = bdis.readLong();
+                indexOffset = bdis.readLong();
             }
 
         }catch(IOException ex) {

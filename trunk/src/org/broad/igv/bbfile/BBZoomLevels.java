@@ -31,19 +31,19 @@ public class BBZoomLevels {
     private static Logger log = Logger.getLogger(BBZoomLevels.class);
 
     // defines the zoom headers access
-    private SeekableStream mBBFis;       // BBFile handle
-    private long mZoomHeadersOffset;     // BBFile first zoom header offset
-    private int mZoomLevelsCount;        // BB File header Table C specified zoom levels
+    private SeekableStream fis;       // BBFile handle
+    private long zoomHeadersOffset;     // BBFile first zoom header offset
+    private int zoomLevelsCount;        // BB File header Table C specified zoom levels
 
     // zoom level headers - Table D , one for each zoom level
     // Note: array size determines how many zoom levels actually read
-    private ArrayList<BBZoomLevelHeader> mZoomLevelHeaders;  // zoom level headers
+    private ArrayList<BBZoomLevelHeader> zoomLevelHeaders;  // zoom level headers
 
     // zoom level data formats - BBFile Table O
-    private ArrayList<BBZoomLevelFormat> mZoomLevelFormatList;
+    private ArrayList<BBZoomLevelFormat> zoomLevelFormatList;
 
     // zoom level R+ trees - one per level
-    private ArrayList<RPTree> mZoomLevelRPTree;
+    private ArrayList<RPTree> zoomLevelRPTree;
 
     /*
    *  constructor   - reads zoom level headers and data format from file I/O stream
@@ -65,17 +65,17 @@ public class BBZoomLevels {
         long zoomIndexOffset;
 
         // save the seekable file handle and zoom zoomLevel headers file offset
-        mBBFis = fis;
-        mZoomHeadersOffset = fileOffset;
-        mZoomLevelsCount = zoomLevels;
+        this.fis = fis;
+        zoomHeadersOffset = fileOffset;
+        zoomLevelsCount = zoomLevels;
         
         // Note: a bad zoom header will result in a 0 count returned
-        zoomHeadersRead =  readZoomHeaders(mZoomHeadersOffset, zoomLevels, isLowToHigh);
+        zoomHeadersRead =  readZoomHeaders(zoomHeadersOffset, zoomLevels, isLowToHigh);
 
         if(zoomHeadersRead > 0){
 
             // create zoom level data format containers
-            mZoomLevelFormatList = new ArrayList<BBZoomLevelFormat>();
+            zoomLevelFormatList = new ArrayList<BBZoomLevelFormat>();
 
             // for each zoom zoomLevel, get associated zoom data format
             for(int index = 0; index < zoomHeadersRead; ++index) {
@@ -84,36 +84,36 @@ public class BBZoomLevels {
 
                 // Zoom dataOffset (from Table D) is file location for zoomCount (Table O)
                 // Note: This dataOffset is zoomFormatLocation in BBZoomLevelFormat.
-                zoomDataOffset = mZoomLevelHeaders.get(index).getDataOffset();
+                zoomDataOffset = zoomLevelHeaders.get(index).getDataOffset();
 
                 // R+ zoom index offset (Table D) marks end of zoom data in the
                 // zoom level format (Table O)
-                long dataSize = mZoomLevelHeaders.get(index).getIndexOffset() - zoomDataOffset
+                long dataSize = zoomLevelHeaders.get(index).getIndexOffset() - zoomDataOffset
                         - BBZoomLevelFormat.ZOOM_FORMAT_HEADER_SIZE;
 
                 // get zoom zoomLevel data records  - zoomDataOffset references zoomCount in Table O
                 // Note: zoom zoomLevel data records read their own data
-                BBZoomLevelFormat zoomLevelData = new BBZoomLevelFormat(zoomLevel, mBBFis, zoomDataOffset,
+                BBZoomLevelFormat zoomLevelData = new BBZoomLevelFormat(zoomLevel, this.fis, zoomDataOffset,
                         dataSize, isLowToHigh, uncompressBufSize);
 
-                mZoomLevelFormatList.add(zoomLevelData);
+                zoomLevelFormatList.add(zoomLevelData);
             }
 
             // create zoom level R+ tree containers
-            mZoomLevelRPTree = new ArrayList<RPTree>();
+            zoomLevelRPTree = new ArrayList<RPTree>();
 
             // for each zoom zoomLevel, get associated R+ tree
             for(int index = 0; index < zoomHeadersRead; ++index) {
 
                 // Zoom indexOffset (from Table D) is file location
                 // for Table O zoomIndex for R+ tree zoom data
-                zoomIndexOffset = mZoomLevelHeaders.get(index).getIndexOffset();
+                zoomIndexOffset = zoomLevelHeaders.get(index).getIndexOffset();
 
                 // get Zoom Data R+ Tree (Tables K, L, M, N): exists for zoom levels
-                RPTree zoomRPTree = new RPTree(mBBFis, zoomIndexOffset, isLowToHigh, uncompressBufSize);
+                RPTree zoomRPTree = new RPTree(this.fis, zoomIndexOffset, isLowToHigh, uncompressBufSize);
 
                 if(zoomRPTree.getNodeCount() > 0)
-                    mZoomLevelRPTree.add(zoomRPTree);
+                    zoomLevelRPTree.add(zoomRPTree);
             }
         }
     }
@@ -125,7 +125,7 @@ public class BBZoomLevels {
     *       file input stream handle
     * */
     public SeekableStream getFileStream() {
-        return mBBFis;
+        return fis;
     }
 
     /*
@@ -137,7 +137,7 @@ public class BBZoomLevels {
     *       first zoom header file offset
     * */
     public long getZoomHeadersOffset() {
-        return mZoomHeadersOffset;
+        return zoomHeadersOffset;
     }
 
     /*
@@ -149,7 +149,7 @@ public class BBZoomLevels {
     *      number of zoom level headers found
     * */
     public int getZoomHeaderCount() {
-        return mZoomLevelHeaders.size();
+        return zoomLevelHeaders.size();
     }
 
     /*
@@ -159,7 +159,7 @@ public class BBZoomLevels {
     *      zoom level headers
     * */
     public ArrayList<BBZoomLevelHeader> getZoomLevelHeaders() {
-        return mZoomLevelHeaders;
+        return zoomLevelHeaders;
     }
 
     /*
@@ -172,10 +172,10 @@ public class BBZoomLevels {
     *      Zoom level header for specified level; or null for bad zoom level.
     * */
     public BBZoomLevelHeader getZoomLevelHeader(int level) {
-        if(level < 1 || level > mZoomLevelsCount)
+        if(level < 1 || level > zoomLevelsCount)
         return null;
 
-        return mZoomLevelHeaders.get(level - 1);
+        return zoomLevelHeaders.get(level - 1);
     }
 
     /*
@@ -185,7 +185,7 @@ public class BBZoomLevels {
     *      zoom level formats for zoom data
     * */
     public ArrayList<BBZoomLevelFormat> getZoomLevelFormats(){
-        return mZoomLevelFormatList;
+        return zoomLevelFormatList;
     }
 
     /*
@@ -198,27 +198,27 @@ public class BBZoomLevels {
     *      R+ index tree for the specified zoom level; or null for bad zoom level
     * */
     public RPTree getZoomLevelRPTree(int level) {
-        if(level < 1 || level > mZoomLevelsCount)
+        if(level < 1 || level > zoomLevelsCount)
             return null;
 
-        return mZoomLevelRPTree.get(level - 1);
+        return zoomLevelRPTree.get(level - 1);
     }
 
     // prints out the zoom level header information
     public void printZoomHeaders() {
 
         // note if successfully read - should always be correct
-        if(mZoomLevelHeaders.size() == mZoomLevelsCount)
-            log.info("Zoom level headers read for " + mZoomLevelsCount + " levels:");
+        if(zoomLevelHeaders.size() == zoomLevelsCount)
+            log.info("Zoom level headers read for " + zoomLevelsCount + " levels:");
 
         else
             log.error("Zoom level headers not successfully read for "
-                    + mZoomLevelsCount + "levels.");
+                    + zoomLevelsCount + "levels.");
 
-        for( int index = 0; index < mZoomLevelHeaders.size(); ++index) {
+        for( int index = 0; index < zoomLevelHeaders.size(); ++index) {
 
             // zoom level headers print themselves
-            mZoomLevelHeaders.get(index).print();
+            zoomLevelHeaders.get(index).print();
         }
 
     }
@@ -243,16 +243,16 @@ public class BBZoomLevels {
             return 0;
 
         // create zoom headers and data containers
-        mZoomLevelHeaders = new ArrayList<BBZoomLevelHeader>();
+        zoomLevelHeaders = new ArrayList<BBZoomLevelHeader>();
 
         // get zoom header information for each zoom levelsRead
         for(int index = 0; index < zoomLevels; ++index)  {
             level = index + 1;
 
             // read zoom level header - read error is returned as Runtime Exception
-            zoomLevelHeader = new BBZoomLevelHeader(mBBFis, fileOffset, level, isLowToHigh);
+            zoomLevelHeader = new BBZoomLevelHeader(fis, fileOffset, level, isLowToHigh);
 
-            mZoomLevelHeaders.add(zoomLevelHeader);
+            zoomLevelHeaders.add(zoomLevelHeader);
 
             fileOffset += BBZoomLevelHeader.ZOOM_LEVEL_HEADER_SIZE;
         }

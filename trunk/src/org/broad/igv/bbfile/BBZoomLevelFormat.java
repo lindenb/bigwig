@@ -3,7 +3,7 @@ package org.broad.igv.bbfile;
 import org.apache.log4j.Logger;
 import org.broad.tribble.util.SeekableStream;
 import org.broad.tribble.util.LittleEndianInputStream;
-import java.util.ArrayList;
+
 import java.io.IOException;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -41,18 +41,18 @@ public class BBZoomLevelFormat {
     public static final int MAX_ZOOM_DATA_RECORDS = 100000000;
 
     // defines the zoom data file access
-    private int mZoomLevel;             // zoom level for data
-    private SeekableStream mBBFis;      // BBFile handle
-    private long mZoomFormatOffset;     // BBFile zoom level data format offset
-    private long mZoomDataOffset;       // BBFile zoom level data offset
-    private long mZoomIndexOffset;      // BBFile zoom level R+ tree offset
+    private int zoomLevel;             // zoom level for data
+    private SeekableStream fis;      // BBFile handle
+    private long zoomFormatOffset;     // BBFile zoom level data format offset
+    private long zoomDataOffset;       // BBFile zoom level data offset
+    private long zoomIndexOffset;      // BBFile zoom level R+ tree offset
 
     // data reader members
-    private boolean mIsLowToHigh;   // zoom data low to high byte order if true; else high to low
+    private boolean isLowToHigh;   // zoom data low to high byte order if true; else high to low
 
     // zoom level data - BBFile Table O
-    private int mZoomRecordCount;   // number of data records; zoomCount in Table O
-    private long mZoomDataSize;     // number of (compressed) zoom level data bytes
+    private int zoomRecordCount;   // number of data records; zoomCount in Table O
+    private long zoomDataSize;     // number of (compressed) zoom level data bytes
 
     /*
     *   constructor   - reads zoom level format (but not the data) for a zoom level.
@@ -74,11 +74,11 @@ public class BBZoomLevelFormat {
                            long dataSize, boolean isLowToHigh, int uncompressBufSize) {
 
         // store file access info
-        mZoomLevel = zoomLevel;
-        mBBFis = fis;
-        mZoomFormatOffset = fileOffset;
-        mZoomDataSize = dataSize;
-        mIsLowToHigh = isLowToHigh;
+        this.zoomLevel = zoomLevel;
+        this.fis = fis;
+        zoomFormatOffset = fileOffset;
+        zoomDataSize = dataSize;
+        this.isLowToHigh = isLowToHigh;
 
         // Note: a bad zoom data header will result in a 0 count returned
         // or an IOException
@@ -92,17 +92,17 @@ public class BBZoomLevelFormat {
         try {
 
             // Read zoom level data format into a buffer
-            mBBFis.seek(mZoomFormatOffset);
-            bytesRead = mBBFis.read(buffer);
+            this.fis.seek(zoomFormatOffset);
+            bytesRead = this.fis.read(buffer);
 
             // decode header - or fail
-            if(mIsLowToHigh) {
+            if(this.isLowToHigh) {
                 LittleEndianInputStream lbdis = new LittleEndianInputStream(new ByteArrayInputStream(buffer));
-                mZoomRecordCount = lbdis.readInt();
+                zoomRecordCount = lbdis.readInt();
             }
             else {
                 DataInputStream bdis = new DataInputStream(new ByteArrayInputStream(buffer));
-                mZoomRecordCount = bdis.readInt();
+                zoomRecordCount = bdis.readInt();
             }
 
         } catch (IOException ex) {
@@ -112,15 +112,15 @@ public class BBZoomLevelFormat {
 
         // integrity check - should be > 0 or less than a max like 100M records?
             // Note: if trouble reading zoom data records, readAllZoomLevelRecords returns 0
-            if(mZoomRecordCount < 0 || mZoomRecordCount > MAX_ZOOM_DATA_RECORDS)
+            if(zoomRecordCount < 0 || zoomRecordCount > MAX_ZOOM_DATA_RECORDS)
                 return;  // terminate if bad zoom level data encountered
 
             // Position file offset past the current zoom level header to pick up
             // the zoom data records which immediately follow.
-            mZoomDataOffset = mZoomFormatOffset + ZOOM_FORMAT_HEADER_SIZE;
+            zoomDataOffset = zoomFormatOffset + ZOOM_FORMAT_HEADER_SIZE;
 
             // calculate the position of the R+ zoom index tree
-            mZoomIndexOffset = mZoomDataOffset + mZoomDataSize;
+            zoomIndexOffset = zoomDataOffset + zoomDataSize;
     }
 
     /*
@@ -130,7 +130,7 @@ public class BBZoomLevelFormat {
     *       zoom level for zoom data
     * */
     public int getZoomLevel() {
-           return mZoomLevel;
+           return zoomLevel;
     }
 
     /*
@@ -140,7 +140,7 @@ public class BBZoomLevelFormat {
     *       file input stream handle
     * */
      public SeekableStream getBBFis() {
-        return mBBFis;
+        return fis;
     }
 
     /*
@@ -150,7 +150,7 @@ public class BBZoomLevelFormat {
     *       file location for zoom data format
     * */
     public long getZoomFormatLocation() {
-       return mZoomFormatOffset;
+       return zoomFormatOffset;
     }
 
     /*
@@ -162,7 +162,7 @@ public class BBZoomLevelFormat {
     *       file location for zoom level R+ data records
     * */
     public int getZoomRecordCount() {
-        return mZoomRecordCount;
+        return zoomRecordCount;
     }
 
     /*
@@ -174,7 +174,7 @@ public class BBZoomLevelFormat {
     *       file location for zoom level R+ data records
     * */
     public long getZoomDataOffset() {
-        return mZoomDataOffset;
+        return zoomDataOffset;
     }
 
     /*
@@ -187,7 +187,7 @@ public class BBZoomLevelFormat {
     *       calculated compressed zoom level data byte size
     * */
     public long getZoomDataSize() {
-        return mZoomDataSize;
+        return zoomDataSize;
     }
 
     /*
@@ -199,19 +199,19 @@ public class BBZoomLevelFormat {
     *       file location for zoom level R+ tree
     * */
      public long getZoomIndexOffset() {
-        return mZoomIndexOffset;
+        return zoomIndexOffset;
     }
 
 
      public void print(){
 
         // identify the zoom level and record count
-       log.info("Zoom level " + mZoomLevel + " format Table O found at "
-             + mZoomFormatOffset);
-       log.info("Zoom record count is " + mZoomRecordCount);
-       log.info("Zoom data location is " + mZoomDataOffset);
-       log.info("Zoom data size is " + mZoomDataOffset);
-       log.info("Zoom index tree location is " + mZoomIndexOffset);
+       log.info("Zoom level " + zoomLevel + " format Table O found at "
+             + zoomFormatOffset);
+       log.info("Zoom record count is " + zoomRecordCount);
+       log.info("Zoom data location is " + zoomDataOffset);
+       log.info("Zoom data size is " + zoomDataOffset);
+       log.info("Zoom index tree location is " + zoomIndexOffset);
     }
 
 }
