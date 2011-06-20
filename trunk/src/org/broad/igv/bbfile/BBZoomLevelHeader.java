@@ -148,13 +148,12 @@ public class BBZoomLevelHeader {
        DataInputStream bdis = null;
 
         byte[] buffer = new byte[ZOOM_LEVEL_HEADER_SIZE];
-        int bytesRead;
 
             try {
 
             // Read zoom header into a buffer
             fis.seek(fileOffset);
-            bytesRead = fis.read(buffer);
+            fis.readFully(buffer);
 
             // decode header
             if(isLowToHigh)

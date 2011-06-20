@@ -83,17 +83,14 @@ public class BBZoomLevelFormat {
         // Note: a bad zoom data header will result in a 0 count returned
         // or an IOException
 
-        int bytesRead;
-        boolean isCompressed;
-
         // size of buffer is ZOOM_FORMAT_HEADER_SIZE to get the record count
         byte[] buffer = new byte[ZOOM_FORMAT_HEADER_SIZE];
 
         try {
 
             // Read zoom level data format into a buffer
-            this.fis.seek(zoomFormatOffset);
-            bytesRead = this.fis.read(buffer);
+            fis.seek(zoomFormatOffset);
+            fis.readFully(buffer);
 
             // decode header - or fail
             if(this.isLowToHigh) {

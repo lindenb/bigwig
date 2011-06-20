@@ -276,12 +276,12 @@ public class BBFileHeader
         DataInputStream bdis = null;
 
          byte[] buffer = new byte[BBFILE_HEADER_SIZE];
-         int bytesRead;
+
 
         try {
             // Read bigBed header into a buffer
             fis.seek(fileOffset);
-            bytesRead = fis.read(buffer);
+            fis.readFully(buffer);
 
             // decode header - determine byte order from first 4 bytes
             // first assume byte order is low to high

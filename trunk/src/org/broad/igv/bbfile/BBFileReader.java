@@ -120,7 +120,7 @@ public class BBFileReader {
         // read in file header
         fileOffset = BBFILE_HEADER_OFFSET;
         fileHeader = new BBFileHeader(path, fis, fileOffset);
-        fileHeader.print();
+        //fileHeader.print();
 
         if (!fileHeader.isHeaderOK()) {
             log.error("BBFile header is unrecognized type, header magic = " +
@@ -894,12 +894,11 @@ public class BBFileReader {
         // Note: dataCount in BBFile is simply a 4 byte int
         // positioned at fullDataOffset in Table C
         byte[] buffer = new byte[4];
-        int bytesRead;
 
         try {
             // read dataCount into a buffer
-            this.fis.seek(fileOffset);
-            bytesRead = this.fis.read(buffer);
+            fis.seek(fileOffset);
+            fis.readFully(buffer);
 
             // decode data count with proper byte stream reader
             // first assume byte order is low to high

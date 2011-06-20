@@ -51,7 +51,6 @@ public class BBTotalSummaryBlock {
         DataInputStream bdis = null;
         
         byte[] buffer = new byte[TOTAL_SUMMARY_BLOCK_SIZE];
-        int bytesRead;
 
         // save the seekable file handle  and B+ Tree file offset
         this.fis = fis;
@@ -59,8 +58,8 @@ public class BBTotalSummaryBlock {
 
         try {
             // Read TotalSummaryBlock header into a buffer
-            this.fis.seek(fileOffset);
-            bytesRead = this.fis.read(buffer);
+            fis.seek(fileOffset);
+            fis.readFully(buffer);
 
             // decode header
             if(isLowToHigh)

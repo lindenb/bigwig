@@ -30,17 +30,16 @@ public class  BPTreeHeader {
     static public final int BPTREE_MAGIC_LTH = 0x78CA8C91;
     static public final int BPTREE_MAGIC_HTL = 0x918CCA78;
 
-    private SeekableStream mBBFis;  // BBFile handle
-    private long mHeaderOffset;     // BBFile file offset for mChromosome tree
-    private boolean mHeaderOK;      // B+ Tree header OK?
+    private long headerOffset;     // BBFile file offset for mChromosome tree
+    private boolean headerOK;      // B+ Tree header OK?
     
     // Chromosome B+ Tree Header - Table E
-    private int mMagic;        // magic number identifies it as B+ header
-    private int mBlockSize;    // number of children per block
-    private int mKeySize;      // min # of charcter bytes for mChromosome name
-    private int mValSize;      // size of (bigWig) values - currently 8
-    private long mItemCount;   // number of chromosomes/contigs in B+ tree
-    private long mReserved;    // Currently 0
+    private int magic;        // magic number identifies it as B+ header
+    private int blockSize;    // number of children per block
+    private int keySize;      // min # of charcter bytes for mChromosome name
+    private int valSize;      // size of (bigWig) values - currently 8
+    private long itemCount;   // number of chromosomes/contigs in B+ tree
+    private long reserved;    // Currently 0
 
    /*
    *    Constructor for reading in a B+ tree header a from a file input stream.
@@ -55,65 +54,62 @@ public class  BPTreeHeader {
         long itemsCount;
 
        // save the seekable file handle  and B+ Tree file offset
-       mBBFis = fis;
-       mHeaderOffset = fileOffset;
+       headerOffset = fileOffset;
 
        // Note: a bad B+ Tree header will result in false returned
-       mHeaderOK =  readHeader(mBBFis, mHeaderOffset, isLowToHigh);
+       headerOK =  readHeader(fis, headerOffset, isLowToHigh);
     }
 
-    public SeekableStream getBBFis() {
-        return mBBFis;
-    }
+
 
     public static int getHeaderSize() {
         return BPTREE_HEADER_SIZE;
     }
 
     public long getHeaderOffset() {
-        return mHeaderOffset;
+        return headerOffset;
     }
 
      public boolean isHeaderOK() {
-        return mHeaderOK;
+        return headerOK;
     }
 
     public int getMagic() {
-        return mMagic;
+        return magic;
     }
 
     public int getBlockSize() {
-        return mBlockSize;
+        return blockSize;
     }
 
     public int getKeySize() {
-        return mKeySize;
+        return keySize;
     }
 
     public int getValSize() {
-        return mValSize;
+        return valSize;
     }
 
     public long getItemCount() {
-        return mItemCount;
+        return itemCount;
     }
 
     public long getReserved() {
-        return mReserved;
+        return reserved;
     }
 
     // prints out the B+ Tree Header
      public void print() {
 
         // Chromosome B+ Tree  Header - BBFile Table E
-        if(mHeaderOK)
-            log.debug("B+ Tree Header was read from file location " + mHeaderOffset);
-        log.debug(" Magic ID =" + mMagic);
-        log.debug(" Block size = " + mBlockSize);
-        log.debug(" Key size = " + mKeySize);
-        log.debug(" Indexed value size = " + mValSize);
-        log.debug(" Item Count = " + mItemCount);
-        log.debug(" Reserved = " + mReserved);
+        if(headerOK)
+            log.debug("B+ Tree Header was read from file location " + headerOffset);
+        log.debug(" Magic ID =" + magic);
+        log.debug(" Block size = " + blockSize);
+        log.debug(" Key size = " + keySize);
+        log.debug(" Indexed value size = " + valSize);
+        log.debug(" Item Count = " + itemCount);
+        log.debug(" Reserved = " + reserved);
     }
     
    /*
@@ -130,41 +126,41 @@ public class  BPTreeHeader {
     
         try {
             // Read B+ tree header into a buffer
-            mBBFis.seek(fileOffset);
-            bytesRead = mBBFis.read(buffer);
+            fis.seek(fileOffset);
+            fis.readFully(buffer);
         
             // decode header
             if(isLowToHigh){
                 lbdis = new LittleEndianInputStream(new ByteArrayInputStream(buffer));
 
                 // check for a valid B+ Tree Header
-                mMagic = lbdis.readInt();
+                magic = lbdis.readInt();
 
-                if(mMagic != BPTREE_MAGIC_LTH)
+                if(magic != BPTREE_MAGIC_LTH)
                     return false;
 
                 // Get mChromosome B+ header information
-                mBlockSize = lbdis.readInt();
-                mKeySize = lbdis.readInt();
-                mValSize = lbdis.readInt();
-                mItemCount = lbdis.readLong();
-                mReserved = lbdis.readLong();
+                blockSize = lbdis.readInt();
+                keySize = lbdis.readInt();
+                valSize = lbdis.readInt();
+                itemCount = lbdis.readLong();
+                reserved = lbdis.readLong();
             }
             else {
                 bdis = new DataInputStream(new ByteArrayInputStream(buffer));
 
                 // check for a valid B+ Tree Header
-                mMagic = bdis.readInt();
+                magic = bdis.readInt();
 
-                if(mMagic != BPTREE_MAGIC_HTL)
+                if(magic != BPTREE_MAGIC_HTL)
                     return false;
 
                 // Get mChromosome B+ header information
-                mBlockSize = bdis.readInt();
-                mKeySize = bdis.readInt();
-                mValSize = bdis.readInt();
-                mItemCount = bdis.readLong();
-                mReserved = bdis.readLong();
+                blockSize = bdis.readInt();
+                keySize = bdis.readInt();
+                valSize = bdis.readInt();
+                itemCount = bdis.readLong();
+                reserved = bdis.readLong();
 
             }
 

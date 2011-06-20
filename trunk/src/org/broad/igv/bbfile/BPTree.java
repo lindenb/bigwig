@@ -548,7 +548,6 @@ public class BPTree {
 
         // set up for node format
         byte[] buffer = new byte[BPTREE_NODE_FORMAT_SIZE];
-        int bytesRead;
         BPTreeNode thisNode = null;
         BPTreeNode childNode = null;
 
@@ -561,8 +560,8 @@ public class BPTree {
         try {
 
            // Read node format into a buffer
-           this.fis.seek(fileOffset);
-           bytesRead = this.fis.read(buffer);
+           fis.seek(fileOffset);
+           fis.readFully(buffer);
 
            if(isLowToHigh)
                 lbdis = new LittleEndianInputStream(new ByteArrayInputStream(buffer));
@@ -596,22 +595,17 @@ public class BPTree {
 
             // Note: B+ tree node item size is the same for leaf and child items
             itemSize =  BPTREE_NODE_ITEM_SIZE + this.keySize;
+            int totalSize = itemSize * itemCount;
+            byte[] itemBuffer = new byte[totalSize];
+            fis.readFully(itemBuffer);
 
-            // set up to read node items
-            byte[] itemBuffer = new byte[itemSize];
-            fileOffset +=  BPTREE_NODE_FORMAT_SIZE;
+            if(isLowToHigh)
+                 lbdis = new LittleEndianInputStream(new ByteArrayInputStream(itemBuffer));
+             else
+                 bdis = new DataInputStream(new ByteArrayInputStream(itemBuffer));
 
             // get the node items - leaves or child nodes
             for(int item = 0; item < itemCount; ++item) {
-
-                // read the node item
-                this.fis.seek(fileOffset);
-                bytesRead = this.fis.read(itemBuffer);
-
-                if(isLowToHigh)
-                    lbdis = new LittleEndianInputStream(new ByteArrayInputStream(itemBuffer));
-                else
-                    bdis = new DataInputStream(new ByteArrayInputStream(itemBuffer));
 
                // always extract the key from the node format
                char[] keychars = new char[keySize];  // + 1 for 0 byte

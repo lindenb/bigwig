@@ -49,7 +49,6 @@ public class RPTree {
     public final int RPTREE_NODE_CHILD_ITEM_SIZE = 24;  // child item size
 
     // R+ tree access variables   - for reading in R+ tree nodes from a file
-    private SeekableStream mBBFis;      // file handle - BBFile input stream
     private int mUncompressBuffSize;    // decompression buffer size; or 0 for uncompressed data
     private boolean mIsLowToHigh;       // binary data low to high if true; else high to low
     private long mRPTreeOffset;         // file offset to the R+ tree
@@ -86,13 +85,13 @@ public class RPTree {
 
         // save the seekable file handle  and B+ Tree file offset
         // Note: the offset is the file position just after the B+ Tree Header
-        mBBFis = fis;
+       // mBBFis = fis;
         mRPTreeOffset =  fileOffset;
         mUncompressBuffSize = uncompressBuffSize;
         mIsLowToHigh = isLowToHigh;
 
         // read in R+ tree header - verify the R+ tree info exits
-        mRPTreeHeader = new RPTreeHeader(mBBFis, mRPTreeOffset,isLowToHigh);
+        mRPTreeHeader = new RPTreeHeader(fis, mRPTreeOffset,isLowToHigh);
 
         // log error if header not found and throw exception
         if(!mRPTreeHeader.isHeaderOK()){
@@ -111,7 +110,7 @@ public class RPTree {
         RPTreeNode parentNode = null;      // parent node of the root is itself, or null
 
         // start constructing the R+ tree - get the root node
-        mRootNode =  readRPTreeNode(mBBFis, nodeOffset, parentNode, isLowToHigh);
+        mRootNode =  readRPTreeNode(fis, nodeOffset, parentNode, isLowToHigh);
     }
 
     /*
@@ -518,14 +517,14 @@ public class RPTree {
     *       A tree node, for success, or null for failure to find the node information.
 
     * */
-    private RPTreeNode readRPTreeNode(SeekableStream fis, long fileOffset,
+    private RPTreeNode readRPTreeNode(SeekableStream fis,
+                                      long fileOffset,
                                       RPTreeNode parent, boolean isLowToHigh){
 
         LittleEndianInputStream lbdis = null; // low o high byte stream reader
         DataInputStream bdis = null;    // high to low byte stream reader
 
         byte[] buffer = new byte[RPTREE_NODE_FORMAT_SIZE];
-        int bytesRead;
         RPTreeNode thisNode = null;
         RPTreeNode childNode = null;
         byte type;
@@ -541,8 +540,8 @@ public class RPTree {
         try {
 
            // Read node format into a buffer
-           mBBFis.seek(fileOffset);
-           bytesRead = mBBFis.read(buffer);
+           fis.seek(fileOffset);
+           fis.readFully(buffer);
 
            if(isLowToHigh)
                lbdis = new LittleEndianInputStream(new ByteArrayInputStream(buffer));
@@ -575,23 +574,19 @@ public class RPTree {
                itemCount = bdis.readShort();
             }
 
-            // set up to read nodes
-            buffer = new byte[itemSize];            // allocate buffer for item sisze
-            fileOffset +=  RPTREE_NODE_FORMAT_SIZE; // step past node format
-            
+            int itemBlockSize = itemCount * itemSize;
+            buffer = new byte[itemBlockSize];            // allocate buffer for item sisze
+            fis.readFully(buffer);
+            if(isLowToHigh)
+                lbdis = new LittleEndianInputStream(new ByteArrayInputStream(buffer));
+            else
+                bdis = new DataInputStream(new ByteArrayInputStream(buffer));
+
             // get the node items - leaves or child nodes
             int startChromID, endChromID;
             int startBase, endBase;
             for(int item = 0; item < itemCount; ++item) {
 
-                // read the node item - note that the byte size is same for leaf and child
-                mBBFis.seek(fileOffset);
-                bytesRead = mBBFis.read(buffer);
-
-                if(isLowToHigh)
-                    lbdis = new LittleEndianInputStream(new ByteArrayInputStream(buffer));
-                else
-                    bdis = new DataInputStream(new ByteArrayInputStream(buffer));
 
                 // always extract the bounding rectangle
                 if(isLowToHigh){
@@ -629,7 +624,7 @@ public class RPTree {
                    else
                        dataOffset =  bdis.readLong();
 
-                   childNode = readRPTreeNode(mBBFis, dataOffset, thisNode, isLowToHigh);
+                   childNode = readRPTreeNode(fis, dataOffset, thisNode, isLowToHigh);
 
                    // insert child node item
                    RPTreeChildNodeItem childItem = new RPTreeChildNodeItem(item, startChromID, startBase,
