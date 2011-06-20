@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
 public class RPTreeChildNodeItem implements RPTreeNodeItem {
 
     private static Logger log = Logger.getLogger(RPTreeChildNodeItem.class);
-    private final boolean mIsLeafItem = false;
-    private long mItemIndex;       // child node item index for B+ tree child node
+    private final boolean isLeafItem = false;
+    private long itemIndex;       // child node item index for B+ tree child node
 
     // R+ child (non-leaf) node item entries: BBFile Table N
-    private RPChromosomeRegion mChromosomeBounds; // chromosome bounds for item
-    private RPTreeNode mChildNode;  // child node assigned to node item
+    private RPChromosomeRegion chromosomeBounds; // chromosome bounds for item
+    private RPTreeNode childNode;  // child node assigned to node item
 
     /*  Constructor for child node items.
     *
@@ -37,43 +37,43 @@ public class RPTreeChildNodeItem implements RPTreeNodeItem {
     public RPTreeChildNodeItem(long itemIndex, int startChromID, int startBase,
                                int endChromID, int endBase, RPTreeNode childNode){
 
-        mItemIndex = itemIndex;
-        mChromosomeBounds = new RPChromosomeRegion(startChromID, startBase, endChromID, endBase);
-        mChildNode = childNode;
+        this.itemIndex = itemIndex;
+        chromosomeBounds = new RPChromosomeRegion(startChromID, startBase, endChromID, endBase);
+        this.childNode = childNode;
     }
 
     public long getItemIndex() {
-           return mItemIndex;
+           return itemIndex;
        }
 
     public boolean isLeafItem(){
-        return mIsLeafItem;
+        return isLeafItem;
     }
 
     public RPChromosomeRegion getChromosomeBounds() {
-        return mChromosomeBounds;
+        return chromosomeBounds;
     }
 
     public RPTreeNode getChildNode() {
-        return mChildNode;
+        return childNode;
     }
 
     public int compareRegions(RPChromosomeRegion chromosomeRegion){
 
-        int value = mChromosomeBounds.compareRegions(chromosomeRegion);
+        int value = chromosomeBounds.compareRegions(chromosomeRegion);
         return value;
     }
 
     public void print(){
 
-        log.debug("Child node item " + mItemIndex + ":\n");
-        log.debug(" StartChromID = " + mChromosomeBounds.getStartChromID() + "\n");
-        log.debug(" StartBase = " + mChromosomeBounds.getStartBase() + "\n");
-        log.debug(" EndChromID = " + mChromosomeBounds.getEndChromID() + "\n");
-        log.debug(" EndBase = " + mChromosomeBounds.getEndBase() + "\n");
+        log.debug("Child node item " + itemIndex + ":\n");
+        log.debug(" StartChromID = " + chromosomeBounds.getStartChromID() + "\n");
+        log.debug(" StartBase = " + chromosomeBounds.getStartBase() + "\n");
+        log.debug(" EndChromID = " + chromosomeBounds.getEndChromID() + "\n");
+        log.debug(" EndBase = " + chromosomeBounds.getEndBase() + "\n");
 
         // child node specific entries
-        mChildNode.printItems();
+        childNode.printItems();
     }
 
 }

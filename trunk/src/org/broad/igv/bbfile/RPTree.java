@@ -49,25 +49,22 @@ public class RPTree {
     public final int RPTREE_NODE_CHILD_ITEM_SIZE = 24;  // child item size
 
     // R+ tree access variables   - for reading in R+ tree nodes from a file
-    private int mUncompressBuffSize;    // decompression buffer size; or 0 for uncompressed data
-    private boolean mIsLowToHigh;       // binary data low to high if true; else high to low
-    private long mRPTreeOffset;         // file offset to the R+ tree
+    private int uncompressBuffSize;    // decompression buffer size; or 0 for uncompressed data
+    private boolean isLowToHigh;       // binary data low to high if true; else high to low
+    private long rpTreeOffset;         // file offset to the R+ tree
 
     // R+ tree index header - Table K
-    private RPTreeHeader mRPTreeHeader; // R+ tree header (Table K for BBFile)
+    private RPTreeHeader rpTreeHeader; // R+ tree header (Table K for BBFile)
 
     // R+ tree bounds
-    private RPChromosomeRegion mChromosomeBounds;  // R+ tree's bounding chromosome region
+    private RPChromosomeRegion chromosomeBounds;  // R+ tree's bounding chromosome region
 
     // R+ tree nodal variables
-    private int mOrder;         // R+ tree order: maximum number of leaves per node
-    private RPTreeNode mRootNode;  // root node for R+ tree
-    private long mNodeCount;        // number of nodes defined in the R+ tree
-    private long mLeafCount;        // number of leaves in the R+ tree
+    private int order;         // R+ tree order: maximum number of leaves per node
+    private RPTreeNode rootNode;  // root node for R+ tree
+    private long nodeCount;        // number of nodes defined in the R+ tree
+    private long leafCount;        // number of leaves in the R+ tree
 
-    // R+ region hit node limitation: see getChromosomeDataHits for details
-    private int mMaxLeafHits;   // maximum number of leaf node hits allowed for hit list
-    private int mLeafHitCount;  // hit count during a hit list construction
 
     /*
    * Constructor for reading in a B+ tree from a BBFile/input stream.
@@ -86,31 +83,31 @@ public class RPTree {
         // save the seekable file handle  and B+ Tree file offset
         // Note: the offset is the file position just after the B+ Tree Header
        // mBBFis = fis;
-        mRPTreeOffset =  fileOffset;
-        mUncompressBuffSize = uncompressBuffSize;
-        mIsLowToHigh = isLowToHigh;
+        rpTreeOffset =  fileOffset;
+        this.uncompressBuffSize = uncompressBuffSize;
+        this.isLowToHigh = isLowToHigh;
 
         // read in R+ tree header - verify the R+ tree info exits
-        mRPTreeHeader = new RPTreeHeader(fis, mRPTreeOffset,isLowToHigh);
+        rpTreeHeader = new RPTreeHeader(fis, rpTreeOffset,isLowToHigh);
 
         // log error if header not found and throw exception
-        if(!mRPTreeHeader.isHeaderOK()){
-            int badMagic = mRPTreeHeader.getMagic();
+        if(!rpTreeHeader.isHeaderOK()){
+            int badMagic = rpTreeHeader.getMagic();
             log.error("Error reading R+ tree header: bad magic = " + badMagic);
             throw new RuntimeException("Error reading R+ tree header: bad magic = " +  badMagic);
         }
 
         // assigns R+ tree organization from the header
-        mOrder = mRPTreeHeader.getBlockSize();
-        mChromosomeBounds = new RPChromosomeRegion(mRPTreeHeader.getStartChromID(), mRPTreeHeader.getStartBase(),
-            mRPTreeHeader.getEndChromID(), mRPTreeHeader.getEndBase());
+        order = rpTreeHeader.getBlockSize();
+        chromosomeBounds = new RPChromosomeRegion(rpTreeHeader.getStartChromID(), rpTreeHeader.getStartBase(),
+            rpTreeHeader.getEndChromID(), rpTreeHeader.getEndBase());
 
         // populate the tree - read in the nodes
-        long nodeOffset = mRPTreeOffset + mRPTreeHeader.getHeaderSize();
+        long nodeOffset = rpTreeOffset + rpTreeHeader.getHeaderSize();
         RPTreeNode parentNode = null;      // parent node of the root is itself, or null
 
         // start constructing the R+ tree - get the root node
-        mRootNode =  readRPTreeNode(fis, nodeOffset, parentNode, isLowToHigh);
+        rootNode =  readRPTreeNode(fis, nodeOffset, isLowToHigh);
     }
 
     /*
@@ -122,10 +119,10 @@ public class RPTree {
     public RPTree(int order) {
 
         // R+ tree node specification
-        mOrder = order;
+        this.order = order;
 
         // Note: acknowledge no bounds specified as a null  object
-        mChromosomeBounds = null;
+        chromosomeBounds = null;
 
     }
 
@@ -136,7 +133,7 @@ public class RPTree {
     *       Data decompression buffer size in bytes; else 0 for uncompressed data in file.
     * */
     public int getUncompressBuffSize() {
-          return mUncompressBuffSize;
+          return uncompressBuffSize;
      }
 
     /*
@@ -146,7 +143,7 @@ public class RPTree {
     *       Returns true if data ordered in low to high byte order; false if high to low.
     * */
      public boolean isIsLowToHigh() {
-          return mIsLowToHigh;
+          return isLowToHigh;
      }
 
     /*
@@ -156,7 +153,7 @@ public class RPTree {
     *       Maximum number of leaf items per node..
     * */
     public int getOrder() {
-        return mOrder;
+        return order;
     }
 
     /*
@@ -166,7 +163,7 @@ public class RPTree {
     *       R+ tree index header.
     * */
     public RPTreeHeader getRPTreeHeader() {
-        return mRPTreeHeader;
+        return rpTreeHeader;
     }
 
     /*
@@ -176,7 +173,7 @@ public class RPTree {
     *       Total number of chromosomes or contigs in the R+ tree.
     * */
     public long getItemCount() {
-        return mRPTreeHeader.getItemCount();
+        return rpTreeHeader.getItemCount();
     }
 
     /*
@@ -186,7 +183,7 @@ public class RPTree {
     *       chromosome bounding region for all R+ tree data
     * */
     public RPChromosomeRegion getChromosomeBounds() {
-        return mChromosomeBounds;
+        return chromosomeBounds;
     }
 
     /*
@@ -196,7 +193,7 @@ public class RPTree {
     *       Node count for R+ tree; or 0 if tree was constructed without nodes.
     * */
      public long getNodeCount() {
-        return mNodeCount;
+        return nodeCount;
      }
 
     /*
@@ -214,7 +211,7 @@ public class RPTree {
         RPChromosomeRegion region;
 
         // Search the R+ tree to extract the chromosome region.
-        RPTreeNode thisNode = mRootNode;
+        RPTreeNode thisNode = rootNode;
         RPChromosomeRegion seedRegion = null;  // null until a chromosome match
 
         region =  findChromosomeRegion(thisNode, startChromID, endChromID, seedRegion);
@@ -231,7 +228,7 @@ public class RPTree {
     public ArrayList<RPChromosomeRegion> getAllChromosomeRegions(){
 
         // Search the R+ tree to extract the chromosome regions
-        RPTreeNode thisNode = mRootNode;
+        RPTreeNode thisNode = rootNode;
 
         ArrayList<RPChromosomeRegion> regionList = new ArrayList<RPChromosomeRegion>();
 
@@ -280,10 +277,8 @@ public class RPTree {
             mMaxLeafHits = mRPTreeHeader.getBlockSize();
         */
 
-        // search the R+ tree for the appropriate regions
-        RPTreeNode thisNode = mRootNode;
-        mLeafHitCount = 0;
-        findChromosomeRegionItems( mRootNode, selectionRegion, leafHitItems);
+
+        findChromosomeRegionItems(rootNode, selectionRegion, leafHitItems);
 
         return leafHitItems;
     }
@@ -292,18 +287,18 @@ public class RPTree {
     public void print() {
 
        // check if read in
-       if(!mRPTreeHeader.isHeaderOK()){
-            int badMagic = mRPTreeHeader.getMagic();
+       if(!rpTreeHeader.isHeaderOK()){
+            int badMagic = rpTreeHeader.getMagic();
             log.error("Error reading R+ tree header: bad magic = " + badMagic);
            return;
        }
 
         // print R+ tree header
-        mRPTreeHeader.print();
+        rpTreeHeader.print();
 
         // print  R+ tree node and leaf items - recursively
-        if(mRootNode != null)
-            mRootNode.printItems();
+        if(rootNode != null)
+            rootNode.printItems();
 
     }
 
@@ -468,7 +463,6 @@ public class RPTree {
                // select contained or intersected leaf regions - item selection is by iterator
                if(Math.abs(hitValue) < 2){
                    leafHitItems.add(leafItem);
-                   ++mLeafHitCount;
                }
 
                // ascending regions will continue to be disjoint so terminate nodal search
@@ -517,9 +511,7 @@ public class RPTree {
     *       A tree node, for success, or null for failure to find the node information.
 
     * */
-    private RPTreeNode readRPTreeNode(SeekableStream fis,
-                                      long fileOffset,
-                                      RPTreeNode parent, boolean isLowToHigh){
+    private RPTreeNode readRPTreeNode(SeekableStream fis, long fileOffset, boolean isLowToHigh){
 
         LittleEndianInputStream lbdis = null; // low o high byte stream reader
         DataInputStream bdis = null;    // high to low byte stream reader
@@ -557,12 +549,12 @@ public class RPTree {
            if(type == 1) {
                isLeaf = true;
                itemSize =  RPTREE_NODE_LEAF_ITEM_SIZE;
-               thisNode = new RPTreeLeafNode(++mNodeCount, parent);
+               thisNode = new RPTreeLeafNode(++nodeCount);
            }
            else {
                isLeaf = false;
                itemSize =  RPTREE_NODE_CHILD_ITEM_SIZE;            
-               thisNode = new RPTreeChildNode(++mNodeCount, parent);
+               thisNode = new RPTreeChildNode(++nodeCount);
            }
 
            if(isLowToHigh){
@@ -613,7 +605,7 @@ public class RPTree {
                     }
 
                    // insert leaf node items
-                    RPTreeLeafNodeItem leafItem = new RPTreeLeafNodeItem(++mLeafCount, startChromID,  startBase,
+                    RPTreeLeafNodeItem leafItem = new RPTreeLeafNodeItem(++leafCount, startChromID,  startBase,
                             endChromID, endBase, dataOffset, dataSize);
                     thisNode.insertItem(leafItem);
                }
@@ -624,7 +616,7 @@ public class RPTree {
                    else
                        dataOffset =  bdis.readLong();
 
-                   childNode = readRPTreeNode(fis, dataOffset, thisNode, isLowToHigh);
+                   childNode = readRPTreeNode(fis, dataOffset, isLowToHigh);
 
                    // insert child node item
                    RPTreeChildNodeItem childItem = new RPTreeChildNodeItem(item, startChromID, startBase,

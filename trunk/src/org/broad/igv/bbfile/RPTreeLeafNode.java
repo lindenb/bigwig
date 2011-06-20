@@ -15,23 +15,21 @@ public class RPTreeLeafNode implements RPTreeNode{
 
     private static Logger log = Logger.getLogger(RPTreeLeafNode.class);
 
-    private long mNodeIndex;        // index for node in R+ tree organization
-    private RPTreeNode m_parent;   // parent node
-    private RPChromosomeRegion mChromosomeBounds;    //  bounds for entire node
-    private ArrayList<RPTreeLeafNodeItem> mLeafItems;   // array for leaf items
+    private long nodeIndex;        // index for node in R+ tree organization
+    private RPChromosomeRegion chromosomeBounds;    //  bounds for entire node
+    private ArrayList<RPTreeLeafNodeItem> leafItems;   // array for leaf items
 
-    public RPTreeLeafNode(long nodeIndex, RPTreeNode parent){
+    public RPTreeLeafNode(long nodeIndex){
 
-        mNodeIndex = nodeIndex;
-        m_parent = parent;
-        mLeafItems = new ArrayList<RPTreeLeafNodeItem>();
+        this.nodeIndex = nodeIndex;
+        leafItems = new ArrayList<RPTreeLeafNodeItem>();
 
         // init with null bounds
-        mChromosomeBounds = new RPChromosomeRegion();
+        chromosomeBounds = new RPChromosomeRegion();
     }
 
      public long getNodeIndex(){
-        return mNodeIndex;
+        return nodeIndex;
     }
 
     public boolean isLeaf() {
@@ -39,25 +37,25 @@ public class RPTreeLeafNode implements RPTreeNode{
     }
 
     public RPChromosomeRegion getChromosomeBounds(){
-         return mChromosomeBounds;
+         return chromosomeBounds;
     }
     
     public int compareRegions(RPChromosomeRegion chromosomeRegion){
         
-        int value = mChromosomeBounds.compareRegions(chromosomeRegion);
+        int value = chromosomeBounds.compareRegions(chromosomeRegion);
         return value;
     }
 
     public int getItemCount() {
-        return mLeafItems.size();
+        return leafItems.size();
     }
 
     public RPTreeNodeItem getItem(int index){
 
-       if(index < 0 || index >= mLeafItems.size())
+       if(index < 0 || index >= leafItems.size())
             return null;
        else
-            return mLeafItems.get(index);
+            return leafItems.get(index);
     }
 
     public boolean insertItem(RPTreeNodeItem item){
@@ -65,17 +63,17 @@ public class RPTreeLeafNode implements RPTreeNode{
          RPTreeLeafNodeItem newItem =  (RPTreeLeafNodeItem)item;
 
         // Note: assumes all keys are inserted in rank order
-        mLeafItems.add(newItem);
+        leafItems.add(newItem);
 
         // todo: compare region and insert at appropriate indexed rank location
         //   mLeafHitItem.add( index, (RPTreeLeafNodeItem)item );
 
         // update leaf node chromosome bounds - use extremes
         // Update node bounds or start node chromosome bounds with first entry
-       if(mChromosomeBounds == null)
-            mChromosomeBounds = new RPChromosomeRegion(newItem.getChromosomeBounds());
+       if(chromosomeBounds == null)
+            chromosomeBounds = new RPChromosomeRegion(newItem.getChromosomeBounds());
        else
-            mChromosomeBounds = mChromosomeBounds.getExtremes(newItem.getChromosomeBounds());
+            chromosomeBounds = chromosomeBounds.getExtremes(newItem.getChromosomeBounds());
 
         // successful insert
          return true;
@@ -90,7 +88,7 @@ public class RPTreeLeafNode implements RPTreeNode{
             return false;
 
         // delete indexed entry
-        mLeafItems.remove(index);
+        leafItems.remove(index);
 
         // successful delete
         return true;
@@ -98,10 +96,10 @@ public class RPTreeLeafNode implements RPTreeNode{
 
     public void printItems(){
 
-        log.debug("Leaf Node contains " +  mLeafItems.size() + " items:");
+        log.debug("Leaf Node contains " +  leafItems.size() + " items:");
 
-        for(int item = 0; item < mLeafItems.size(); ++item){
-            mLeafItems.get(item).print();
+        for(int item = 0; item < leafItems.size(); ++item){
+            leafItems.get(item).print();
         }
     }
 

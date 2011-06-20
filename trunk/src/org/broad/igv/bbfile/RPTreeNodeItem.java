@@ -21,9 +21,6 @@ interface RPTreeNodeItem  {
     // Returns the items index in the parent node list.
     long getItemIndex();
 
-    // Identifies the item as a leaf item or a child node item.
-    boolean isLeafItem();
-
     // returns the chromosome boundary for the item
     public RPChromosomeRegion getChromosomeBounds();
 

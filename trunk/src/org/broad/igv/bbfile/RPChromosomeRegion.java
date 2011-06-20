@@ -17,10 +17,10 @@ public class RPChromosomeRegion {
 
     private static Logger log = Logger.getLogger(RPChromosomeRegion.class);
 
-    private int mStartChromID;  // starting mChromosome in item
-    private int mStartBase;     // starting base pair in item
-    private int mEndChromID;    // ending mChromosome in item
-    private int mEndBase;       // ending base pair in item
+    private int startChromID;  // starting mChromosome in item
+    private int startBase;     // starting base pair in item
+    private int endChromID;    // ending mChromosome in item
+    private int endBase;       // ending base pair in item
 
     /*
     *   Construct region from a specification.
@@ -28,10 +28,10 @@ public class RPChromosomeRegion {
     public RPChromosomeRegion(int startChromID, int startBase,
                                    int endChromID, int endBase){
 
-        mStartChromID = startChromID;
-        mStartBase = startBase;
-        mEndChromID = endChromID;
-        mEndBase = endBase;
+        this.startChromID = startChromID;
+        this.startBase = startBase;
+        this.endChromID = endChromID;
+        this.endBase = endBase;
     }
     
     /*
@@ -39,10 +39,10 @@ public class RPChromosomeRegion {
     * */
     public RPChromosomeRegion(RPChromosomeRegion region){
 
-        mStartChromID = region.mStartChromID;
-        mStartBase = region.mStartBase;
-        mEndChromID = region.mEndChromID;
-        mEndBase = region.mEndBase;
+        startChromID = region.startChromID;
+        startBase = region.startBase;
+        endChromID = region.endChromID;
+        endBase = region.endBase;
     }
 
     /*  
@@ -53,44 +53,44 @@ public class RPChromosomeRegion {
     }
 
     public int getStartChromID() {
-        return mStartChromID;
+        return startChromID;
     }
 
     public void setStartChromID(int mStartChromID) {
-        this.mStartChromID = mStartChromID;
+        this.startChromID = mStartChromID;
     }
 
     public int getStartBase() {
-        return mStartBase;
+        return startBase;
     }
 
     public void setStartBase(int mStartBase) {
-        this.mStartBase = mStartBase;
+        this.startBase = mStartBase;
     }
 
     public int getEndChromID() {
-        return mEndChromID;
+        return endChromID;
     }
 
     public void setEndChromID(int mEndChromID) {
-        this.mEndChromID = mEndChromID;
+        this.endChromID = mEndChromID;
     }
 
     public int getEndBase() {
-        return mEndBase;
+        return endBase;
     }
 
      public void setEndBase(int mEndBase) {
-        this.mEndBase = mEndBase;
+        this.endBase = mEndBase;
      }
 
     public void print(){
 
         log.debug("Chromosome bounds:");
-        log.debug("StartChromID = " + mStartChromID);
-        log.debug("StartBase = " + mStartBase);
-        log.debug("EndChromID = " + mEndChromID);
-        log.debug("EndBase = " + mEndBase);
+        log.debug("StartChromID = " + startChromID);
+        log.debug("StartBase = " + startBase);
+        log.debug("EndChromID = " + endChromID);
+        log.debug("EndBase = " + endBase);
     }
 
     /*
@@ -142,8 +142,8 @@ public class RPChromosomeRegion {
     * */
     public boolean equals(RPChromosomeRegion testRegion){
 
-        if(mStartChromID == testRegion.mStartChromID && mStartBase == testRegion.mStartBase &&
-                mEndChromID == testRegion.mEndChromID && mEndBase == testRegion.mEndBase)
+        if(startChromID == testRegion.startChromID && startBase == testRegion.startBase &&
+                endChromID == testRegion.endChromID && endBase == testRegion.endBase)
             return true;
         else
             return false;
@@ -161,10 +161,10 @@ public class RPChromosomeRegion {
     * */
     public boolean containedIn(RPChromosomeRegion testRegion){
 
-        if(mStartChromID > testRegion.mStartChromID  ||
-          (mStartChromID == testRegion.mStartChromID && mStartBase >= testRegion.mStartBase)){
-            if(mEndChromID < testRegion.mEndChromID ||
-              (mEndChromID == testRegion.mEndChromID && mEndBase <= testRegion.mEndBase) )
+        if(startChromID > testRegion.startChromID ||
+          (startChromID == testRegion.startChromID && startBase >= testRegion.startBase)){
+            if(endChromID < testRegion.endChromID ||
+              (endChromID == testRegion.endChromID && endBase <= testRegion.endBase) )
                 return true;
             else
                 return false;
@@ -187,10 +187,10 @@ public class RPChromosomeRegion {
     public boolean intersectsBelow(RPChromosomeRegion testRegion){
 
         // Only need to test if some part of this region is below and some within test region.
-        if(mStartChromID < testRegion.mStartChromID ||
-          (mStartChromID == testRegion.mStartChromID && mStartBase < testRegion.mStartBase)){
-             if(mEndChromID > testRegion.mStartChromID ||
-               (mEndChromID == testRegion.mStartChromID && mEndBase > testRegion.mStartBase))
+        if(startChromID < testRegion.startChromID ||
+          (startChromID == testRegion.startChromID && startBase < testRegion.startBase)){
+             if(endChromID > testRegion.startChromID ||
+               (endChromID == testRegion.startChromID && endBase > testRegion.startBase))
                 return true;
              else
                 return false;
@@ -213,10 +213,10 @@ public class RPChromosomeRegion {
     public boolean intersectsAbove(RPChromosomeRegion testRegion){
 
         // Only need to test if some part of this region is above and some within test region.
-        if(mEndChromID > testRegion.mEndChromID ||
-          (mEndChromID == testRegion.mEndChromID && mEndBase > testRegion.mEndBase)){
-            if(mStartChromID < testRegion.mEndChromID ||
-              (mStartChromID == testRegion.mEndChromID && mStartBase < testRegion.mEndBase))
+        if(endChromID > testRegion.endChromID ||
+          (endChromID == testRegion.endChromID && endBase > testRegion.endBase)){
+            if(startChromID < testRegion.endChromID ||
+              (startChromID == testRegion.endChromID && startBase < testRegion.endBase))
                 return true;
             else
                 return false;
@@ -236,8 +236,8 @@ public class RPChromosomeRegion {
     * */
     public boolean disjointBelow(RPChromosomeRegion testRegion){
 
-        if(mEndChromID < testRegion.mStartChromID ||
-                mEndChromID == testRegion.mStartChromID && mEndBase <= testRegion.mStartBase)
+        if(endChromID < testRegion.startChromID ||
+                endChromID == testRegion.startChromID && endBase <= testRegion.startBase)
             return true;
         else
             return false;
@@ -254,8 +254,8 @@ public class RPChromosomeRegion {
     * */
      public boolean disjointAbove(RPChromosomeRegion testRegion){
 
-        if(mStartChromID > testRegion.mEndChromID ||
-                mStartChromID == testRegion.mEndChromID && mStartBase >= testRegion.mEndBase)
+        if(startChromID > testRegion.endChromID ||
+                startChromID == testRegion.endChromID && startBase >= testRegion.endBase)
             return true;
         else
             return false;
@@ -274,18 +274,18 @@ public class RPChromosomeRegion {
         RPChromosomeRegion newRegion = new RPChromosomeRegion(this);
 
         // update node bounds
-        if(testRegion.mStartChromID < newRegion.mStartChromID ||
-            (testRegion.mStartChromID == newRegion.mStartChromID &&
-                    testRegion.mStartBase < newRegion.mStartBase)){
-            newRegion.mStartChromID = testRegion.mStartChromID;
-            newRegion.mStartBase = testRegion.mStartBase;
+        if(testRegion.startChromID < newRegion.startChromID ||
+            (testRegion.startChromID == newRegion.startChromID &&
+                    testRegion.startBase < newRegion.startBase)){
+            newRegion.startChromID = testRegion.startChromID;
+            newRegion.startBase = testRegion.startBase;
        }
 
-       if(testRegion.mEndChromID > newRegion.mEndChromID ||
-            (testRegion.mEndChromID == newRegion.mEndChromID &&
-                    testRegion.mEndBase > newRegion.mEndBase)){
-            newRegion.mEndChromID = testRegion.mEndChromID;
-            newRegion.mEndBase = testRegion.mEndBase;
+       if(testRegion.endChromID > newRegion.endChromID ||
+            (testRegion.endChromID == newRegion.endChromID &&
+                    testRegion.endBase > newRegion.endBase)){
+            newRegion.endChromID = testRegion.endChromID;
+            newRegion.endBase = testRegion.endBase;
        }
 
         return newRegion;
@@ -306,18 +306,18 @@ public class RPChromosomeRegion {
     public RPChromosomeRegion getUpperExtreme(int startChromID, int startBase){
 
         // screen disjoint extreme
-        if(startChromID < mStartChromID || startChromID > mEndChromID)
+        if(startChromID < this.startChromID || startChromID > endChromID)
             return null;
-        else if(startChromID == mStartChromID && startBase < mStartBase)
+        else if(startChromID == this.startChromID && startBase < this.startBase)
             return null;
 
         RPChromosomeRegion newRegion = new RPChromosomeRegion();
 
         // trim upper extremity
-        newRegion.mStartChromID = startChromID;
-        newRegion.mStartBase = startBase;
-        newRegion.mEndChromID = this.mEndChromID;
-        newRegion.mEndBase = this.mEndBase;
+        newRegion.startChromID = startChromID;
+        newRegion.startBase = startBase;
+        newRegion.endChromID = this.endChromID;
+        newRegion.endBase = this.endBase;
 
         return newRegion;
     }
@@ -337,18 +337,18 @@ public class RPChromosomeRegion {
     public RPChromosomeRegion getLowerExtreme(int endChromID, int endBase){
 
         // screen disjoint extreme
-        if(endChromID < mStartChromID || endChromID > mEndChromID)
+        if(endChromID < startChromID || endChromID > this.endChromID)
             return null;
-        else if(endChromID == mEndChromID && endBase > mEndBase)
+        else if(endChromID == this.endChromID && endBase > this.endBase)
             return null;
 
         RPChromosomeRegion newRegion = new RPChromosomeRegion();
 
         // trim upper extremity
-        newRegion.mStartChromID = this.mStartChromID;
-        newRegion.mStartBase = this.mStartBase;
-        newRegion.mEndChromID = endChromID;
-        newRegion.mEndBase = endBase;
+        newRegion.startChromID = this.startChromID;
+        newRegion.startBase = this.startBase;
+        newRegion.endChromID = endChromID;
+        newRegion.endBase = endBase;
 
         return newRegion;
     }

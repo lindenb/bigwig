@@ -23,15 +23,14 @@ import java.util.ArrayList;
 public class BPTreeChildNode implements BPTreeNode{
 
     private static Logger log = Logger.getLogger(BPTreeChildNode.class);
-    private final boolean mIsLeafNode = false;
+    private final boolean isLeafNode = false;
 
-    private long mNodeIndex;    // index for node in B+ tree organization
-    private BPTreeNode mParent; // parent node
-    String mLowestChromKey;     // lowest chromosome/contig key name
-    String mHighestChromKey;         // highest chromosome/contig key name
-    int mLowestChromID;         // lowest chromosome ID corresponds to lowest key
-    int mHighestChromID;        // highest chromosome ID corresponds to highest key
-    private ArrayList<BPTreeChildNodeItem> mChildItems; // child node items
+    private long nodeIndex;    // index for node in B+ tree organization
+    String lowestChromKey;     // lowest chromosome/contig key name
+    String highestChromKey;         // highest chromosome/contig key name
+    int lowestChromID;         // lowest chromosome ID corresponds to lowest key
+    int highestChromID;        // highest chromosome ID corresponds to highest key
+    private ArrayList<BPTreeChildNodeItem> childItems; // child node items
 
     /*
     *   Constructor for the B+ tree child (non-leaf) node.
@@ -42,11 +41,10 @@ public class BPTreeChildNode implements BPTreeNode{
     *
     *   Note: Inserted child items contain child/leaf nodes assigned.
     * */
-    public BPTreeChildNode(long nodeIndex, BPTreeNode parent){
+    public BPTreeChildNode(long nodeIndex){
 
-        mNodeIndex = nodeIndex;
-        mParent = parent;
-        mChildItems = new ArrayList<BPTreeChildNodeItem>();
+        this.nodeIndex = nodeIndex;
+        childItems = new ArrayList<BPTreeChildNodeItem>();
     }
 
      /*
@@ -56,7 +54,7 @@ public class BPTreeChildNode implements BPTreeNode{
     *       node index in B+ tree
     * */
      public long getNodeIndex(){
-        return mNodeIndex;
+        return nodeIndex;
     }
 
     /*
@@ -66,7 +64,7 @@ public class BPTreeChildNode implements BPTreeNode{
     *       true, if leaf node; false if child node
     * */
     public boolean isLeaf() {
-        return mIsLeafNode;
+        return isLeafNode;
     }
 
     /*
@@ -79,18 +77,18 @@ public class BPTreeChildNode implements BPTreeNode{
 
         // Quick implementation: assumes all keys are inserted in rank order
         // todo: verify if need to compare key and insert at rank location
-        mChildItems.add((BPTreeChildNodeItem)item );
+        childItems.add((BPTreeChildNodeItem)item );
 
         BPTreeNode childNode = ((BPTreeChildNodeItem)item).getChildNode();
 
         // Note: assumes rank order insertions
-        if(mChildItems.size() == 1 ){
-            mLowestChromKey = childNode.getLowestChromKey();
-            mLowestChromID = childNode.getLowestChromID();
+        if(childItems.size() == 1 ){
+            lowestChromKey = childNode.getLowestChromKey();
+            lowestChromID = childNode.getLowestChromID();
         }
         else {
-            mHighestChromKey = childNode.getHighestChromKey();
-            mHighestChromID = childNode.getHighestChromID();
+            highestChromKey = childNode.getHighestChromKey();
+            highestChromID = childNode.getHighestChromID();
         }
 
 
@@ -109,7 +107,7 @@ public class BPTreeChildNode implements BPTreeNode{
         if(index < 0 || index >= getItemCount())
             return false;
 
-        mChildItems.remove(index);
+        childItems.remove(index);
         return true;    // success
     }
 
@@ -120,7 +118,7 @@ public class BPTreeChildNode implements BPTreeNode{
     *       Count of node items contained in the node
     * */
     public int getItemCount() {
-        return mChildItems.size();
+        return childItems.size();
     }
 
     /*
@@ -135,7 +133,7 @@ public class BPTreeChildNode implements BPTreeNode{
         if(index >= itemCount)
             return null;
 
-        return mChildItems.get(index);
+        return childItems.get(index);
     }
 
     /*
@@ -145,8 +143,8 @@ public class BPTreeChildNode implements BPTreeNode{
     *       Lowest contig/chromosome name key value; or null if no node items
     * */
     public  String getLowestChromKey(){
-        if(mChildItems.size() > 0)
-            return mLowestChromKey;
+        if(childItems.size() > 0)
+            return lowestChromKey;
         else
             return null;
     }
@@ -158,8 +156,8 @@ public class BPTreeChildNode implements BPTreeNode{
     *       Highest contig/chromosome name key value; or null if no node items
     * */
     public  String getHighestChromKey(){
-        if(mChildItems.size() > 0)
-            return mHighestChromKey;
+        if(childItems.size() > 0)
+            return highestChromKey;
         else
             return null;
     }
@@ -171,8 +169,8 @@ public class BPTreeChildNode implements BPTreeNode{
     *       Lowest key contig/chromosome ID; or -1 if no node items
     * */
     public  int getLowestChromID(){
-        if(mChildItems.size() > 0)
-            return mLowestChromID;
+        if(childItems.size() > 0)
+            return lowestChromID;
         else
             return -1;
     }
@@ -184,8 +182,8 @@ public class BPTreeChildNode implements BPTreeNode{
     *       Highest key contig/chromosome ID; or -1 if no node items
     * */
     public  int getHighestChromID(){
-        if(mChildItems.size() > 0)
-            return mHighestChromID;
+        if(childItems.size() > 0)
+            return highestChromID;
         else
             return -1;
     }
@@ -197,11 +195,11 @@ public class BPTreeChildNode implements BPTreeNode{
     public void printItems(){
         int  itemCount = getItemCount();
 
-        log.debug("Child node " + mNodeIndex + " contains " + itemCount + " child items:");
+        log.debug("Child node " + nodeIndex + " contains " + itemCount + " child items:");
         for(int item = 0; item < itemCount; ++item){
 
             // recursively will print all node items below this node
-            mChildItems.get(item).print();
+            childItems.get(item).print();
         }
     }
 
@@ -213,7 +211,7 @@ public class BPTreeChildNode implements BPTreeNode{
     *       List of child items contained by this node
     * */
     public ArrayList<BPTreeChildNodeItem> getChildItems(){
-        return mChildItems;
+        return childItems;
     }
 
 }

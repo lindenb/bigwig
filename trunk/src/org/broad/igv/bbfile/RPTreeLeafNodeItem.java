@@ -19,13 +19,13 @@ import org.apache.log4j.Logger;
 public class RPTreeLeafNodeItem implements RPTreeNodeItem {
 
     private static Logger log = Logger.getLogger(RPTreeLeafNodeItem.class);
-    private final boolean mIsLeafItem = true;
-    private long mItemIndex;       // leaf item index in R+ tree leaf item list
+    private final boolean isLeafItem = true;
+    private long itemIndex;       // leaf item index in R+ tree leaf item list
 
     // R+ tree leaf node item entries: BBFile Table M
-    private RPChromosomeRegion mChromosomeBounds; // chromosome bounds for item
-    private long mDataOffset;      // file offset to data item
-    private long mDataSize;        // size of data item
+    private RPChromosomeRegion chromosomeBounds; // chromosome bounds for item
+    private long dataOffset;      // file offset to data item
+    private long dataSize;        // size of data item
 
     /*  Constructor for leaf node items.
     *
@@ -42,52 +42,52 @@ public class RPTreeLeafNodeItem implements RPTreeNodeItem {
     public RPTreeLeafNodeItem(long itemIndex, int startChromID,  int startBase,
             int endChromID, int endBase, long dataOffset, long dataSize){
 
-        mItemIndex = itemIndex;
-        mChromosomeBounds = new RPChromosomeRegion(startChromID, startBase, endChromID, endBase);
-        mDataOffset = dataOffset;
-        mDataSize = dataSize;
+        this.itemIndex = itemIndex;
+        chromosomeBounds = new RPChromosomeRegion(startChromID, startBase, endChromID, endBase);
+        this.dataOffset = dataOffset;
+        this.dataSize = dataSize;
     }
 
     // *** RPTreeNodeItem interface implementation  ***
     public long getItemIndex() {
-           return mItemIndex;
+           return itemIndex;
        }
 
     public boolean isLeafItem(){
-           return mIsLeafItem;
+           return isLeafItem;
        }
 
     public RPChromosomeRegion getChromosomeBounds() {
-        return mChromosomeBounds;
+        return chromosomeBounds;
     }
 
     public int compareRegions(RPChromosomeRegion chromosomeRegion){
 
         // test leaf item bounds for hit
-        int value = mChromosomeBounds.compareRegions(chromosomeRegion);
+        int value = chromosomeBounds.compareRegions(chromosomeRegion);
         return value;
     }
 
     public void print(){
 
-       log.debug("R+ tree leaf node data item " + mItemIndex);
-       log.debug("StartChromID = " + mChromosomeBounds.getStartChromID());
-       log.debug("StartBase = " + mChromosomeBounds.getStartBase());
-       log.debug("EndChromID = " + mChromosomeBounds.getEndChromID());
-       log.debug("EndBase = " +  mChromosomeBounds.getEndBase());
+       log.debug("R+ tree leaf node data item " + itemIndex);
+       log.debug("StartChromID = " + chromosomeBounds.getStartChromID());
+       log.debug("StartBase = " + chromosomeBounds.getStartBase());
+       log.debug("EndChromID = " + chromosomeBounds.getEndChromID());
+       log.debug("EndBase = " +  chromosomeBounds.getEndBase());
 
        // leaf node specific entries
-       log.debug("DataOffset = " +  mDataOffset);
-       log.debug("DataSize = " + mDataSize);
+       log.debug("DataOffset = " + dataOffset);
+       log.debug("DataSize = " + dataSize);
     }
 
     // *** RPTreeLeafNodeItem specific methods ***
      public long getDataOffset() {
-        return mDataOffset;
+        return dataOffset;
     }
 
     public long geDataSize() {
-        return mDataSize;
+        return dataSize;
     }
 
 }
