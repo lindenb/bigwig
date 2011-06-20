@@ -20,14 +20,14 @@ public class BigWigSection {
 
     private static Logger log = Logger.getLogger(BigWigSection.class);
 
-    private boolean mIsLowToHigh;       // byte order is low to high if true; else high to low
-    private LittleEndianInputStream mLbdis;   // input stream reader for low to high byte ordered data
-    private DataInputStream mBdis;      // input stream reader for high to low byte ordered data
+    private boolean isLowToHigh;       // byte order is low to high if true; else high to low
+    private LittleEndianInputStream lbdis;   // input stream reader for low to high byte ordered data
+    private DataInputStream dis;      // input stream reader for high to low byte ordered data
 
-    private RPTreeLeafNodeItem mLeafHitItem;    // leaf item defines chromosome region and file data location
-    private int mSectionDataSize;       // byte size of decompressed data for this section
-    private HashMap<Integer, String> mChromosomeMap; // map of chromosome ID's and corresponding names
-    private BigWigSectionHeader mWigSectionHeader;  // wig section header
+    private RPTreeLeafNodeItem leafHitItem;    // leaf item defines chromosome region and file data location
+    private int sectionDataSize;       // byte size of decompressed data for this section
+    private HashMap<Integer, String> chromosomeMap; // map of chromosome ID's and corresponding names
+    private BigWigSectionHeader wigSectionHeader;  // wig section header
 
     /*
     *   Constructor for a BigWig data section which includes the section header
@@ -44,30 +44,30 @@ public class BigWigSection {
     public BigWigSection(byte[] sectionBuffer, HashMap<Integer, String> chromosomeMap,
                          boolean isLowToHigh, RPTreeLeafNodeItem leafHitItem){
 
-        mChromosomeMap =  chromosomeMap;
-        mIsLowToHigh = isLowToHigh;
-        mLeafHitItem = leafHitItem;
+        this.chromosomeMap =  chromosomeMap;
+        this.isLowToHigh = isLowToHigh;
+        this.leafHitItem = leafHitItem;
 
         // wrap the Wig section buffer as an input stream and get the section header
         // Note: A RuntimeException is thrown if header is not read properly
-        if(mIsLowToHigh) {
-            mLbdis = new LittleEndianInputStream(new ByteArrayInputStream(sectionBuffer));
-            mWigSectionHeader = new BigWigSectionHeader(mLbdis);
+        if(this.isLowToHigh) {
+            lbdis = new LittleEndianInputStream(new ByteArrayInputStream(sectionBuffer));
+            wigSectionHeader = new BigWigSectionHeader(lbdis);
 
         }
         else  {
-            mBdis = new DataInputStream(new ByteArrayInputStream(sectionBuffer));
-            mWigSectionHeader = new BigWigSectionHeader(mBdis);
+            dis = new DataInputStream(new ByteArrayInputStream(sectionBuffer));
+            wigSectionHeader = new BigWigSectionHeader(dis);
         }
 
         // check for valid Wig item type
-        if(mWigSectionHeader.getItemType() == BigWigSectionHeader.WigItemType.Unknown){
-            log.error("Read error on wig section leaf index " + mLeafHitItem.getItemIndex());
-            throw new RuntimeException("Read error on wig section leaf index " + mLeafHitItem.getItemIndex());
+        if(wigSectionHeader.getItemType() == BigWigSectionHeader.WigItemType.Unknown){
+            log.error("Read error on wig section leaf index " + this.leafHitItem.getItemIndex());
+            throw new RuntimeException("Read error on wig section leaf index " + this.leafHitItem.getItemIndex());
         }
 
         // include header in data segment size accounting
-        mSectionDataSize = mWigSectionHeader.SECTION_HEADER_SIZE;
+        sectionDataSize = wigSectionHeader.SECTION_HEADER_SIZE;
 
         // use method getSectionData to extract section data
     }
@@ -82,7 +82,7 @@ public class BigWigSection {
     *       Specifies if Wig section has a valid data item type.
     * */
     public boolean isValidSectionType(){
-        return mWigSectionHeader.IsValidType();
+        return wigSectionHeader.IsValidType();
     }
 
     /*
@@ -92,7 +92,7 @@ public class BigWigSection {
     *       Wig section header
     * */
     public int getItemCount() {
-        return mWigSectionHeader.getItemCount();
+        return wigSectionHeader.getItemCount();
     }
 
     /*
@@ -102,7 +102,7 @@ public class BigWigSection {
     *       Wig section header
     * */
     public BigWigSectionHeader getSectionHeader() {
-        return mWigSectionHeader;
+        return wigSectionHeader;
     }
 
     /*
@@ -112,7 +112,7 @@ public class BigWigSection {
     *       Number of uncompressed bytes read for the Wig data section
     * */
     public int getSectionDataSize() {
-        return mSectionDataSize;
+        return sectionDataSize;
     }
 
     /*
@@ -135,20 +135,20 @@ public class BigWigSection {
 
         // get the section's data item specifications
         // Note: A RuntimeException is thrown if wig section header is not read properly
-        int chromID =  mWigSectionHeader.getChromID();
-        String chromosome = mChromosomeMap.get(chromID);
-        int itemCount = mWigSectionHeader.getItemCount();
-        int chromStart = mWigSectionHeader.getChromosomeStart();
-        int chromEnd = mWigSectionHeader.getChromosomeEnd();
-        int itemStep = mWigSectionHeader.getItemStep();
-        int itemSpan =  mWigSectionHeader.getItemSpan();
+        int chromID =  wigSectionHeader.getChromID();
+        String chromosome = chromosomeMap.get(chromID);
+        int itemCount = wigSectionHeader.getItemCount();
+        int chromStart = wigSectionHeader.getChromosomeStart();
+        int chromEnd = wigSectionHeader.getChromosomeEnd();
+        int itemStep = wigSectionHeader.getItemStep();
+        int itemSpan =  wigSectionHeader.getItemSpan();
         int itemIndex = 0;
         int startBase = 0;
         int endBase = 0;
         float value = 0.0f;
 
         // find Wig data type - BBFile Table J item type
-        BigWigSectionHeader.WigItemType itemType = mWigSectionHeader.getItemType();
+        BigWigSectionHeader.WigItemType itemType = wigSectionHeader.getItemType();
 
         // check if all leaf items are selection hits
         RPChromosomeRegion itemRegion = new RPChromosomeRegion(chromID, chromStart,
@@ -161,47 +161,47 @@ public class BigWigSection {
         try {
             for(int index = 0; index < itemCount; ++index) {
                 ++itemIndex;
-                if(mIsLowToHigh){
+                if(isLowToHigh){
                     if(itemType == BigWigSectionHeader.WigItemType.FixedStep){
                         startBase = chromStart;
                         endBase = startBase + itemSpan;
-                        value = mLbdis.readFloat();
+                        value = lbdis.readFloat();
                         chromStart = startBase + itemStep;
-                        mSectionDataSize += BigWigSectionHeader.FIXEDSTEP_ITEM_SIZE;
+                        sectionDataSize += BigWigSectionHeader.FIXEDSTEP_ITEM_SIZE;
                     }
                     else if(itemType == BigWigSectionHeader.WigItemType.VarStep){
 
-                        startBase = mLbdis.readInt();
+                        startBase = lbdis.readInt();
                         endBase = startBase + itemSpan;
-                        value = mLbdis.readFloat();
-                        mSectionDataSize += BigWigSectionHeader.VARSTEP_ITEM_SIZE;
+                        value = lbdis.readFloat();
+                        sectionDataSize += BigWigSectionHeader.VARSTEP_ITEM_SIZE;
                     }
                     else if(itemType == BigWigSectionHeader.WigItemType.BedGraph){
-                        startBase = mLbdis.readInt();
-                        endBase = mLbdis.readInt();
-                        value = mLbdis.readFloat();
-                        mSectionDataSize += BigWigSectionHeader.BEDGRAPH_ITEM_SIZE;
+                        startBase = lbdis.readInt();
+                        endBase = lbdis.readInt();
+                        value = lbdis.readFloat();
+                        sectionDataSize += BigWigSectionHeader.BEDGRAPH_ITEM_SIZE;
                     }
                 }
                 else {  // byte order is high to low
                     if(itemType == BigWigSectionHeader.WigItemType.FixedStep){
                         startBase = chromStart;
                         endBase = startBase + itemSpan;
-                        value = mBdis.readFloat();
+                        value = dis.readFloat();
                         chromStart = startBase + itemStep;
-                        mSectionDataSize += BigWigSectionHeader.FIXEDSTEP_ITEM_SIZE;
+                        sectionDataSize += BigWigSectionHeader.FIXEDSTEP_ITEM_SIZE;
                     }
                     else if(itemType == BigWigSectionHeader.WigItemType.VarStep){
-                        startBase = mBdis.readInt();
+                        startBase = dis.readInt();
                         endBase = startBase + itemSpan;
-                        value = mBdis.readFloat();
-                        mSectionDataSize += BigWigSectionHeader.VARSTEP_ITEM_SIZE;
+                        value = dis.readFloat();
+                        sectionDataSize += BigWigSectionHeader.VARSTEP_ITEM_SIZE;
                     }
                     else if(itemType == BigWigSectionHeader.WigItemType.BedGraph){
-                        startBase = mBdis.readInt();
-                        endBase = mBdis.readInt();
-                        value = mBdis.readFloat();
-                        mSectionDataSize += BigWigSectionHeader.BEDGRAPH_ITEM_SIZE;
+                        startBase = dis.readInt();
+                        endBase = dis.readInt();
+                        value = dis.readFloat();
+                        sectionDataSize += BigWigSectionHeader.BEDGRAPH_ITEM_SIZE;
                     }
                 }
 
@@ -228,16 +228,16 @@ public class BigWigSection {
             throw new RuntimeException("Read error for Wig section item " + itemIndex);
         }
 
-        return mSectionDataSize;
+        return sectionDataSize;
     }
 
     /*
     *   Method prints out the data items for this Wig section.
     * */
     public void print() {
-        long leafIndex = mLeafHitItem.getItemIndex();
-        log.debug("Wig section for leaf item " + leafIndex + " has a data size = " + mSectionDataSize);
-        mWigSectionHeader.print();
+        long leafIndex = leafHitItem.getItemIndex();
+        log.debug("Wig section for leaf item " + leafIndex + " has a data size = " + sectionDataSize);
+        wigSectionHeader.print();
     }
 
 }

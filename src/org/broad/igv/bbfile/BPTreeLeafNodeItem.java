@@ -16,13 +16,13 @@ import org.apache.log4j.Logger;
 public class BPTreeLeafNodeItem implements BPTreeNodeItem {
 
     private static Logger log = Logger.getLogger(BPTreeLeafNodeItem.class);
-    private final boolean mIsLeafItem = true;
-    private long mLeafIndex;    // leaf index in B+ tree item list
+    private final boolean isLeafItem = true;
+    private long leafIndex;    // leaf index in B+ tree item list
 
     // B+ Tree Leaf Node Item entities - BBFile Table G
-    private String mChromKey; // B+ tree node item is associated by key
-    private int mChromID;      // numeric mChromosome/contig ID
-    private int mChromSize;    // number of bases in mChromosome/contig
+    private String chromKey; // B+ tree node item is associated by key
+    private int chromID;      // numeric mChromosome/contig ID
+    private int chromSize;    // number of bases in mChromosome/contig
 
     /*
     *   Constructs a B+ tree leaf node item with the supplied information.
@@ -35,10 +35,10 @@ public class BPTreeLeafNodeItem implements BPTreeNodeItem {
     * */
     public BPTreeLeafNodeItem(long leafIndex, String chromKey, int chromID, int chromSize){
 
-        mLeafIndex = leafIndex;
-        mChromKey = chromKey;
-        mChromID = chromID;
-        mChromSize = chromSize;
+        this.leafIndex = leafIndex;
+        this.chromKey = chromKey;
+        this.chromID = chromID;
+        this.chromSize = chromSize;
     }
 
     /*
@@ -48,7 +48,7 @@ public class BPTreeLeafNodeItem implements BPTreeNodeItem {
     *       index assigned to this node item
     * */
     public long getItemIndex(){
-        return mLeafIndex;
+        return leafIndex;
     }
 
     /*
@@ -58,7 +58,7 @@ public class BPTreeLeafNodeItem implements BPTreeNodeItem {
     *       true because node is a leaf item
     * */
     public boolean isLeafItem() {
-        return mIsLeafItem;
+        return isLeafItem;
     }
 
     /*
@@ -68,7 +68,7 @@ public class BPTreeLeafNodeItem implements BPTreeNodeItem {
     *       chromosome name key assigned to this node item
     * */
     public String getChromKey() {
-        return mChromKey;
+        return chromKey;
     }
 
    /*
@@ -81,7 +81,7 @@ public class BPTreeLeafNodeItem implements BPTreeNodeItem {
     *       true, if keys are equal; false if keys are different
     * */
     public boolean chromKeysMatch(String chromKey) {
-        String thisKey = mChromKey;
+        String thisKey = this.chromKey;
         String thatKey = chromKey;
 
         // Note: must have the same length to compare chromosome names
@@ -102,19 +102,19 @@ public class BPTreeLeafNodeItem implements BPTreeNodeItem {
 
     public void print() {
 
-       log.debug("B+ tree leaf node item number " + mLeafIndex);
-       log.debug("Key value = " + mChromKey);
-       log.debug("ChromID = " + mChromID);
-       log.debug("Chromsize = " + mChromSize);
+       log.debug("B+ tree leaf node item number " + leafIndex);
+       log.debug("Key value = " + chromKey);
+       log.debug("ChromID = " + chromID);
+       log.debug("Chromsize = " + chromSize);
    }
 
     // *** BPTreeLeafNodeItem specific methods ***
     public int getChromID() {
-       return mChromID;
+       return chromID;
    }
 
    public int getChromSize() {
-       return mChromSize;
+       return chromSize;
    }
 
 }

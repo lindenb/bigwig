@@ -13,102 +13,100 @@ import java.util.ArrayList;
  */
 
 /**
- *
- *   Container class for R+ tree leaf or child node format
-  *  Note: RPTreeNode interface supports leaf and child node formats
+ * Container class for R+ tree leaf or child node format
+ * Note: RPTreeNode interface supports leaf and child node formats
  */
-public class RPTreeChildNode implements RPTreeNode{
+public class RPTreeChildNode implements RPTreeNode {
 
     private static Logger log = Logger.getLogger(RPTreeChildNode.class);
 
-    private long mNodeIndex;        // index for node in R+ tree organization
-    private RPTreeNode m_parent;    // parent node
-     private RPChromosomeRegion mChromosomeBounds;  // chromosome bounds for entire node
-    private ArrayList<RPTreeChildNodeItem> mChildItems; // array for child items
+    private long nodeIndex;        // index for node in R+ tree organization
+    private RPChromosomeRegion chromosomeBounds;  // chromosome bounds for entire node
+    private ArrayList<RPTreeChildNodeItem> childItems; // array for child items
 
-    public RPTreeChildNode(long nodeIndex, RPTreeNode parent){
+    public RPTreeChildNode(long nodeIndex) {
 
-        mNodeIndex = nodeIndex;
-        m_parent = parent;
-        mChildItems = new ArrayList<RPTreeChildNodeItem>();
+        this.nodeIndex = nodeIndex;
+        childItems = new ArrayList<RPTreeChildNodeItem>();
 
         // Note: Chromosome bounds are null until a valid region is specified
     }
 
-     // *** BPTreeNode interface implementation ***
-     public long getNodeIndex(){
-        return mNodeIndex;
+    // *** BPTreeNode interface implementation ***
+
+    public long getNodeIndex() {
+        return nodeIndex;
     }
 
-    public RPChromosomeRegion getChromosomeBounds(){
-         return mChromosomeBounds;
+    public RPChromosomeRegion getChromosomeBounds() {
+        return chromosomeBounds;
     }
 
-    public int compareRegions(RPChromosomeRegion chromosomeRegion){
+    public int compareRegions(RPChromosomeRegion chromosomeRegion) {
 
         // test leaf item bounds for hit
-        int value = mChromosomeBounds.compareRegions(chromosomeRegion);
+        int value = chromosomeBounds.compareRegions(chromosomeRegion);
         return value;
     }
-    
+
     public boolean isLeaf() {
         return false;
     }
 
     public int getItemCount() {
-        return mChildItems.size();
+        return childItems.size();
     }
 
-    public RPTreeNodeItem getItem(int index){
+    public RPTreeNodeItem getItem(int index) {
 
-       if(index < 0 || index >= mChildItems.size())
+        if (index < 0 || index >= childItems.size())
             return null;
-       else{
-            RPTreeChildNodeItem item = mChildItems.get(index);
+        else {
+            RPTreeChildNodeItem item = childItems.get(index);
             return (RPTreeNodeItem) item;
-       }
+        }
     }
 
-   public boolean insertItem(RPTreeNodeItem item){
+    public boolean insertItem(RPTreeNodeItem item) {
 
-       RPTreeChildNodeItem newItem =  (RPTreeChildNodeItem)item;
+        RPTreeChildNodeItem newItem = (RPTreeChildNodeItem) item;
 
-       // Quick implementation: assumes all keys are inserted in rank order
-       // todo: or compare key and insert at rank location
-       mChildItems.add(newItem );
+        // Quick implementation: assumes all keys are inserted in rank order
+        // todo: or compare key and insert at rank location
+        childItems.add(newItem);
 
-       // Update node bounds or start node chromosome bounds with first entry
-       if(mChromosomeBounds == null)
-            mChromosomeBounds = new RPChromosomeRegion(newItem.getChromosomeBounds());
-       else
-            mChromosomeBounds = mChromosomeBounds.getExtremes(newItem.getChromosomeBounds());
+        // Update node bounds or start node chromosome bounds with first entry
+        if (chromosomeBounds == null)
+            chromosomeBounds = new RPChromosomeRegion(newItem.getChromosomeBounds());
+        else
+            chromosomeBounds = chromosomeBounds.getExtremes(newItem.getChromosomeBounds());
 
-       // success
-       return true;
-   }
+        // success
+        return true;
+    }
 
-    public boolean deleteItem(int index){
+    public boolean deleteItem(int index) {
 
         int itemCount = getItemCount();
 
         // unacceptable index  - reject
-        if(index < 0 || index >= itemCount)
+        if (index < 0 || index >= itemCount)
             return false;
 
         // delete indexed entry
-        mChildItems.remove(index);
+        childItems.remove(index);
 
         // successful delete
         return true;
     }
 
-    public void printItems(){
+    public void printItems() {
 
-        log.debug("Child node " + mNodeIndex + " contains "
-                + mChildItems.size() + " items:");
+        log.debug("Child node " + nodeIndex + " contains "
+                + childItems.size() + " items:");
 
-        for(int item = 0; item < mChildItems.size(); ++item){
-            mChildItems.get(item).print();
+        for (int item = 0; item < childItems.size(); ++item) {
+            childItems.get(item).print();
         }
     }
 

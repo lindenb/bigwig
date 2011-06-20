@@ -9,9 +9,6 @@ package org.broad.igv.bbfile;
  */
 public interface RPTreeNode {
 
-    // Returns the node index in the R+ tree organization.
-    public long getNodeIndex();
-
     // Identifies the node as a leaf node or a child (non-leaf) node.
     public boolean isLeaf();
 

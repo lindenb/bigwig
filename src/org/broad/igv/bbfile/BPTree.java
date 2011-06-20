@@ -577,11 +577,11 @@ public class BPTree {
            // create the B+ tree node
            if(type == 1) {
                isLeaf = true;
-               thisNode = new BPTreeLeafNode(++nodeCount, parent);
+               thisNode = new BPTreeLeafNode(++nodeCount);
            }
            else {
                isLeaf = false;
-               thisNode = new BPTreeChildNode(++nodeCount, parent);
+               thisNode = new BPTreeChildNode(++nodeCount);
            }
 
            if(isLowToHigh) {

@@ -21,15 +21,14 @@ import java.util.ArrayList;
 public class BPTreeLeafNode implements BPTreeNode{
 
     private static Logger log = Logger.getLogger(BPTreeLeafNode.class);
-    private final boolean mIsLeafNode = true;
+    private final boolean isLeafNode = true;
 
-    private long mNodeIndex;    // index for node in B+ tree organization
-    private BPTreeNode mParent; // parent node
-    String mLowestChromKey;     // lowest chromosome/contig key name
-    String mHighestChromKey;    // highest chromosome/contig key name
-    int mLowestChromID;         // lowest chromosome ID corresponds to lowest key
-    int mHighestChromID;        // highest chromosome ID corresponds to highest key
-    private ArrayList<BPTreeLeafNodeItem> mLeafItems; // array for leaf items
+    private long nodeIndex;    // index for node in B+ tree organization
+    String lowestChromKey;     // lowest chromosome/contig key name
+    String highestChromKey;    // highest chromosome/contig key name
+    int lowestChromID;         // lowest chromosome ID corresponds to lowest key
+    int highestChromID;        // highest chromosome ID corresponds to highest key
+    private ArrayList<BPTreeLeafNodeItem> leafItems; // array for leaf items
 
     /*
     *   Constructor for the B+ tree leaf (terminal) node.
@@ -40,11 +39,10 @@ public class BPTreeLeafNode implements BPTreeNode{
     *
     *   Note: Inserted leaf items contain associated name key/chromosome ID.
     * */
-    public BPTreeLeafNode(long nodeIndex, BPTreeNode parent){
+    public BPTreeLeafNode(long nodeIndex){
 
-        mNodeIndex = nodeIndex;
-        mParent = parent;
-        mLeafItems = new ArrayList<BPTreeLeafNodeItem>();
+        this.nodeIndex = nodeIndex;
+        leafItems = new ArrayList<BPTreeLeafNodeItem>();
     }
 
     /*
@@ -54,7 +52,7 @@ public class BPTreeLeafNode implements BPTreeNode{
     *       node index in B+ tree
     * */
     public long getNodeIndex(){
-         return mNodeIndex;
+         return nodeIndex;
     }
 
     /*
@@ -64,7 +62,7 @@ public class BPTreeLeafNode implements BPTreeNode{
     *       true, if leaf node; false if child node
     * */
     public boolean isLeaf() {
-        return mIsLeafNode;
+        return isLeafNode;
     }
 
     /*
@@ -77,16 +75,16 @@ public class BPTreeLeafNode implements BPTreeNode{
 
          // Quick implementation: assumes all keys are inserted in rank order
         // todo: verify if need to compare key and insert at rank location
-        mLeafItems.add((BPTreeLeafNodeItem)item );
+        leafItems.add((BPTreeLeafNodeItem)item );
 
         // Note: assumes rank order insertions
-        if(mLeafItems.size() == 1 ){
-            mLowestChromKey = item.getChromKey();
-            mLowestChromID = ((BPTreeLeafNodeItem)item).getChromID();
+        if(leafItems.size() == 1 ){
+            lowestChromKey = item.getChromKey();
+            lowestChromID = ((BPTreeLeafNodeItem)item).getChromID();
         }
         else {
-           mHighestChromKey = item.getChromKey();
-           mHighestChromID = ((BPTreeLeafNodeItem)item).getChromID();
+           highestChromKey = item.getChromKey();
+           highestChromID = ((BPTreeLeafNodeItem)item).getChromID();
         }
 
         // success
@@ -105,7 +103,7 @@ public class BPTreeLeafNode implements BPTreeNode{
         if(index < 0 || index >= getItemCount())
            return false;
 
-        mLeafItems.remove(index);
+        leafItems.remove(index);
         return true;  // success
     }
 
@@ -116,7 +114,7 @@ public class BPTreeLeafNode implements BPTreeNode{
     *       Count of node items contained in the node
     * */
     public int getItemCount() {
-        return mLeafItems.size();
+        return leafItems.size();
     }
 
     /*
@@ -127,7 +125,7 @@ public class BPTreeLeafNode implements BPTreeNode{
     * */
     public  BPTreeNodeItem getItem(int index){
         if(getItemCount() > 0 && index < getItemCount())
-            return mLeafItems.get(index);
+            return leafItems.get(index);
         else
             return null;
     }
@@ -139,8 +137,8 @@ public class BPTreeLeafNode implements BPTreeNode{
     *       Lowest key contig/chromosome name value
     * */
     public  String getLowestChromKey(){
-       if(mLeafItems.size() > 0)
-           return mLowestChromKey;
+       if(leafItems.size() > 0)
+           return lowestChromKey;
        else
            return null;
     }
@@ -152,8 +150,8 @@ public class BPTreeLeafNode implements BPTreeNode{
     *       Highest key contig/chromosome name value
     * */
     public  String getHighestChromKey(){
-       if(mLeafItems.size() > 0)
-           return mHighestChromKey;
+       if(leafItems.size() > 0)
+           return highestChromKey;
        else
            return null;
     }
@@ -165,8 +163,8 @@ public class BPTreeLeafNode implements BPTreeNode{
     *       Lowest key contig/chromosome ID; or -1 if no node items
     * */
     public  int getLowestChromID(){
-        if(mLeafItems.size() > 0)
-            return mLowestChromID;
+        if(leafItems.size() > 0)
+            return lowestChromID;
         else
             return -1;
     }
@@ -178,8 +176,8 @@ public class BPTreeLeafNode implements BPTreeNode{
     *       Highest key contig/chromosome ID; or -1 if no node items
     * */
     public  int getHighestChromID(){
-        if(mLeafItems.size() > 0)
-            return mHighestChromID;
+        if(leafItems.size() > 0)
+            return highestChromID;
         else
             return -1;
     }
@@ -191,9 +189,9 @@ public class BPTreeLeafNode implements BPTreeNode{
     public void printItems(){
         int  itemCount = getItemCount();
 
-        log.debug("Leaf node " + mNodeIndex +  "contains " + itemCount + " leaf items:");
+        log.debug("Leaf node " + nodeIndex +  "contains " + itemCount + " leaf items:");
         for(int item = 0; item < itemCount; ++item){
-            mLeafItems.get(item).print();
+            leafItems.get(item).print();
         }
     }
 
@@ -205,7 +203,7 @@ public class BPTreeLeafNode implements BPTreeNode{
     *       List of leaf items contained by this node
     * */
     public  ArrayList<BPTreeLeafNodeItem> getLeafItems() {
-        return mLeafItems;
+        return leafItems;
     }
 
 }

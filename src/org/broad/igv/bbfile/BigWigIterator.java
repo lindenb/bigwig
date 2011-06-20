@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,26 +21,26 @@ public class BigWigIterator implements Iterator<WigItem> {
     boolean empty = false;
 
     //specification of chromosome selection region
-    private RPChromosomeRegion mSelectionRegion;  // selection region for iterator
-    private boolean mIsContained;     // if true, features must be fully contained by selection region
+    private RPChromosomeRegion selectionRegion;  // selection region for iterator
+    private boolean isContained;     // if true, features must be fully contained by selection region
 
     // File access variables for reading Bed data block
-    private SeekableStream mBBFis;  // file input stream handle
-    private BPTree mChromIDTree;    // B+ chromosome index tree
-    private RPTree mChromDataTree;  // R+ chromosome data location tree
+    private SeekableStream fis;  // file input stream handle
+    private BPTree chromIDTree;    // B+ chromosome index tree
+    private RPTree chromDataTree;  // R+ chromosome data location tree
 
     // chromosome region extraction items
-    private ArrayList<RPTreeLeafNodeItem> mLeafHitList; // array of leaf hits for selection region items
-    private HashMap<Integer, String> mChromosomeMap;  // map of chromosome ID's and corresponding names
-    private int mLeafItemIndex;   // index of current leaf item being processed from leaf hit list
-    RPTreeLeafNodeItem mLeafHitItem;   // leaf item being processed by next
-    private RPChromosomeRegion mHitRegion;  // hit selection region for iterator
+    private ArrayList<RPTreeLeafNodeItem> leafHitList; // array of leaf hits for selection region items
+    private HashMap<Integer, String> chromosomeMap;  // map of chromosome ID's and corresponding names
+    private int leafItemIndex;   // index of current leaf item being processed from leaf hit list
+    RPTreeLeafNodeItem leafHitItem;   // leaf item being processed by next
+    private RPChromosomeRegion hitRegion;  // hit selection region for iterator
 
     // current data block processing members
-    private BigWigDataBlock mWigDataBlock;  // Wig data block with Wig records decompressed
-    private boolean mDataBlockRead;  // indicates successful read of data block
-    private ArrayList<WigItem> mWigItemList; // array of selected Wig values
-    private int mWigItemIndex;      // index of next Wig data item from the list
+    private BigWigDataBlock wigDataBlock;  // Wig data block with Wig records decompressed
+    private boolean dataBlockRead;  // indicates successful read of data block
+    private ArrayList<WigItem> wigItemList; // array of selected Wig values
+    private int wigItemIndex;      // index of next Wig data item from the list
 
     /**
      * Constructor for a BigWig iterator over the specified chromosome region
@@ -66,11 +65,11 @@ public class BigWigIterator implements Iterator<WigItem> {
         if (selectionRegion == null)
             throw new RuntimeException("Error: BigWigIterator selection region is null\n");
 
-        mBBFis = fis;
-        mChromIDTree = chromIDTree;
-        mChromDataTree = chromDataTree;
-        mSelectionRegion = new RPChromosomeRegion(selectionRegion);
-        mIsContained = contained;
+        this.fis = fis;
+        this.chromIDTree = chromIDTree;
+        this.chromDataTree = chromDataTree;
+        this.selectionRegion = new RPChromosomeRegion(selectionRegion);
+        isContained = contained;
 
         // set up hit list and first data block read
         int hitCount = getHitRegion(selectionRegion, contained);
@@ -96,11 +95,11 @@ public class BigWigIterator implements Iterator<WigItem> {
         if (empty) return false;
 
         // first check if current segment can be read for next Wig item
-        if (mWigItemIndex < mWigItemList.size())
+        if (wigItemIndex < wigItemList.size())
             return true;
 
             // need to fetch next data block
-        else if (mLeafItemIndex < mLeafHitList.size())
+        else if (leafItemIndex < leafHitList.size())
             return true;
 
         else
@@ -119,20 +118,20 @@ public class BigWigIterator implements Iterator<WigItem> {
     public WigItem next() {
 
         // return next Wig item in list
-        if (mWigItemIndex < mWigItemList.size())
-            return (mWigItemList.get(mWigItemIndex++));
+        if (wigItemIndex < wigItemList.size())
+            return (wigItemList.get(wigItemIndex++));
 
             // attempt to get next leaf item data block
         else {
-            int nHits = getHitRegion(mSelectionRegion, mIsContained);
+            int nHits = getHitRegion(selectionRegion, isContained);
 
             if (nHits > 0) {
                 // Note: getDataBlock initializes bed feature index to 0
-                return (mWigItemList.get(mWigItemIndex++)); // return 1st Data Block item
+                return (wigItemList.get(wigItemIndex++)); // return 1st Data Block item
             } else {
                 String result = String.format("Failed to find data for wig region (%d,%d,%d,%d)\n",
-                        mHitRegion.getStartChromID(), mHitRegion.getStartBase(),
-                        mHitRegion.getEndChromID(), mHitRegion.getEndBase());
+                        hitRegion.getStartChromID(), hitRegion.getStartBase(),
+                        hitRegion.getEndChromID(), hitRegion.getEndBase());
                 log.error(result);
 
                 return null;
@@ -152,7 +151,7 @@ public class BigWigIterator implements Iterator<WigItem> {
     * */
 
     public RPChromosomeRegion getSelectionRegion() {
-        return mSelectionRegion;
+        return selectionRegion;
     }
 
 /*
@@ -174,11 +173,11 @@ public class BigWigIterator implements Iterator<WigItem> {
 
     public int setSelectionRegion(RPChromosomeRegion selectionRegion,
                                   boolean contained) {
-        mSelectionRegion = selectionRegion;
-        mIsContained = contained;
+        this.selectionRegion = selectionRegion;
+        isContained = contained;
 
         // set up hit list and first data block read
-        mLeafHitList = null;    // Must nullify existing hit list first!
+        leafHitList = null;    // Must nullify existing hit list first!
         int hitCount = getHitRegion(selectionRegion, contained);
         if (hitCount == 0)   // no hits - no point in fetching data
             throw new RuntimeException("No wig data found in the selection region");
@@ -198,7 +197,7 @@ public class BigWigIterator implements Iterator<WigItem> {
     * */
 
     public boolean isContained() {
-        return mIsContained;
+        return isContained;
     }
 
     /*
@@ -209,7 +208,7 @@ public class BigWigIterator implements Iterator<WigItem> {
     * */
 
     public SeekableStream getBBFis() {
-        return mBBFis;
+        return fis;
     }
 
     /*
@@ -221,7 +220,7 @@ public class BigWigIterator implements Iterator<WigItem> {
     * */
 
     public BPTree getChromosomeIDTree() {
-        return mChromIDTree;
+        return chromIDTree;
     }
 
     /*
@@ -233,7 +232,7 @@ public class BigWigIterator implements Iterator<WigItem> {
     * */
 
     public RPTree getChromosomeDataTree() {
-        return mChromDataTree;
+        return chromDataTree;
     }
 
     /*
@@ -257,22 +256,22 @@ public class BigWigIterator implements Iterator<WigItem> {
         int hitCount = 0;
 
         // check if new hit list is needed
-        if (mLeafHitList == null) {
+        if (leafHitList == null) {
             hitCount = getHitList(hitRegion, contained);
             if (hitCount == 0)
                 return 0;   // no hit data found
         } else {
-            hitCount = mLeafHitList.size() - mLeafItemIndex;
+            hitCount = leafHitList.size() - leafItemIndex;
             if (hitCount == 0)
                 return 0;   // hit list exhausted
         }
 
         // Perform a block read for starting base of selection region - use first leaf hit
-        mDataBlockRead = getDataBlock(mLeafItemIndex++);
+        dataBlockRead = getDataBlock(leafItemIndex++);
 
         // try next item - probably intersection issue
         // Note: recursive call until a block is valid or hit list exhuasted
-        if (!mDataBlockRead)
+        if (!dataBlockRead)
             hitCount = getHitRegion(hitRegion, contained);
 
         return hitCount;
@@ -297,23 +296,23 @@ public class BigWigIterator implements Iterator<WigItem> {
     private int getHitList(RPChromosomeRegion hitRegion, boolean contained) {
 
         // hit list for hit region; subject to mMaxLeafHits limitation
-        mLeafHitList = mChromDataTree.getChromosomeDataHits(hitRegion, contained);
+        leafHitList = chromDataTree.getChromosomeDataHits(hitRegion, contained);
 
         // check if any leaf items were selected
-        int nHits = mLeafHitList.size();
+        int nHits = leafHitList.size();
         if (nHits == 0)
             return 0;
         else
-            mLeafItemIndex = 0;    // reset hit item index to start of list
+            leafItemIndex = 0;    // reset hit item index to start of list
 
         // find hit bounds from first and last hit items
-        int startChromID = mLeafHitList.get(0).getChromosomeBounds().getStartChromID();
-        int startBase = mLeafHitList.get(0).getChromosomeBounds().getStartBase();
-        int endChromID = mLeafHitList.get(nHits - 1).getChromosomeBounds().getEndChromID();
-        int endBase = mLeafHitList.get(nHits - 1).getChromosomeBounds().getEndBase();
+        int startChromID = leafHitList.get(0).getChromosomeBounds().getStartChromID();
+        int startBase = leafHitList.get(0).getChromosomeBounds().getStartBase();
+        int endChromID = leafHitList.get(nHits - 1).getChromosomeBounds().getEndChromID();
+        int endBase = leafHitList.get(nHits - 1).getChromosomeBounds().getEndBase();
 
         // save hit region; not currently used but useful for debug
-        mHitRegion = new RPChromosomeRegion(startChromID, startBase, endChromID, endBase);
+        this.hitRegion = new RPChromosomeRegion(startChromID, startBase, endChromID, endBase);
 
         return nHits;
     }
@@ -331,30 +330,30 @@ public class BigWigIterator implements Iterator<WigItem> {
     private boolean getDataBlock(int leafItemIndex) {
 
         // check for valid data block
-        if (leafItemIndex >= mLeafHitList.size())
+        if (leafItemIndex >= leafHitList.size())
             return false;
 
         // Perform a block read for indexed leaf item
-        mLeafHitItem = mLeafHitList.get(leafItemIndex);
+        leafHitItem = leafHitList.get(leafItemIndex);
 
         // get the chromosome names associated with the hit region ID's
-        int startChromID = mLeafHitItem.getChromosomeBounds().getStartChromID();
-        int endChromID = mLeafHitItem.getChromosomeBounds().getEndChromID();
-        mChromosomeMap = mChromIDTree.getChromosomeIDMap(startChromID, endChromID);
+        int startChromID = leafHitItem.getChromosomeBounds().getStartChromID();
+        int endChromID = leafHitItem.getChromosomeBounds().getEndChromID();
+        chromosomeMap = chromIDTree.getChromosomeIDMap(startChromID, endChromID);
 
-        boolean isLowToHigh = mChromDataTree.isIsLowToHigh();
-        int uncompressBufSize = mChromDataTree.getUncompressBuffSize();
+        boolean isLowToHigh = chromDataTree.isIsLowToHigh();
+        int uncompressBufSize = chromDataTree.getUncompressBuffSize();
 
         // decompress leaf item data block for feature extraction
-        mWigDataBlock = new BigWigDataBlock(mBBFis, mLeafHitItem, mChromosomeMap, isLowToHigh,
+        wigDataBlock = new BigWigDataBlock(fis, leafHitItem, chromosomeMap, isLowToHigh,
                 uncompressBufSize);
 
         // get section Wig item list and set next index to first item
-        mWigItemList = mWigDataBlock.getWigData(mSelectionRegion, mIsContained);
-        mWigItemIndex = 0;
+        wigItemList = wigDataBlock.getWigData(selectionRegion, isContained);
+        wigItemIndex = 0;
 
         // data block items available for iterator
-        if (mWigItemList.size() > 0)
+        if (wigItemList.size() > 0)
             return true;
         else
             return false;

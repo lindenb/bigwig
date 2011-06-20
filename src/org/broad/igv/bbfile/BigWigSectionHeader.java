@@ -35,17 +35,17 @@ public class BigWigSectionHeader {
     public static final int VARSTEP_ITEM_SIZE = 8;
     public static final int BEDGRAPH_ITEM_SIZE = 12;
 
-    private int mChromID;       // Chromosome/contig Numerical ID from BBFile Chromosome B+ tree
-    private int mChromStart;    // starting base position
-    private int mChromEnd;      // ending base position
-    private int mItemStep;      // number of base spaces between fixed items
-    private int mItemSpan;      // number of bases in fixed step items
-    private WigItemType mItemType; // type of data items: 1 = bedGraph, 2 = varStep, 3 = fixedStep
-    private byte mReserved;     // reserved; currently = 0
-    private short mItemCount;   // number of data items in this chromosome section
+    private int chromID;       // Chromosome/contig Numerical ID from BBFile Chromosome B+ tree
+    private int chromStart;    // starting base position
+    private int chromEnd;      // ending base position
+    private int itemStep;      // number of base spaces between fixed items
+    private int itemSpan;      // number of bases in fixed step items
+    private WigItemType itemType; // type of data items: 1 = bedGraph, 2 = varStep, 3 = fixedStep
+    private byte reserved;     // reserved; currently = 0
+    private short itemCount;   // number of data items in this chromosome section
 
-    private boolean mIsValidType;    // indicates a if a valid Wig item type was read
-    private String mItemDescription; // string representation of item type.
+    private boolean isValidType;    // indicates a if a valid Wig item type was read
+    private String itemDescription; // string representation of item type.
 
     /*
     *   Constructor creates a Wig Section Header (Table J) from uncompressed buffer.
@@ -59,21 +59,21 @@ public class BigWigSectionHeader {
 
         // get Wig Section Header
         try {
-            mChromID = lbdis.readInt();
-            mChromStart = lbdis.readInt();
-            mChromEnd = lbdis.readInt();
-            mItemStep = lbdis.readInt();
-            mItemSpan = lbdis.readInt();
+            chromID = lbdis.readInt();
+            chromStart = lbdis.readInt();
+            chromEnd = lbdis.readInt();
+            itemStep = lbdis.readInt();
+            itemSpan = lbdis.readInt();
             type = lbdis.readByte();
-            mReserved = lbdis.readByte();
-            mItemCount = lbdis.readShort();
+            reserved = lbdis.readByte();
+            itemCount = lbdis.readShort();
         }catch(IOException ex) {
             log.error("Error reading wig section header ", ex);
             throw new RuntimeException("Error reading wig section header", ex);
         }
 
         // tag as valid
-        mIsValidType = getItemType(type);
+        isValidType = getItemType(type);
     }
 
     /*
@@ -88,21 +88,21 @@ public class BigWigSectionHeader {
 
         // get Wig Section Header
         try {
-            mChromID = bdis.readInt();
-            mChromStart = bdis.readInt();
-            mChromEnd = bdis.readInt();
-            mItemStep = bdis.readInt();
-            mItemSpan = bdis.readInt();
+            chromID = bdis.readInt();
+            chromStart = bdis.readInt();
+            chromEnd = bdis.readInt();
+            itemStep = bdis.readInt();
+            itemSpan = bdis.readInt();
             type = bdis.readByte();
-            mReserved = bdis.readByte();
-            mItemCount = bdis.readShort();
+            reserved = bdis.readByte();
+            itemCount = bdis.readShort();
         }catch(IOException ex) {
             log.error("Error reading wig section header ", ex);
             throw new RuntimeException("Error reading wig section header", ex);
         }
 
         // tag as valid
-        mIsValidType = getItemType(type);
+        isValidType = getItemType(type);
     }
 
     /*
@@ -112,7 +112,7 @@ public class BigWigSectionHeader {
     *       Chromosome ID for the section's region
     * */
     public int getChromID() {
-        return mChromID;
+        return chromID;
     }
 
     /*
@@ -122,7 +122,7 @@ public class BigWigSectionHeader {
     *       Chromosome start base for the section's region
     * */
     public int getChromosomeStart() {
-        return mChromStart;
+        return chromStart;
     }
 
     /*
@@ -132,7 +132,7 @@ public class BigWigSectionHeader {
     *       Chromosome end base for the section's region
     * */
     public int getChromosomeEnd() {
-        return mChromEnd;
+        return chromEnd;
     }
 
     /*
@@ -142,7 +142,7 @@ public class BigWigSectionHeader {
     *       Chromosome base step between fixed step sections
     * */
     public int getItemStep() {
-        return mItemStep;
+        return itemStep;
     }
 
     /*
@@ -152,7 +152,7 @@ public class BigWigSectionHeader {
     *       Chromosome base span for fixed and variable step sections
     * */
     public int getItemSpan() {
-        return mItemSpan;
+        return itemSpan;
     }
 
     /*
@@ -162,7 +162,7 @@ public class BigWigSectionHeader {
     *       Section item type for Wig data
     * */
     public WigItemType getItemType() {
-        return mItemType;
+        return itemType;
     }
 
     /*
@@ -172,7 +172,7 @@ public class BigWigSectionHeader {
     *       Specifies if section's data iytem type is valid
     * */
     public boolean IsValidType() {
-        return mIsValidType;
+        return isValidType;
     }
 
     /*
@@ -182,7 +182,7 @@ public class BigWigSectionHeader {
     *       Number of items defined for the section
     * */
     public short getItemCount() {
-        return mItemCount;
+        return itemCount;
     }
 
     /*
@@ -192,20 +192,20 @@ public class BigWigSectionHeader {
     *       Reserved byte for the section (should always be 0)
     * */
     public byte getReserved() {
-        return mReserved;
+        return reserved;
     }
 
     public void print(){
         log.debug(" BigWig section header "
-                + " for "+ mItemDescription + " data");
-        log.debug("Chromosome ID = " + mChromID);
-        log.debug("ChromStart = " + mChromStart);
-        log.debug("ChromEnd = " + mChromEnd);
-        log.debug("ItemStep = " + mItemStep);
-        log.debug("ItemSpan = " + mItemSpan);
-        log.debug("ItemType = " + mItemType);
-        log.debug("mReserved = " + mReserved);
-        log.debug("mItemCount = " + mItemCount);
+                + " for "+ itemDescription + " data");
+        log.debug("Chromosome ID = " + chromID);
+        log.debug("ChromStart = " + chromStart);
+        log.debug("ChromEnd = " + chromEnd);
+        log.debug("ItemStep = " + itemStep);
+        log.debug("ItemSpan = " + itemSpan);
+        log.debug("ItemType = " + itemType);
+        log.debug("mReserved = " + reserved);
+        log.debug("mItemCount = " + itemCount);
     }
 
     /*
@@ -221,23 +221,23 @@ public class BigWigSectionHeader {
         boolean isValid;
 
         if(type == 1){
-            mItemType = WigItemType.BedGraph;
-            mItemDescription = "Wig Bed Graph";
+            itemType = WigItemType.BedGraph;
+            itemDescription = "Wig Bed Graph";
             isValid = true;
         }
         else if(type == 2){
-            mItemType = WigItemType.VarStep;
-            mItemDescription = "Wig Variable Step";
+            itemType = WigItemType.VarStep;
+            itemDescription = "Wig Variable Step";
             isValid = true;
         }
         else if(type == 3){
-            mItemType = WigItemType.FixedStep;
-            mItemDescription = "Wig Fixed Step";
+            itemType = WigItemType.FixedStep;
+            itemDescription = "Wig Fixed Step";
             isValid = true;
         }
         else {
-            mItemType = WigItemType.Unknown;
-            mItemDescription = "Wig Type Unknown";
+            itemType = WigItemType.Unknown;
+            itemDescription = "Wig Type Unknown";
             isValid = false;
         }
 
