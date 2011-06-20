@@ -49,10 +49,10 @@ public class WigItem {
     }
 
      public void print(){
-       log.info("Wig item index " + itemIndex);
-       log.info("mChromosome name: " + chromosome);
-       log.info("mChromosome start base = " + startBase);
-       log.info("mChromosome end base = " + endBase);
-       log.info("Wig value: \n" + wigValue);
+       log.debug("Wig item index " + itemIndex);
+       log.debug("mChromosome name: " + chromosome);
+       log.debug("mChromosome start base = " + startBase);
+       log.debug("mChromosome end base = " + endBase);
+       log.debug("Wig value: \n" + wigValue);
    }
 }

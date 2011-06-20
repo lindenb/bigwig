@@ -127,11 +127,11 @@ public class BBZoomLevelHeader {
     public void print(){
 
         // Table D - Zoom Level Header information
-        System.out.println("Zoom level " + zoomLevel + " header Table D: ");
-        System.out.println("Number of zoom level bases = " + reductionLevel);
-        System.out.println("Reserved = " + reserved);
-        System.out.println("Zoom data offset = " + dataOffset);
-        System.out.println("Zoom index offset = " + indexOffset);
+        log.debug("Zoom level " + zoomLevel + " header Table D: ");
+        log.debug("Number of zoom level bases = " + reductionLevel);
+        log.debug("Reserved = " + reserved);
+        log.debug("Zoom data offset = " + dataOffset);
+        log.debug("Zoom index offset = " + indexOffset);
     }
 
     /*

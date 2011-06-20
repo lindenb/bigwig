@@ -191,7 +191,7 @@ public class BPTreeLeafNode implements BPTreeNode{
     public void printItems(){
         int  itemCount = getItemCount();
 
-        log.info("Leaf node " + mNodeIndex +  "contains " + itemCount + " leaf items:");
+        log.debug("Leaf node " + mNodeIndex +  "contains " + itemCount + " leaf items:");
         for(int item = 0; item < itemCount; ++item){
             mLeafItems.get(item).print();
         }

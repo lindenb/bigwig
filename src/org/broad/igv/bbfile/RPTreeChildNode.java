@@ -104,7 +104,7 @@ public class RPTreeChildNode implements RPTreeNode{
 
     public void printItems(){
 
-        log.info("Child node " + mNodeIndex + " contains "
+        log.debug("Child node " + mNodeIndex + " contains "
                 + mChildItems.size() + " items:");
 
         for(int item = 0; item < mChildItems.size(); ++item){

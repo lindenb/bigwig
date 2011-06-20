@@ -191,7 +191,7 @@ public class BigBedDataBlock {
 
     public void print() {
 
-        log.info("BigBed data for " + bedFeatureList.size() + " items");
+        log.debug("BigBed data for " + bedFeatureList.size() + " items");
 
         for(int index = 0; index <= bedFeatureList.size(); ++index) {
             // BigBed data items print themselves

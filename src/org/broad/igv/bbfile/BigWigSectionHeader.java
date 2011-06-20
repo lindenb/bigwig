@@ -196,16 +196,16 @@ public class BigWigSectionHeader {
     }
 
     public void print(){
-        log.info(" BigWig section header "
+        log.debug(" BigWig section header "
                 + " for "+ mItemDescription + " data");
-        log.info("Chromosome ID = " + mChromID);
-        log.info("ChromStart = " + mChromStart);
-        log.info("ChromEnd = " + mChromEnd);
-        log.info("ItemStep = " + mItemStep);
-        log.info("ItemSpan = " + mItemSpan);
-        log.info("ItemType = " + mItemType);
-        log.info("mReserved = " + mReserved);
-        log.info("mItemCount = " + mItemCount);
+        log.debug("Chromosome ID = " + mChromID);
+        log.debug("ChromStart = " + mChromStart);
+        log.debug("ChromEnd = " + mChromEnd);
+        log.debug("ItemStep = " + mItemStep);
+        log.debug("ItemSpan = " + mItemSpan);
+        log.debug("ItemType = " + mItemType);
+        log.debug("mReserved = " + mReserved);
+        log.debug("mItemCount = " + mItemCount);
     }
 
     /*

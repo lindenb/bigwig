@@ -236,7 +236,7 @@ public class BigWigSection {
     * */
     public void print() {
         long leafIndex = mLeafHitItem.getItemIndex();
-        log.info("Wig section for leaf item " + leafIndex + " has a data size = " + mSectionDataSize);
+        log.debug("Wig section for leaf item " + leafIndex + " has a data size = " + mSectionDataSize);
         mWigSectionHeader.print();
     }
 

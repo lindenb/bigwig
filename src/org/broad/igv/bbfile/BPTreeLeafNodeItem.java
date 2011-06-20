@@ -102,10 +102,10 @@ public class BPTreeLeafNodeItem implements BPTreeNodeItem {
 
     public void print() {
 
-       log.info("B+ tree leaf node item number " + mLeafIndex);
-       log.info("Key value = " + mChromKey);
-       log.info("ChromID = " + mChromID);
-       log.info("Chromsize = " + mChromSize);
+       log.debug("B+ tree leaf node item number " + mLeafIndex);
+       log.debug("Key value = " + mChromKey);
+       log.debug("ChromID = " + mChromID);
+       log.debug("Chromsize = " + mChromSize);
    }
 
     // *** BPTreeLeafNodeItem specific methods ***

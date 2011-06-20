@@ -113,7 +113,7 @@ public class BBFileReader {
     public BBFileReader(String path, SeekableStream stream) {
 
 
-        log.info("Opening BBFile source  " + path);
+        log.debug("Opening BBFile source  " + path);
         this.path = path;
         fis = stream;
 

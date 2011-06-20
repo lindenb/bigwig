@@ -140,12 +140,12 @@ public class BBTotalSummaryBlock {
     public void printTotalSummaryBlock(){
 
         // Table D - Zoom Level Header information
-        log.info("BBFile TotalSummaryBlock (Table DD):");
-        log.info("Number of bases covered= " + basesCovered);
-        log.info("MinVal = " + minVal);
-        log.info("MaxVal = " + maxVal);
-        log.info("Sum of data values = "+ sumData);
-        log.info("Sum of squares values = " + sumSquares);
+        log.debug("BBFile TotalSummaryBlock (Table DD):");
+        log.debug("Number of bases covered= " + basesCovered);
+        log.debug("MinVal = " + minVal);
+        log.debug("MaxVal = " + maxVal);
+        log.debug("Sum of data values = "+ sumData);
+        log.debug("Sum of squares values = " + sumSquares);
     }
 
 }

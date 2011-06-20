@@ -206,12 +206,12 @@ public class BBZoomLevelFormat {
      public void print(){
 
         // identify the zoom level and record count
-       log.info("Zoom level " + zoomLevel + " format Table O found at "
+       log.debug("Zoom level " + zoomLevel + " format Table O found at "
              + zoomFormatOffset);
-       log.info("Zoom record count is " + zoomRecordCount);
-       log.info("Zoom data location is " + zoomDataOffset);
-       log.info("Zoom data size is " + zoomDataOffset);
-       log.info("Zoom index tree location is " + zoomIndexOffset);
+       log.debug("Zoom record count is " + zoomRecordCount);
+       log.debug("Zoom data location is " + zoomDataOffset);
+       log.debug("Zoom data size is " + zoomDataOffset);
+       log.debug("Zoom index tree location is " + zoomIndexOffset);
     }
 
 }

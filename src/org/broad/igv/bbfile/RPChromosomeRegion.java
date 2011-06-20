@@ -86,11 +86,11 @@ public class RPChromosomeRegion {
 
     public void print(){
 
-        log.info("Chromosome bounds:");
-        log.info("StartChromID = " + mStartChromID);
-        log.info("StartBase = " + mStartBase);
-        log.info("EndChromID = " + mEndChromID);
-        log.info("EndBase = " + mEndBase);
+        log.debug("Chromosome bounds:");
+        log.debug("StartChromID = " + mStartChromID);
+        log.debug("StartBase = " + mStartBase);
+        log.debug("EndChromID = " + mEndChromID);
+        log.debug("EndBase = " + mEndBase);
     }
 
     /*

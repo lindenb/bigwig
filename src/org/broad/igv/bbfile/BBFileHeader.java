@@ -229,12 +229,12 @@ public class BBFileHeader
 
             if(isHeaderOK){
                 if(isBigWig())
-                    log.info("BigWig file " + path + ", file header at location " + fileHeaderOffset);
+                    log.debug("BigWig file " + path + ", file header at location " + fileHeaderOffset);
                 else if(isBigBed())
-                    log.info("BigBed file " + path + ", file header at location " + fileHeaderOffset);
+                    log.debug("BigBed file " + path + ", file header at location " + fileHeaderOffset);
             }
             else {
-               log.info("BBFile " + path + "  with bad magic = " + magic +
+               log.debug("BBFile " + path + "  with bad magic = " + magic +
                        " from file header location " + fileHeaderOffset);
                return; // bad read - remaining header items not interpreted
             }
@@ -242,24 +242,24 @@ public class BBFileHeader
         // otherwise header was constructed without reading
         else {
             if(isBigWig())
-                log.info("BBFile " + path + " is a BigWig file, header magic = " + magic);
+                log.debug("BBFile " + path + " is a BigWig file, header magic = " + magic);
             else if(isBigBed())
-                log.info("BBFile " + path + " is a BigBed file, header magic = " + magic);
+                log.debug("BBFile " + path + " is a BigBed file, header magic = " + magic);
         }
 
         // header fields
-        log.info("BBFile header magic = " + magic);
-        log.info("Version = " + version);
-        log.info("Zoom Levels = "+ nZoomLevels);
-        log.info("Chromosome Info B+ tree offset = " + chromTreeOffset);
-        log.info("Data Block offset = " + fullDataOffset);
-        log.info("Chromosome Data R+ tree offset = " + fullIndexOffset);
-        log.info("Bed fields count = " + fieldCount);
-        log.info("Bed defined fields count = " + definedFieldCount);
-        log.info("AutoSql Offset = " + autoSqlOffset);
-        log.info("Total Summary offset = " + totalSummaryOffset);
-        log.info("Maximum uncompressed buffer size = " + uncompressBuffSize);
-        log.info("m_reserved = " + reserved);
+        log.debug("BBFile header magic = " + magic);
+        log.debug("Version = " + version);
+        log.debug("Zoom Levels = "+ nZoomLevels);
+        log.debug("Chromosome Info B+ tree offset = " + chromTreeOffset);
+        log.debug("Data Block offset = " + fullDataOffset);
+        log.debug("Chromosome Data R+ tree offset = " + fullIndexOffset);
+        log.debug("Bed fields count = " + fieldCount);
+        log.debug("Bed defined fields count = " + definedFieldCount);
+        log.debug("AutoSql Offset = " + autoSqlOffset);
+        log.debug("Total Summary offset = " + totalSummaryOffset);
+        log.debug("Maximum uncompressed buffer size = " + uncompressBuffSize);
+        log.debug("m_reserved = " + reserved);
     }
 
      /*
