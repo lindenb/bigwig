@@ -2,10 +2,8 @@ package org.broad.igv.bbfile;
 
 import org.apache.log4j.Logger;
 import org.broad.tribble.util.SeekableStream;
-import org.broad.tribble.util.LittleEndianInputStream;
 
 import java.util.ArrayList;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -26,21 +24,20 @@ public class BigWigDataBlock {
     final int BED_GRAPH_ITEM_SIZE = 12;
 
     // Bed data block access variables   - for reading in bed records from a file
-    private SeekableStream mBBFis;  // file input stream handle
-    private long mFileOffset;       // Wig data block file offset
-    private long mLeafDataSize;     // byte size for data block specified in the R+ leaf
-    private boolean mIsLowToHigh;   // if true, data is low to high byte order; else high to low
+    private long fileOffset;       // Wig data block file offset
+    private long leafDataSize;     // byte size for data block specified in the R+ leaf
+    private boolean isLowToHigh;   // if true, data is low to high byte order; else high to low
 
     // defines the bigWig data source
-    private HashMap<Integer, String> mChromosomeMap;  // map of chromosome ID's and corresponding names
-    private RPTreeLeafNodeItem mLeafHitItem;   // R+ leaf item containing data block location
+    private HashMap<Integer, String> chromosomeMap;  // map of chromosome ID's and corresponding names
+    private RPTreeLeafNodeItem leafHitItem;   // R+ leaf item containing data block location
 
     // uncompressed byte stream buffer and readers
-    private byte[] mWigBuffer;      // buffer containing leaf block data uncompressed
-    private int mRemDataSize;       // number of uncompressed data bytes not extracted
+    private byte[] wigBuffer;      // buffer containing leaf block data uncompressed
+    private int remDataSize;       // number of uncompressed data bytes not extracted
 
     // Wig data extraction members
-    private ArrayList<WigItem> mWigItemList;  // array of Wig section items
+    private ArrayList<WigItem> wigItemList;  // array of Wig section items
 
     /*
     *   Constructor for Wig data block reader.
@@ -55,36 +52,34 @@ public class BigWigDataBlock {
     * */
     public BigWigDataBlock(SeekableStream fis, RPTreeLeafNodeItem leafHitItem,
             HashMap<Integer, String> chromosomeMap, boolean isLowToHigh, int uncompressBufSize){
-        mBBFis = fis;
-        mLeafHitItem = leafHitItem;
-        mChromosomeMap = chromosomeMap;
-        mIsLowToHigh = isLowToHigh;
+        this.leafHitItem = leafHitItem;
+        this.chromosomeMap = chromosomeMap;
+        this.isLowToHigh = isLowToHigh;
 
-        int bytesRead;
-        mFileOffset = mLeafHitItem.getDataOffset();
-        mLeafDataSize = mLeafHitItem.geDataSize();
-        byte[] buffer = new byte[(int) mLeafDataSize];
+        fileOffset = this.leafHitItem.getDataOffset();
+        leafDataSize = this.leafHitItem.geDataSize();
+        byte[] buffer = new byte[(int) leafDataSize];
 
         // read Wig data block into a buffer
         try {
-            mBBFis.seek(mFileOffset);
-            bytesRead = fis.read(buffer);
+            fis.seek(fileOffset);
+            fis.readFully(buffer);
 
             // decompress if necessary - the buffer size is 0 for uncompressed data
             // Note:  BBFile Table C specifies a decompression buffer size
             if(uncompressBufSize > 0)
-                mWigBuffer = BBCompressionUtils.decompress(buffer, uncompressBufSize);
+                wigBuffer = BBCompressionUtils.decompress(buffer, uncompressBufSize);
             else
-                mWigBuffer = buffer;    // use uncompressed read buffer directly
+                wigBuffer = buffer;    // use uncompressed read buffer directly
         }catch(IOException ex) {
-             long itemIndex = mLeafHitItem.getItemIndex();
+             long itemIndex = this.leafHitItem.getItemIndex();
              log.error("Error reading Wig section for leaf item " + itemIndex, ex);
              String error = String.format("Error reading Wig section for leaf item %d\n", itemIndex);
              throw new RuntimeException(error, ex);
         }
 
         // initialize unread data size
-        mRemDataSize = mWigBuffer.length;
+        remDataSize = wigBuffer.length;
 
         // use getWigData to extract data block items
     }
@@ -105,32 +100,32 @@ public class BigWigDataBlock {
     public ArrayList<WigItem> getWigData(RPChromosomeRegion selectionRegion,
                                                 boolean contained){
 
-        mWigItemList = new ArrayList<WigItem>();
+        wigItemList = new ArrayList<WigItem>();
         
-        for(int index = 0; mRemDataSize > 0; ++index) {
+        for(int index = 0; remDataSize > 0; ++index) {
 
             // extract items in the Wig data section
             // Note: A RuntimeException is thrown if wig section is not read properly
-            BigWigSection wigSection = new BigWigSection(mWigBuffer, mChromosomeMap, mIsLowToHigh, mLeafHitItem);
+            BigWigSection wigSection = new BigWigSection(wigBuffer, chromosomeMap, isLowToHigh, leafHitItem);
 
             // get wig section items and section bytes read
-            int sectionBytes = wigSection.getSectionData(selectionRegion, contained, mWigItemList);
+            int sectionBytes = wigSection.getSectionData(selectionRegion, contained, wigItemList);
 
             // adjust remaining data block size
-            mRemDataSize -= sectionBytes;
+            remDataSize -= sectionBytes;
         }
 
-        return mWigItemList;
+        return wigItemList;
     }
 
      public void print() {
 
-        long itemIndex = mLeafHitItem.getItemIndex();
+        long itemIndex = leafHitItem.getItemIndex();
         log.debug("Wig section data referenced by leaf item " + itemIndex);
 
-        for(int index = 0; index <= mWigItemList.size(); ++index) {
+        for(int index = 0; index <= wigItemList.size(); ++index) {
             // BigWig sections print themselves
-            mWigItemList.get(index).print();
+            wigItemList.get(index).print();
          }
     }
 

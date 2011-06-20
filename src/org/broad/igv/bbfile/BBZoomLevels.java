@@ -31,7 +31,7 @@ public class BBZoomLevels {
     private static Logger log = Logger.getLogger(BBZoomLevels.class);
 
     // defines the zoom headers access
-    private SeekableStream fis;       // BBFile handle
+    //private SeekableStream fis;       // BBFile handle
     private long zoomHeadersOffset;     // BBFile first zoom header offset
     private int zoomLevelsCount;        // BB File header Table C specified zoom levels
 
@@ -65,12 +65,12 @@ public class BBZoomLevels {
         long zoomIndexOffset;
 
         // save the seekable file handle and zoom zoomLevel headers file offset
-        this.fis = fis;
+        //this.fis = fis;
         zoomHeadersOffset = fileOffset;
         zoomLevelsCount = zoomLevels;
         
         // Note: a bad zoom header will result in a 0 count returned
-        zoomHeadersRead =  readZoomHeaders(zoomHeadersOffset, zoomLevels, isLowToHigh);
+        zoomHeadersRead =  readZoomHeaders(fis, zoomHeadersOffset, zoomLevels, isLowToHigh);
 
         if(zoomHeadersRead > 0){
 
@@ -93,7 +93,7 @@ public class BBZoomLevels {
 
                 // get zoom zoomLevel data records  - zoomDataOffset references zoomCount in Table O
                 // Note: zoom zoomLevel data records read their own data
-                BBZoomLevelFormat zoomLevelData = new BBZoomLevelFormat(zoomLevel, this.fis, zoomDataOffset,
+                BBZoomLevelFormat zoomLevelData = new BBZoomLevelFormat(zoomLevel, fis, zoomDataOffset,
                         dataSize, isLowToHigh, uncompressBufSize);
 
                 zoomLevelFormatList.add(zoomLevelData);
@@ -110,22 +110,12 @@ public class BBZoomLevels {
                 zoomIndexOffset = zoomLevelHeaders.get(index).getIndexOffset();
 
                 // get Zoom Data R+ Tree (Tables K, L, M, N): exists for zoom levels
-                RPTree zoomRPTree = new RPTree(this.fis, zoomIndexOffset, isLowToHigh, uncompressBufSize);
+                RPTree zoomRPTree = new RPTree(fis, zoomIndexOffset, isLowToHigh, uncompressBufSize);
 
                 if(zoomRPTree.getNodeCount() > 0)
                     zoomLevelRPTree.add(zoomRPTree);
             }
         }
-    }
-
-    /*
-    *   Method returns the file input stream handle
-    *
-    *   Returns:
-    *       file input stream handle
-    * */
-    public SeekableStream getFileStream() {
-        return fis;
     }
 
     /*
@@ -235,7 +225,7 @@ public class BBZoomLevels {
     *       Count of zoom levels headers read, or 0 for failure to find the
     *       header information.
     * */
-    private int readZoomHeaders(long fileOffset, int zoomLevels, boolean isLowToHigh) {
+    private int readZoomHeaders(SeekableStream fis, long fileOffset, int zoomLevels, boolean isLowToHigh) {
         int level = 0;
         BBZoomLevelHeader zoomLevelHeader;
 

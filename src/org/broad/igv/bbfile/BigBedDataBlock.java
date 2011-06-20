@@ -65,7 +65,6 @@ public class BigBedDataBlock {
         this.chromosomeMap = chromosomeMap;
         this.isLowToHigh = isLowToHigh;
 
-        int bytesRead;
         dataBlockSize = this.leafHitItem.geDataSize();
         byte[] buffer = new byte[(int) dataBlockSize];
 
@@ -73,8 +72,8 @@ public class BigBedDataBlock {
 
         // read Bed data block into a buffer
         try {
-            this.fis.seek(fileOffset);
-            bytesRead = fis.read(buffer);
+            fis.seek(fileOffset);
+            fis.readFully(buffer);
 
             // decompress if necessary - the buffer size is 0 for uncompressed data
             // Note:  BBFile Table C specifies a decompression buffer size

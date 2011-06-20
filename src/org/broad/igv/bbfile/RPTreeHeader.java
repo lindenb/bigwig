@@ -25,21 +25,21 @@ public class RPTreeHeader {
     public final int RPTREE_MAGIC_HTL = 0xE0AC6824;
 
     // defines the R+ Tree access
-    private SeekableStream mBBFis;      // BBFile handle
-    private long mRPTreeOffset;         // BBFile file offset for mChromosome region tree
-    private boolean mHeaderOK;          // R+ Tree header read OK
+
+    private long rpTreeOffset;         // BBFile file offset for mChromosome region tree
+    private boolean headerOK;          // R+ Tree header read OK
 
     // R+ Tree header - Table K
-    private int mMagic;             // magic number identifies it as B+ header
-    private int mBlockSize;         // number of children per block
-    private long mItemCount;        // number of chromosomes/contigs in B+ tree
-    private int mStartChromID;      // ID of the first mChromosome in item
-    private int mStartBase;         // Position of first base in item
-    private int mEndChromID;        // ID of the first mChromosome in item
-    private int mEndBase;           // Position of first base in item
-    private long mEndFileOffset;    // file position marking mEndBase of data
-    private int mItemsPerSlot;      // number of items per leaf
-    private long mReserved;         // Currently 0
+    private int magic;             // magic number identifies it as B+ header
+    private int blockSize;         // number of children per block
+    private long itemCount;        // number of chromosomes/contigs in B+ tree
+    private int startChromID;      // ID of the first mChromosome in item
+    private int startBase;         // Position of first base in item
+    private int endChromID;        // ID of the first mChromosome in item
+    private int endBase;           // Position of first base in item
+    private long endFileOffset;    // file position marking mEndBase of data
+    private int itemsPerSlot;      // number of items per leaf
+    private long reserved;         // Currently 0
 
     // constructor   - reads from file input stream
     /*
@@ -54,17 +54,15 @@ public class RPTreeHeader {
 
         long itemsCount;
 
-       // save the file input handle  and B+ Tree file offset
-       mBBFis = fis;
-       mRPTreeOffset =  fileOffset;
+       rpTreeOffset =  fileOffset;
 
        // Note: a bad R+ Tree header will result in false returned
-       mHeaderOK =  readHeader(mBBFis, mRPTreeOffset, isLowToHigh);
+       headerOK =  readHeader(fis, rpTreeOffset, isLowToHigh);
 
     }
 
     public boolean isHeaderOK() {
-        return mHeaderOK;
+        return headerOK;
     }
 
     public int getHeaderSize() {
@@ -72,74 +70,74 @@ public class RPTreeHeader {
     }
 
     public long getTreeOffset() {
-        return mRPTreeOffset;
+        return rpTreeOffset;
     }
 
     public int getMagic() {
-        return mMagic;
+        return magic;
     }
 
     public int getBlockSize() {
-        return mBlockSize;
+        return blockSize;
     }
 
     public long getItemCount() {
-        return mItemCount;
+        return itemCount;
     }
 
     public int getStartChromID() {
-        return mStartChromID;
+        return startChromID;
     }
 
     public int getStartBase() {
-        return mStartBase;
+        return startBase;
     }
 
     public int getEndChromID() {
-        return mEndChromID;
+        return endChromID;
     }
 
     public int getEndBase() {
-        return mEndBase;
+        return endBase;
     }
 
     public long getMEndFileOffset() {
-        return mEndFileOffset;
+        return endFileOffset;
     }
 
     public int getItemsPerSlot() {
-        return mItemsPerSlot;
+        return itemsPerSlot;
     }
 
     public long getReserved() {
-        return mReserved;
+        return reserved;
     }
 
 // prints out the B+ Tree Header
 public void print() {
 
    // note if read successfully
-   if(mHeaderOK){
+   if(headerOK){
        log.debug("R+ tree header has " + RPTREE_HEADER_SIZE + " bytes.");
-       log.debug("R+ tree header magic = " + mMagic);
+       log.debug("R+ tree header magic = " + magic);
    }
    else {
-       log.debug("R+ Tree header is unrecognized type, header magic = " + mMagic);
+       log.debug("R+ Tree header is unrecognized type, header magic = " + magic);
        return;
    }
 
    // Table E - Chromosome B+ Tree  Header
-   log.debug("R+ Tree file offset = " +  mRPTreeOffset);
-   log.debug("magic = " + mMagic);
-   log.debug("Block size = " + mBlockSize);
-   log.debug("ItemCount = " + mItemCount);
-   log.debug("StartChromID = " + mStartChromID);
-   log.debug("StartBase = " + mStartBase);
-   log.debug("EndChromID = " + mEndChromID);
-   log.debug("EndBase = " + mEndBase);
-   log.debug("EndFileOffset = " + mEndFileOffset);
-   log.debug("ItemsPerSlot = " + mItemsPerSlot);
-   log.debug("Reserved = " + mReserved);
+   log.debug("R+ Tree file offset = " + rpTreeOffset);
+   log.debug("magic = " + magic);
+   log.debug("Block size = " + blockSize);
+   log.debug("ItemCount = " + itemCount);
+   log.debug("StartChromID = " + startChromID);
+   log.debug("StartBase = " + startBase);
+   log.debug("EndChromID = " + endChromID);
+   log.debug("EndBase = " + endBase);
+   log.debug("EndFileOffset = " + endFileOffset);
+   log.debug("ItemsPerSlot = " + itemsPerSlot);
+   log.debug("Reserved = " + reserved);
    }
 
   /*
@@ -153,52 +151,51 @@ public void print() {
    DataInputStream bdis;
       
     byte[] buffer = new byte[RPTREE_HEADER_SIZE];
-    int bytesRead;
 
    try {
        // Read R+ tree header into a buffer
-       mBBFis.seek(fileOffset);
-       bytesRead = mBBFis.read(buffer);
+       fis.seek(fileOffset);
+       fis.readFully(buffer);
 
        // decode header
        if(isLowToHigh){
            lbdis = new LittleEndianInputStream(new ByteArrayInputStream(buffer));
-           mMagic = lbdis.readInt();
+           magic = lbdis.readInt();
 
            // check for a valid B+ Tree Header
-           if(mMagic != RPTREE_MAGIC_LTH)
+           if(magic != RPTREE_MAGIC_LTH)
                return false;
 
            // Get mChromosome B+ header information
-           mBlockSize = lbdis.readInt();
-           mItemCount = lbdis.readLong();
-           mStartChromID = lbdis.readInt();
-           mStartBase = lbdis.readInt();
-           mEndChromID = lbdis.readInt();
-           mEndBase = lbdis.readInt();
-           mEndFileOffset = lbdis.readLong();
-           mItemsPerSlot = lbdis.readInt();
-           mReserved = lbdis.readInt();
+           blockSize = lbdis.readInt();
+           itemCount = lbdis.readLong();
+           startChromID = lbdis.readInt();
+           startBase = lbdis.readInt();
+           endChromID = lbdis.readInt();
+           endBase = lbdis.readInt();
+           endFileOffset = lbdis.readLong();
+           itemsPerSlot = lbdis.readInt();
+           reserved = lbdis.readInt();
        }
        else {
            bdis = new DataInputStream(new ByteArrayInputStream(buffer));
 
            // check for a valid B+ Tree Header
-           mMagic = bdis.readInt();
+           magic = bdis.readInt();
 
-           if(mMagic != RPTREE_MAGIC_HTL)
+           if(magic != RPTREE_MAGIC_HTL)
                return false;
 
            // Get mChromosome B+ header information
-           mBlockSize = bdis.readInt();
-           mItemCount = bdis.readLong();
-           mStartChromID = bdis.readInt();
-           mStartBase = bdis.readInt();
-           mEndChromID = bdis.readInt();
-           mEndBase = bdis.readInt();
-           mEndFileOffset = bdis.readLong();
-           mItemsPerSlot = bdis.readInt();
-           mReserved = bdis.readInt();
+           blockSize = bdis.readInt();
+           itemCount = bdis.readLong();
+           startChromID = bdis.readInt();
+           startBase = bdis.readInt();
+           endChromID = bdis.readInt();
+           endBase = bdis.readInt();
+           endFileOffset = bdis.readLong();
+           itemsPerSlot = bdis.readInt();
+           reserved = bdis.readInt();
        }
 
    }catch(IOException ex) {
