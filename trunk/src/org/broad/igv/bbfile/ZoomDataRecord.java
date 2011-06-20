@@ -117,17 +117,17 @@ public class ZoomDataRecord {
     public void print(){
 
         // Table P - zoom data record
-       log.info("Zoom data record (Table DD) number " + recordNumber +
+       log.debug("Zoom data record (Table DD) number " + recordNumber +
                " for zoom level " + zoomLevel);
-        log.info("ChromName = " + chromName);
-        log.info("ChromId = " + chromId);
-        log.info("ChromStart = " + chromStart);
-        log.info("ChromEnd = " + chromEnd);
-        log.info("ValidCount = " + basesCovered);
-        log.info("MinVal = " + minVal);
-        log.info("MaxVal = " + maxVal);
-        log.info("Sum of data values = " + sumData);
-        log.info("Sum of squares values = " + sumSquares);
+        log.debug("ChromName = " + chromName);
+        log.debug("ChromId = " + chromId);
+        log.debug("ChromStart = " + chromStart);
+        log.debug("ChromEnd = " + chromEnd);
+        log.debug("ValidCount = " + basesCovered);
+        log.debug("MinVal = " + minVal);
+        log.debug("MaxVal = " + maxVal);
+        log.debug("Sum of data values = " + sumData);
+        log.debug("Sum of squares values = " + sumSquares);
     }
 }
 

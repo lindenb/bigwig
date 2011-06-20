@@ -120,26 +120,26 @@ public void print() {
 
    // note if read successfully
    if(mHeaderOK){
-       log.info("R+ tree header has " + RPTREE_HEADER_SIZE + " bytes.");
-       log.info("R+ tree header magic = " + mMagic);
+       log.debug("R+ tree header has " + RPTREE_HEADER_SIZE + " bytes.");
+       log.debug("R+ tree header magic = " + mMagic);
    }
    else {
-       log.info("R+ Tree header is unrecognized type, header magic = " + mMagic);
+       log.debug("R+ Tree header is unrecognized type, header magic = " + mMagic);
        return;
    }
 
    // Table E - Chromosome B+ Tree  Header
-   log.info("R+ Tree file offset = " +  mRPTreeOffset);
-   log.info("magic = " + mMagic);
-   log.info("Block size = " + mBlockSize);
-   log.info("ItemCount = " + mItemCount);
-   log.info("StartChromID = " + mStartChromID);
-   log.info("StartBase = " + mStartBase);
-   log.info("EndChromID = " + mEndChromID);
-   log.info("EndBase = " + mEndBase);
-   log.info("EndFileOffset = " + mEndFileOffset);
-   log.info("ItemsPerSlot = " + mItemsPerSlot);
-   log.info("Reserved = " + mReserved);
+   log.debug("R+ Tree file offset = " +  mRPTreeOffset);
+   log.debug("magic = " + mMagic);
+   log.debug("Block size = " + mBlockSize);
+   log.debug("ItemCount = " + mItemCount);
+   log.debug("StartChromID = " + mStartChromID);
+   log.debug("StartBase = " + mStartBase);
+   log.debug("EndChromID = " + mEndChromID);
+   log.debug("EndBase = " + mEndBase);
+   log.debug("EndFileOffset = " + mEndFileOffset);
+   log.debug("ItemsPerSlot = " + mItemsPerSlot);
+   log.debug("Reserved = " + mReserved);
    }
 
   /*

@@ -66,11 +66,11 @@ public class RPTreeChildNodeItem implements RPTreeNodeItem {
 
     public void print(){
 
-        log.info("Child node item " + mItemIndex + ":\n");
-        log.info(" StartChromID = " + mChromosomeBounds.getStartChromID() + "\n");
-        log.info(" StartBase = " + mChromosomeBounds.getStartBase() + "\n");
-        log.info(" EndChromID = " + mChromosomeBounds.getEndChromID() + "\n");
-        log.info(" EndBase = " + mChromosomeBounds.getEndBase() + "\n");
+        log.debug("Child node item " + mItemIndex + ":\n");
+        log.debug(" StartChromID = " + mChromosomeBounds.getStartChromID() + "\n");
+        log.debug(" StartBase = " + mChromosomeBounds.getStartBase() + "\n");
+        log.debug(" EndChromID = " + mChromosomeBounds.getEndChromID() + "\n");
+        log.debug(" EndBase = " + mChromosomeBounds.getEndBase() + "\n");
 
         // child node specific entries
         mChildNode.printItems();

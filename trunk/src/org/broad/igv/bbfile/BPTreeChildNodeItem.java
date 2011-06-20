@@ -99,8 +99,8 @@ public class BPTreeChildNodeItem implements BPTreeNodeItem {
 
     public void print() {
 
-        log.info("B+ Tree child node " + mItemIndex);
-        log.info("Key value = " + mChromKey);
+        log.debug("B+ Tree child node " + mItemIndex);
+        log.debug("Key value = " + mChromKey);
 
         // recursively print chid node items
         mChildNode.printItems();

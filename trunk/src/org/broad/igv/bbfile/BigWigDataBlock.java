@@ -126,7 +126,7 @@ public class BigWigDataBlock {
      public void print() {
 
         long itemIndex = mLeafHitItem.getItemIndex();
-        log.info("Wig section data referenced by leaf item " + itemIndex);
+        log.debug("Wig section data referenced by leaf item " + itemIndex);
 
         for(int index = 0; index <= mWigItemList.size(); ++index) {
             // BigWig sections print themselves

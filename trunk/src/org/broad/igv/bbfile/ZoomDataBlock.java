@@ -200,7 +200,7 @@ public class ZoomDataBlock {
 
     public void print() {
         long leafIndex = mLeafHitItem.getItemIndex();
-        log.info("Zoom Level " + mZoomLevel + "data for leaf item " + leafIndex + ":");
+        log.debug("Zoom Level " + mZoomLevel + "data for leaf item " + leafIndex + ":");
 
         for(int index = 0; index <= mZoomDataList.size(); ++index) {
             // zoom data records print themselves

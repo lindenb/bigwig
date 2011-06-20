@@ -70,15 +70,15 @@ public class RPTreeLeafNodeItem implements RPTreeNodeItem {
 
     public void print(){
 
-       log.info("R+ tree leaf node data item " + mItemIndex);
-       log.info("StartChromID = " + mChromosomeBounds.getStartChromID());
-       log.info("StartBase = " + mChromosomeBounds.getStartBase());
-       log.info("EndChromID = " + mChromosomeBounds.getEndChromID());
-       log.info("EndBase = " +  mChromosomeBounds.getEndBase());
+       log.debug("R+ tree leaf node data item " + mItemIndex);
+       log.debug("StartChromID = " + mChromosomeBounds.getStartChromID());
+       log.debug("StartBase = " + mChromosomeBounds.getStartBase());
+       log.debug("EndChromID = " + mChromosomeBounds.getEndChromID());
+       log.debug("EndBase = " +  mChromosomeBounds.getEndBase());
 
        // leaf node specific entries
-       log.info("DataOffset = " +  mDataOffset);
-       log.info("DataSize = " + mDataSize);
+       log.debug("DataOffset = " +  mDataOffset);
+       log.debug("DataSize = " + mDataSize);
     }
 
     // *** RPTreeLeafNodeItem specific methods ***

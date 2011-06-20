@@ -197,7 +197,7 @@ public class BPTreeChildNode implements BPTreeNode{
     public void printItems(){
         int  itemCount = getItemCount();
 
-        log.info("Child node " + mNodeIndex + " contains " + itemCount + " child items:");
+        log.debug("Child node " + mNodeIndex + " contains " + itemCount + " child items:");
         for(int item = 0; item < itemCount; ++item){
 
             // recursively will print all node items below this node

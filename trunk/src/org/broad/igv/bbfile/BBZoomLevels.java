@@ -209,7 +209,7 @@ public class BBZoomLevels {
 
         // note if successfully read - should always be correct
         if(zoomLevelHeaders.size() == zoomLevelsCount)
-            log.info("Zoom level headers read for " + zoomLevelsCount + " levels:");
+            log.debug("Zoom level headers read for " + zoomLevelsCount + " levels:");
 
         else
             log.error("Zoom level headers not successfully read for "

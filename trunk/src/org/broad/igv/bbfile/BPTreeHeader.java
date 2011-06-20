@@ -107,13 +107,13 @@ public class  BPTreeHeader {
 
         // Chromosome B+ Tree  Header - BBFile Table E
         if(mHeaderOK)
-            log.info("B+ Tree Header was read from file location " + mHeaderOffset);
-        log.info(" Magic ID =" + mMagic);
-        log.info(" Block size = " + mBlockSize);
-        log.info(" Key size = " + mKeySize);
-        log.info(" Indexed value size = " + mValSize);
-        log.info(" Item Count = " + mItemCount);
-        log.info(" Reserved = " + mReserved);
+            log.debug("B+ Tree Header was read from file location " + mHeaderOffset);
+        log.debug(" Magic ID =" + mMagic);
+        log.debug(" Block size = " + mBlockSize);
+        log.debug(" Key size = " + mKeySize);
+        log.debug(" Indexed value size = " + mValSize);
+        log.debug(" Item Count = " + mItemCount);
+        log.debug(" Reserved = " + mReserved);
     }
     
    /*

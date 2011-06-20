@@ -98,7 +98,7 @@ public class RPTreeLeafNode implements RPTreeNode{
 
     public void printItems(){
 
-        log.info("Leaf Node contains " +  mLeafItems.size() + " items:");
+        log.debug("Leaf Node contains " +  mLeafItems.size() + " items:");
 
         for(int item = 0; item < mLeafItems.size(); ++item){
             mLeafItems.get(item).print();
