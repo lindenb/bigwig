@@ -106,6 +106,10 @@ public class ZoomDataRecord {
         return sumData;
     }
 
+    public float getMeanVal() {
+        return basesCovered == 0 ? 0 : sumData / basesCovered;
+    }
+
     public float getSumSquares() {
         return sumSquares;
     }
