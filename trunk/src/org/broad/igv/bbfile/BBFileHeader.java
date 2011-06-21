@@ -1,4 +1,3 @@
-
 /**
  * Created by IntelliJ IDEA.
  * User: martind
@@ -9,11 +8,10 @@
 
 /**
  *  Container class defines the header information for BigBed and BigWig files
-*/
+ */
 package org.broad.igv.bbfile;
-//import org.broad.igv.util.SeekableStream;
-//import org.broad.igv.tdf.LittleEndianInputStream;
-//import org.broad.tribble.util.SeekableStream;
+
+
 import org.apache.log4j.Logger;
 import org.broad.tribble.util.SeekableStream;
 import org.broad.tribble.util.*;
@@ -26,10 +24,9 @@ import java.io.IOException;
 /*
 *   Container class for holding the BBFile header information, Table C .
 **/
-public class BBFileHeader
-{
+public class BBFileHeader {
 
-     private static Logger log = Logger.getLogger(BBFileHeader.class);
+    private static Logger log = Logger.getLogger(BBFileHeader.class);
 
     // defines bigBed/bigwig Header Format types
     static public final int BBFILE_HEADER_SIZE = 64;
@@ -49,7 +46,6 @@ public class BBFileHeader
     private boolean isLowToHigh;       // flag indicates values represented low to high bytes
     private boolean isBigBed;          // flag indicates file is BigBed format
     private boolean isBigWig;          // flag indicates file is BigWig format;
-    private boolean isStreamSource;    // constructed from input stream
 
     // BBFile Header items - Table C:
     // mMagic number (4 bytes) indicates file type and byte order :
@@ -71,8 +67,6 @@ public class BBFileHeader
     // constructor reads BBFile header from an input stream
     public BBFileHeader(String path, SeekableStream fis, long fileOffset) {
 
-        // showing  input source
-        isStreamSource = true;
 
         // save the path and seekable file handle
         this.path = path;
@@ -103,13 +97,10 @@ public class BBFileHeader
             int uncompressBuffSize,
             long reserved) {
 
-        // showing  input source not specified here
-        // set
-        this.isStreamSource = false;
         this.magic = magic;
 
         // Note: may want to validate the rest of the fields as well
-        if(isBigWig() || isBigBed())
+        if (isBigWig() || isBigBed())
             this.isHeaderOK = true;
 
         this.version = version;
@@ -130,33 +121,13 @@ public class BBFileHeader
         return path;
     }
 
-    public void setPath(String mSourcePath) {
-        this.path = mSourcePath;
-    }
-
-    public SeekableStream getFileStream() {
-        return fis;
-    }
-
-    public void setFileStream(SeekableStream mBBFis) {
-        this.fis = mBBFis;
-    }
-
-     public long getMFileHeaderOffset() {
-        return fileHeaderOffset;
-    }
-
-    // ************** return file info ****************
 
     public boolean isHeaderOK() {
-           return isHeaderOK;
-       }
-
-     public boolean isStreamSource() {
-        return isStreamSource;
+        return isHeaderOK;
     }
 
-     public boolean isLowToHigh() {
+
+    public boolean isLowToHigh() {
         return isLowToHigh;
     }
 
@@ -178,25 +149,25 @@ public class BBFileHeader
         return magic;
     }
 
-     public short getVersion() {
+    public short getVersion() {
         return version;
-     }
+    }
 
-     public short getZoomLevels() {
-         return nZoomLevels;
-     }
+    public short getZoomLevels() {
+        return nZoomLevels;
+    }
 
-     public long getChromosomeTreeOffset() {
-         return chromTreeOffset;
-     }
+    public long getChromosomeTreeOffset() {
+        return chromTreeOffset;
+    }
 
-     public long getFullDataOffset() {
-         return fullDataOffset;
-     }
+    public long getFullDataOffset() {
+        return fullDataOffset;
+    }
 
-     public long getFullIndexOffset() {
-         return fullIndexOffset;
-     }
+    public long getFullIndexOffset() {
+        return fullIndexOffset;
+    }
 
      public short getFieldCount() {
          return fieldCount;
@@ -206,63 +177,49 @@ public class BBFileHeader
          return definedFieldCount;
      }
 
-     public long getAutoSqlOffset() {
-         return autoSqlOffset;
-     }
+    public long getAutoSqlOffset() {
+        return autoSqlOffset;
+    }
 
-     public long getTotalSummaryOffset() {
-         return totalSummaryOffset;
-     }
+    public long getTotalSummaryOffset() {
+        return totalSummaryOffset;
+    }
 
-     public int getUncompressBuffSize() {
-         return uncompressBuffSize;
-     }
+    public int getUncompressBuffSize() {
+        return uncompressBuffSize;
+    }
 
-     public long getReserved() {
-         return reserved;
-     }
 
     public void print() {
 
-        // note if header read successfully from a source
-        if(isStreamSource) {
+        if (isHeaderOK) {
+            if (isBigWig())
+                System.out.println("BigWig file " + path + ", file header at location " + fileHeaderOffset);
+            else if (isBigBed())
+                System.out.println("BigBed file " + path + ", file header at location " + fileHeaderOffset);
+        } else {
+            System.out.println("BBFile " + path + "  with bad magic = " + magic +
+                    " from file header location " + fileHeaderOffset);
+            return; // bad read - remaining header items not interpreted
+        }
 
-            if(isHeaderOK){
-                if(isBigWig())
-                    log.debug("BigWig file " + path + ", file header at location " + fileHeaderOffset);
-                else if(isBigBed())
-                    log.debug("BigBed file " + path + ", file header at location " + fileHeaderOffset);
-            }
-            else {
-               log.debug("BBFile " + path + "  with bad magic = " + magic +
-                       " from file header location " + fileHeaderOffset);
-               return; // bad read - remaining header items not interpreted
-            }
-        }
-        // otherwise header was constructed without reading
-        else {
-            if(isBigWig())
-                log.debug("BBFile " + path + " is a BigWig file, header magic = " + magic);
-            else if(isBigBed())
-                log.debug("BBFile " + path + " is a BigBed file, header magic = " + magic);
-        }
 
         // header fields
-        log.debug("BBFile header magic = " + magic);
-        log.debug("Version = " + version);
-        log.debug("Zoom Levels = "+ nZoomLevels);
-        log.debug("Chromosome Info B+ tree offset = " + chromTreeOffset);
-        log.debug("Data Block offset = " + fullDataOffset);
-        log.debug("Chromosome Data R+ tree offset = " + fullIndexOffset);
-        log.debug("Bed fields count = " + fieldCount);
-        log.debug("Bed defined fields count = " + definedFieldCount);
-        log.debug("AutoSql Offset = " + autoSqlOffset);
-        log.debug("Total Summary offset = " + totalSummaryOffset);
-        log.debug("Maximum uncompressed buffer size = " + uncompressBuffSize);
-        log.debug("m_reserved = " + reserved);
+        System.out.println("BBFile header magic = " + magic);
+        System.out.println("Version = " + version);
+        System.out.println("Zoom Levels = " + nZoomLevels);
+        System.out.println("Chromosome Info B+ tree offset = " + chromTreeOffset);
+        System.out.println("Data Block offset = " + fullDataOffset);
+        System.out.println("Chromosome Data R+ tree offset = " + fullIndexOffset);
+        System.out.println("Bed fields count = " + fieldCount);
+        System.out.println("Bed defined fields count = " + definedFieldCount);
+        System.out.println("AutoSql Offset = " + autoSqlOffset);
+        System.out.println("Total Summary offset = " + totalSummaryOffset);
+        System.out.println("Maximum uncompressed buffer size = " + uncompressBuffSize);
+        System.out.println("m_reserved = " + reserved);
     }
 
-     /*
+    /*
      *  Reads in BBFile header information.
      *
      *  Returns:
@@ -275,7 +232,7 @@ public class BBFileHeader
         LittleEndianInputStream lbdis = null;
         DataInputStream bdis = null;
 
-         byte[] buffer = new byte[BBFILE_HEADER_SIZE];
+        byte[] buffer = new byte[BBFILE_HEADER_SIZE];
 
 
         try {
@@ -290,20 +247,20 @@ public class BBFileHeader
             magic = lbdis.readInt();
 
             // check for a valid bigBed or bigWig file
-            if(magic == BIGWIG_MAGIC_LTH)
+            if (magic == BIGWIG_MAGIC_LTH)
                 isBigWig = true;
-            else if(magic == BIGBED_MAGIC_LTH)
+            else if (magic == BIGBED_MAGIC_LTH)
                 isBigBed = true;
 
-            // try high to low byte order
+                // try high to low byte order
             else {
                 bdis = new DataInputStream(new ByteArrayInputStream(buffer));
                 magic = bdis.readInt();
 
                 // check for a valid bigBed or bigWig file
-                if(magic == BIGWIG_MAGIC_HTL)
+                if (magic == BIGWIG_MAGIC_HTL)
                     isBigWig = true;
-                else if(magic == BIGBED_MAGIC_HTL)
+                else if (magic == BIGBED_MAGIC_HTL)
                     isBigBed = true;
 
                 else
@@ -314,7 +271,7 @@ public class BBFileHeader
             }
 
             // Get header information
-            if(isLowToHigh) {
+            if (isLowToHigh) {
                 version = lbdis.readShort();
                 nZoomLevels = lbdis.readShort();
                 chromTreeOffset = lbdis.readLong();
@@ -326,9 +283,7 @@ public class BBFileHeader
                 totalSummaryOffset = lbdis.readLong();
                 uncompressBuffSize = lbdis.readInt();
                 reserved = lbdis.readLong();
-            }
-            else
-            {
+            } else {
                 version = bdis.readShort();
                 nZoomLevels = bdis.readShort();
                 chromTreeOffset = bdis.readLong();
@@ -342,12 +297,12 @@ public class BBFileHeader
                 reserved = bdis.readLong();
             }
 
-        }catch(IOException ex) {
+        } catch (IOException ex) {
             throw new RuntimeException("Error reading file header for " + path, ex);
         }
 
-         // file header was read properly
-         return true;
+        // file header was read properly
+        return true;
     }
 
 }  // mEndBase of class BBFileHeader
