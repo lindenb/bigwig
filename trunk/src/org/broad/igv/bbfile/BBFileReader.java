@@ -563,6 +563,15 @@ public class BBFileReader {
         if (!isBigBedFile())
             return null;
 
+        if (chromosomeDataTree == null) {
+            // get R+ chromosome data location tree (Tables K, L, M, N)
+            chromDataTreeOffset = fileHeader.getFullIndexOffset();
+            if (chromDataTreeOffset != 0) {
+                fileOffset = chromDataTreeOffset;
+                chromosomeDataTree = new RPTree(fis, fileOffset, isLowToHigh, uncompressBufSize);
+            }
+
+        }
         // go from chromosome names to chromosome ID region
         RPChromosomeRegion selectionRegion = getChromosomeBounds(startChromosome, startBase,
                 endChromosome, endBase);
@@ -594,6 +603,16 @@ public class BBFileReader {
         if (!isBigBedFile())
             return null;
 
+        if (chromosomeDataTree == null) {
+            // get R+ chromosome data location tree (Tables K, L, M, N)
+            chromDataTreeOffset = fileHeader.getFullIndexOffset();
+            if (chromDataTreeOffset != 0) {
+                fileOffset = chromDataTreeOffset;
+                chromosomeDataTree = new RPTree(fis, fileOffset, isLowToHigh, uncompressBufSize);
+            }
+
+        }
+
         // get all region bounds
         RPChromosomeRegion selectionRegion = chromosomeDataTree.getChromosomeBounds();
 
@@ -605,37 +624,7 @@ public class BBFileReader {
         return bedIterator;
     }
 
-    /**
-     * Returns an iterator for BigBed features which occupy a chromosome selection region.
-     * <p/>
-     * Note: the BBFile type should be BigBed; else a null iterator is returned.
-     * <p/>
-     * Parameters:
-     * selectionRegion - chromosome selection region consisting of:
-     * startChromID - ID of start chromosome
-     * startBase     - starting base position for features
-     * endChromosome - ID of end chromosome
-     * endBase       - ending base position for feature
-     * contained     - flag specifies bed features must be contained in the specified
-     * base region if true; else can intersect the region if false
-     * <p/>
-     * Returns:
-     * Iterator to provide BedFeature(s) for the requested chromosome selection region.
-     * Error conditions:
-     * 1) An empty iterator is returned if region has no data available
-     * 2) A null object is returned if the file is not BigBed.(see isBigBedFile method)
-     */
-    public BigBedIterator getBigBedIterator(RPChromosomeRegion selectionRegion, boolean contained) {
 
-        if (!isBigBedFile())
-            return null;
-
-        // compose an iterator
-        BigBedIterator bedIterator = new BigBedIterator(fis, chromosomeIDTree, chromosomeDataTree,
-                selectionRegion, contained);
-
-        return bedIterator;
-    }
 
     /**
      * Returns an iterator for BigWig values which occupy the specified startChromosome region.
@@ -703,6 +692,15 @@ public class BBFileReader {
         if (!isBigWigFile())
             return null;
 
+        if (chromosomeDataTree == null) {
+            // get R+ chromosome data location tree (Tables K, L, M, N)
+            chromDataTreeOffset = fileHeader.getFullIndexOffset();
+            if (chromDataTreeOffset != 0) {
+                fileOffset = chromDataTreeOffset;
+                chromosomeDataTree = new RPTree(fis, fileOffset, isLowToHigh, uncompressBufSize);
+            }
+
+        }
         // get all regions bounds
         RPChromosomeRegion selectionRegion = chromosomeDataTree.getChromosomeBounds();
 
@@ -714,37 +712,7 @@ public class BBFileReader {
         return wigIterator;
     }
 
-    /**
-     * Returns an iterator for BigWig values which occupy the specified chromosome selection region.
-     * <p/>
-     * Note: the BBFile type should be BigBed; else a null iterator is returned.
-     * <p/>
-     * Parameters:
-     * selectionRegion - chromosome selction region consists of:
-     * startChromID  - ID of start chromosome
-     * startBase    - starting base position for features
-     * endChromoID  - ID of end chromosome
-     * endBase      - ending base position for feature
-     * contained    - flag specifies bed features must be contained in the specified
-     * base region if true; else can intersect the region if false
-     * <p/>
-     * Returns:
-     * Iterator to provide BedFeature(s) for the requested chromosome selection region.
-     * Error conditions:
-     * 1) An empty iterator is returned if region has no data available
-     * 2) A null object is returned if the file is not BigBed.(see isBigWigFile method)
-     */
-    public BigWigIterator getBigWigIterator(RPChromosomeRegion selectionRegion, boolean contained) {
 
-        if (!isBigWigFile())
-            return null;
-
-        // compose an iterator
-        BigWigIterator wigIterator = new BigWigIterator(fis, chromosomeIDTree, chromosomeDataTree,
-                selectionRegion, contained);
-
-        return wigIterator;
-    }
 
     /**
      * Returns an iterator for zoom level records for the chromosome selection region.
