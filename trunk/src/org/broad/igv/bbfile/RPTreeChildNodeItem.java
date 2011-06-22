@@ -17,7 +17,6 @@ public class RPTreeChildNodeItem implements RPTreeNodeItem {
 
     private static Logger log = Logger.getLogger(RPTreeChildNodeItem.class);
     private final boolean isLeafItem = false;
-    private long itemIndex;       // child node item index for B+ tree child node
 
     // R+ child (non-leaf) node item entries: BBFile Table N
     private RPChromosomeRegion chromosomeBounds; // chromosome bounds for item
@@ -34,20 +33,12 @@ public class RPTreeChildNodeItem implements RPTreeNodeItem {
     *       childNode - child node item assigned to child node
     *
     * */
-    public RPTreeChildNodeItem(long itemIndex, int startChromID, int startBase,
+    public RPTreeChildNodeItem(int startChromID, int startBase,
                                int endChromID, int endBase, RPTreeNode childNode){
 
-        this.itemIndex = itemIndex;
+
         chromosomeBounds = new RPChromosomeRegion(startChromID, startBase, endChromID, endBase);
         this.childNode = childNode;
-    }
-
-    public long getItemIndex() {
-           return itemIndex;
-       }
-
-    public boolean isLeafItem(){
-        return isLeafItem;
     }
 
     public RPChromosomeRegion getChromosomeBounds() {
@@ -66,7 +57,7 @@ public class RPTreeChildNodeItem implements RPTreeNodeItem {
 
     public void print(){
 
-        log.debug("Child node item " + itemIndex + ":\n");
+        log.debug("Child node item :\n");
         log.debug(" StartChromID = " + chromosomeBounds.getStartChromID() + "\n");
         log.debug(" StartBase = " + chromosomeBounds.getStartBase() + "\n");
         log.debug(" EndChromID = " + chromosomeBounds.getEndChromID() + "\n");

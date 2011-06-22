@@ -18,8 +18,6 @@ package org.broad.igv.bbfile;
 
 interface RPTreeNodeItem  {
 
-    // Returns the items index in the parent node list.
-    long getItemIndex();
 
     // returns the chromosome boundary for the item
     public RPChromosomeRegion getChromosomeBounds();

@@ -62,8 +62,7 @@ public class BigWigSection {
 
         // check for valid Wig item type
         if(wigSectionHeader.getItemType() == BigWigSectionHeader.WigItemType.Unknown){
-            log.error("Read error on wig section leaf index " + this.leafHitItem.getItemIndex());
-            throw new RuntimeException("Read error on wig section leaf index " + this.leafHitItem.getItemIndex());
+            throw new RuntimeException("Read error on wig section leaf index ");
         }
 
         // include header in data segment size accounting
@@ -235,8 +234,7 @@ public class BigWigSection {
     *   Method prints out the data items for this Wig section.
     * */
     public void print() {
-        long leafIndex = leafHitItem.getItemIndex();
-        log.debug("Wig section for leaf item " + leafIndex + " has a data size = " + sectionDataSize);
+        log.debug("Wig section for leaf item  has a data size = " + sectionDataSize);
         wigSectionHeader.print();
     }
 

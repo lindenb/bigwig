@@ -16,14 +16,10 @@ import org.apache.log4j.Logger;
 *           depends on whether the file is BigWig of Table J format
 *           or BigBed of Tble I format.
  */
-public class RPTreeLeafNodeItem implements RPTreeNodeItem {
+public class RPTreeLeafNodeItem extends RPChromosomeRegion implements RPTreeNodeItem {
 
     private static Logger log = Logger.getLogger(RPTreeLeafNodeItem.class);
-    private final boolean isLeafItem = true;
-    private long itemIndex;       // leaf item index in R+ tree leaf item list
 
-    // R+ tree leaf node item entries: BBFile Table M
-    private RPChromosomeRegion chromosomeBounds; // chromosome bounds for item
     private long dataOffset;      // file offset to data item
     private long dataSize;        // size of data item
 
@@ -39,50 +35,35 @@ public class RPTreeLeafNodeItem implements RPTreeNodeItem {
     *       dataSize - size of (compressed) leaf data region in bytes
     *
     * */
-    public RPTreeLeafNodeItem(long itemIndex, int startChromID,  int startBase,
-            int endChromID, int endBase, long dataOffset, long dataSize){
 
-        this.itemIndex = itemIndex;
-        chromosomeBounds = new RPChromosomeRegion(startChromID, startBase, endChromID, endBase);
+    public RPTreeLeafNodeItem(int startChromID, int startBase,
+                              int endChromID, int endBase, long dataOffset, long dataSize) {
+        super(startChromID, startBase, endChromID, endBase);
         this.dataOffset = dataOffset;
         this.dataSize = dataSize;
     }
 
-    // *** RPTreeNodeItem interface implementation  ***
-    public long getItemIndex() {
-           return itemIndex;
-       }
-
-    public boolean isLeafItem(){
-           return isLeafItem;
-       }
-
+ 
     public RPChromosomeRegion getChromosomeBounds() {
-        return chromosomeBounds;
+        return this;
     }
 
-    public int compareRegions(RPChromosomeRegion chromosomeRegion){
+    public void print() {
 
-        // test leaf item bounds for hit
-        int value = chromosomeBounds.compareRegions(chromosomeRegion);
-        return value;
-    }
+        log.debug("R+ tree leaf node data item ");
+        log.debug("StartChromID = " + getStartChromID());
+        log.debug("StartBase = " + getStartBase());
+        log.debug("EndChromID = " + getEndChromID());
+        log.debug("EndBase = " + getEndBase());
 
-    public void print(){
-
-       log.debug("R+ tree leaf node data item " + itemIndex);
-       log.debug("StartChromID = " + chromosomeBounds.getStartChromID());
-       log.debug("StartBase = " + chromosomeBounds.getStartBase());
-       log.debug("EndChromID = " + chromosomeBounds.getEndChromID());
-       log.debug("EndBase = " +  chromosomeBounds.getEndBase());
-
-       // leaf node specific entries
-       log.debug("DataOffset = " + dataOffset);
-       log.debug("DataSize = " + dataSize);
+        // leaf node specific entries
+        log.debug("DataOffset = " + dataOffset);
+        log.debug("DataSize = " + dataSize);
     }
 
     // *** RPTreeLeafNodeItem specific methods ***
-     public long getDataOffset() {
+
+    public long getDataOffset() {
         return dataOffset;
     }
 

@@ -605,7 +605,7 @@ public class RPTree {
                     }
 
                    // insert leaf node items
-                    RPTreeLeafNodeItem leafItem = new RPTreeLeafNodeItem(++leafCount, startChromID,  startBase,
+                    RPTreeLeafNodeItem leafItem = new RPTreeLeafNodeItem(startChromID,  startBase,
                             endChromID, endBase, dataOffset, dataSize);
                     thisNode.insertItem(leafItem);
                }
@@ -619,7 +619,7 @@ public class RPTree {
                    childNode = readRPTreeNode(fis, dataOffset, isLowToHigh);
 
                    // insert child node item
-                   RPTreeChildNodeItem childItem = new RPTreeChildNodeItem(item, startChromID, startBase,
+                   RPTreeChildNodeItem childItem = new RPTreeChildNodeItem(startChromID, startBase,
                         endChromID, endBase, childNode);
                     thisNode.insertItem(childItem);
                 }

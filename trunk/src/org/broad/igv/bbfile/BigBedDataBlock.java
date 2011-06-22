@@ -83,8 +83,7 @@ public class BigBedDataBlock {
               bedBuffer = buffer;    // use uncompressed read buffer directly
 
        }catch(IOException ex) {
-            long itemIndex = this.leafHitItem.getItemIndex();
-            String error = String.format("Error reading Bed data for leaf item %d \n", itemIndex);
+            String error = String.format("Error reading Bed data for leaf item %d \n");
             log.error(error, ex);
             throw new RuntimeException(error, ex);
        }
