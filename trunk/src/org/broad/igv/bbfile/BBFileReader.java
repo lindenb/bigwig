@@ -176,14 +176,6 @@ public class BBFileReader {
         fileOffset = fileHeader.getFullDataOffset();
         dataCount = getDataCount(fis, fileOffset);
 
-        // get R+ chromosome data location tree (Tables K, L, M, N)
-        chromDataTreeOffset = fileHeader.getFullIndexOffset();
-        if (chromDataTreeOffset != 0) {
-            fileOffset = chromDataTreeOffset;
-            chromosomeDataTree = new RPTree(fis, fileOffset, isLowToHigh,
-                    uncompressBufSize);
-        }
-
 
     }
 
@@ -649,6 +641,16 @@ public class BBFileReader {
     public BigWigIterator getBigWigIterator(String startChromosome, int startBase,
                                             String endChromosome, int endBase, boolean contained) {
 
+        if (chromosomeDataTree == null) {
+            // get R+ chromosome data location tree (Tables K, L, M, N)
+            chromDataTreeOffset = fileHeader.getFullIndexOffset();
+            if (chromDataTreeOffset != 0) {
+                fileOffset = chromDataTreeOffset;
+                chromosomeDataTree = new RPTree(fis, fileOffset, isLowToHigh, uncompressBufSize);
+            }
+
+        }
+
         if (!isBigWigFile())
             return null;
 
@@ -759,7 +761,7 @@ public class BBFileReader {
                 endChromosome, endBase);
 
         // check for valid selection region  
-        if (selectionRegion == null)  {
+        if (selectionRegion == null) {
             return ZoomLevelIterator.EmptyIterator.theInstance;
         }
 
