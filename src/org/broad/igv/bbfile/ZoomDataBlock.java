@@ -82,11 +82,8 @@ public class ZoomDataBlock {
                 zoomBuffer = buffer;    // use uncompressed read buffer directly
 
         } catch (IOException ex) {
-            long itemIndex = this.leafHitItem.getItemIndex();
-            log.error("Error reading Zoom level " + this.zoomLevel + " data for leaf item "
-                    + itemIndex, ex);
-            String error = String.format("Error reading zoom level %d data for leaf item %d\n",
-                    this.zoomLevel, itemIndex);
+            log.error("Error reading Zoom level " + this.zoomLevel + " data for leaf item ",  ex);
+            String error = String.format("Error reading zoom level %d data for leaf item %d\n", this.zoomLevel);
             throw new RuntimeException(error, ex);
         }
 
@@ -180,21 +177,18 @@ public class ZoomDataBlock {
             }
 
         } catch (IOException ex) {
-            long itemIndex = leafHitItem.getItemIndex();
-            log.error("Read error for zoom level " + zoomLevel + " leaf item " + itemIndex);
+            log.error("Read error for zoom level " + zoomLevel + " leaf item " );
 
             // accept this as an end of block condition unless no items were read
             if (recordNumber == 1)
-                throw new RuntimeException("Read error for zoom level " + zoomLevel +
-                        " leaf item " + itemIndex);
+                throw new RuntimeException("Read error for zoom level " + zoomLevel + " leaf item ");
         }
 
         return zoomDataList;
     }
 
     public void print() {
-        long leafIndex = leafHitItem.getItemIndex();
-        log.debug("Zoom Level " + zoomLevel + "data for leaf item " + leafIndex + ":");
+        log.debug("Zoom Level " + zoomLevel + "data for leaf item :");
 
         for (int index = 0; index <= zoomDataList.size(); ++index) {
             // zoom data records print themselves

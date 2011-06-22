@@ -72,9 +72,8 @@ public class BigWigDataBlock {
             else
                 wigBuffer = buffer;    // use uncompressed read buffer directly
         }catch(IOException ex) {
-             long itemIndex = this.leafHitItem.getItemIndex();
-             log.error("Error reading Wig section for leaf item " + itemIndex, ex);
-             String error = String.format("Error reading Wig section for leaf item %d\n", itemIndex);
+             log.error("Error reading Wig section for leaf item ", ex);
+             String error = String.format("Error reading Wig section for leaf item %d\n");
              throw new RuntimeException(error, ex);
         }
 
@@ -120,8 +119,7 @@ public class BigWigDataBlock {
 
      public void print() {
 
-        long itemIndex = leafHitItem.getItemIndex();
-        log.debug("Wig section data referenced by leaf item " + itemIndex);
+        log.debug("Wig section data referenced by leaf item ");
 
         for(int index = 0; index <= wigItemList.size(); ++index) {
             // BigWig sections print themselves
