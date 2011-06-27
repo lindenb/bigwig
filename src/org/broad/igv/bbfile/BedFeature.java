@@ -109,10 +109,10 @@ public class BedFeature {
 
    public void print(){
 
-       log.debug("BigBed feature item " + itemIndex);
-       log.debug("mChromosome name: " + chromosome);
-       log.debug("mChromosome start base= " + startBase);
+       System.out.println("BigBed feature item " + itemIndex);
+       System.out.println("mChromosome name: " + chromosome);
+       System.out.println("mChromosome start base= " + startBase);
        log.debug("mChromosome end base = " + endBase);
-       log.debug("Rest of fields: \n" + restOfFields);
+       System.out.println("Rest of fields: \n" + restOfFields);
    }
 }
