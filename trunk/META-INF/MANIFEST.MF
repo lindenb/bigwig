@@ -5,6 +5,7 @@ Bundle-SymbolicName: BigWig
 Bundle-Version: 1.0.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Description: This project provides java readers for the UCSC's BigWig and BigBed formats.
+Bundle-DocURL: http://code.google.com/p/bigwig
 Bundle-ClassPath: .,
  lib/junit-4.5.jar,
  lib/log4j-1.2.15.jar
