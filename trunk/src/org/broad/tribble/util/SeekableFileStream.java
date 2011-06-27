@@ -40,6 +40,16 @@ public class SeekableFileStream extends SeekableStream {
         fis = new FileInputStream(file);
     }
 
+
+    public boolean eof() throws IOException {
+        return file.length() == fis.getChannel().position();
+    }
+
+    public long length() {
+        return file.length();
+    }
+
+
     public void seek(long position) throws IOException {
         fis.getChannel().position(position);
     }
@@ -65,7 +75,7 @@ public class SeekableFileStream extends SeekableStream {
 
     @Override
     public int read(byte[] b) throws IOException {
-        return fis.read(b);
+        return fis.read(b);    
     }
 
     @Override
@@ -75,7 +85,7 @@ public class SeekableFileStream extends SeekableStream {
 
     @Override
     public void mark(int readlimit) {
-        fis.mark(readlimit);
+        fis.mark(readlimit); 
     }
 
     @Override
