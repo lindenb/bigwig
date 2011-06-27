@@ -25,6 +25,7 @@
     <jar jarfile="${dist}/BigWig.jar" manifest="META-INF/MANIFEST.MF">
       <fileset dir="${build}" />
       <fileset dir="." includes="**/*.jar"/>
+      <fileset dir="." includes="log4j.properties"/>
     </jar>
   </target>
 
