@@ -72,15 +72,15 @@ public class BedFeature {
     private String chromosome;      // mChromosome/contig name
     private int startBase;         // starting base for item
     private int endBase;           // ending base for item
-    private String restOfFields;    // string containing custom fields
+    private String[] restOfFields;    // string containing custom fields
 
-    public BedFeature(int itemIndex, String chromosome, int startBase, int endBase, String restOfFileds){
+    public BedFeature(int itemIndex, String chromosome, int startBase, int endBase, String restOfFieldsString){
 
        this.itemIndex = itemIndex;
        this.chromosome =  chromosome;
        this.startBase =  startBase;
        this.endBase = endBase;
-       restOfFields = restOfFileds;
+       restOfFields = restOfFieldsString == null ? null : restOfFieldsString.split("\t");
    }
 
    // returns the data record index
@@ -103,7 +103,7 @@ public class BedFeature {
        return endBase;
    }
 
-    public String getRestOfFields(){
+    public String[] getRestOfFields(){
         return restOfFields;
     }
 
