@@ -98,6 +98,13 @@ public class BigWigIterator implements Iterator<WigItem> {
         // Ready for next() data extraction
     }
 
+    /**
+     * Constructor for an empty iterator
+     */
+    public BigWigIterator() {
+        empty = true;
+    }
+
     /*
    *  Method returns status on a "next item" being available.
    *
