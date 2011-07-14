@@ -99,6 +99,12 @@ public class BigBedIterator implements Iterator<BedFeature> {
 
     }
 
+
+    public BigBedIterator() {
+        empty = true;
+    }
+
+
     /*
    *  Method returns status on a "next item" being available.
    *
