@@ -98,19 +98,10 @@ public class BPTreeLeafNodeItem implements BPTreeNodeItem {
     *   Returns:
     *       true, if keys are equal; false if keys are different
     * */
+   
     public boolean chromKeysMatch(String chromKey) {
         String thisKey = this.chromKey;
         String thatKey = chromKey;
-
-        // Note: must have the same length to compare chromosome names
-        int thisKeyLength = thisKey.length();
-        int thatKeyLength = thatKey.length();
-
-        // check if need to truncate the larger string
-        if(thisKeyLength > thatKeyLength)
-            thisKey = thisKey.substring(0,thatKeyLength);
-        else if(thatKeyLength > thisKeyLength)
-            thatKey = thatKey.substring(0,thisKeyLength);
 
         if (thisKey.compareTo(thatKey) == 0)
             return true;
