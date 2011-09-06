@@ -99,10 +99,11 @@ public class BigWigIterator implements Iterator<WigItem> {
     }
 
     /**
-     * Constructor for an empty iterator
+     * Constructor for an "empty" iterator
      */
-    public BigWigIterator() {
+    public  BigWigIterator () {
         empty = true;
+
     }
 
     /*
@@ -370,8 +371,7 @@ public class BigWigIterator implements Iterator<WigItem> {
         int uncompressBufSize = chromDataTree.getUncompressBuffSize();
 
         // decompress leaf item data block for feature extraction
-        wigDataBlock = new BigWigDataBlock(fis, leafHitItem, chromosomeMap, isLowToHigh,
-                uncompressBufSize);
+        wigDataBlock = new BigWigDataBlock(fis, leafHitItem, chromosomeMap, isLowToHigh, uncompressBufSize);
 
         // get section Wig item list and set next index to first item
         wigItemList = wigDataBlock.getWigData(selectionRegion, isContained);

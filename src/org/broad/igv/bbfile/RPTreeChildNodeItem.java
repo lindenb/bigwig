@@ -34,7 +34,6 @@ import org.apache.log4j.Logger;
 public class RPTreeChildNodeItem implements RPTreeNodeItem {
 
     private static Logger log = Logger.getLogger(RPTreeChildNodeItem.class);
-    private final boolean isLeafItem = false;
 
     // R+ child (non-leaf) node item entries: BBFile Table N
     private RPChromosomeRegion chromosomeBounds; // chromosome bounds for item
@@ -51,29 +50,45 @@ public class RPTreeChildNodeItem implements RPTreeNodeItem {
     *       childNode - child node item assigned to child node
     *
     * */
+
     public RPTreeChildNodeItem(int startChromID, int startBase,
-                               int endChromID, int endBase, RPTreeNode childNode){
+                               int endChromID, int endBase, RPTreeNode childNode) {
 
 
         chromosomeBounds = new RPChromosomeRegion(startChromID, startBase, endChromID, endBase);
         this.childNode = childNode;
     }
 
+
+    public RPTreeChildNodeItem(int startChromID, int startBase,
+                               int endChromID, int endBase, long childDataOffset) {
+
+
+        chromosomeBounds = new RPChromosomeRegion(startChromID, startBase, endChromID, endBase);
+    }
+
+
     public RPChromosomeRegion getChromosomeBounds() {
         return chromosomeBounds;
     }
 
     public RPTreeNode getChildNode() {
+
+        if (childNode instanceof RPTreeNodeProxy) {
+            RPTreeNodeProxy proxy = (RPTreeNodeProxy) childNode;
+             childNode = RPTree.readRPTreeNode(proxy.fis, proxy.fileOffset, proxy.isLowToHigh, true);
+        }
+
         return childNode;
     }
 
-    public int compareRegions(RPChromosomeRegion chromosomeRegion){
+    public int compareRegions(RPChromosomeRegion chromosomeRegion) {
 
         int value = chromosomeBounds.compareRegions(chromosomeRegion);
         return value;
     }
 
-    public void print(){
+    public void print() {
 
         log.debug("Child node item :\n");
         log.debug(" StartChromID = " + chromosomeBounds.getStartChromID() + "\n");

@@ -62,9 +62,9 @@ public class RPTree {
 
     private static Logger log = Logger.getLogger(RPTree.class);
 
-    public final int RPTREE_NODE_FORMAT_SIZE = 4;       // node format size
-    public final int RPTREE_NODE_LEAF_ITEM_SIZE = 32;   // leaf item size
-    public final int RPTREE_NODE_CHILD_ITEM_SIZE = 24;  // child item size
+    public static final int RPTREE_NODE_FORMAT_SIZE = 4;       // node format size
+    public static final int RPTREE_NODE_LEAF_ITEM_SIZE = 32;   // leaf item size
+    public static final int RPTREE_NODE_CHILD_ITEM_SIZE = 24;  // child item size
 
     // R+ tree access variables   - for reading in R+ tree nodes from a file
     private int uncompressBuffSize;    // decompression buffer size; or 0 for uncompressed data
@@ -96,36 +96,37 @@ public class RPTree {
     *       isLowToHigh - binary values are low to high if true; else high to low
     *       uncompressBuffSize - buffer size for decompression; else 0 for uncompressed data
     * */
-    public RPTree(SeekableStream fis, long fileOffset, boolean isLowToHigh,  int uncompressBuffSize) {
+
+    public RPTree(SeekableStream fis, long fileOffset, boolean isLowToHigh, int uncompressBuffSize, boolean forceDescend) {
 
         // save the seekable file handle  and B+ Tree file offset
         // Note: the offset is the file position just after the B+ Tree Header
-       // mBBFis = fis;
-        rpTreeOffset =  fileOffset;
+        // mBBFis = fis;
+        rpTreeOffset = fileOffset;
         this.uncompressBuffSize = uncompressBuffSize;
         this.isLowToHigh = isLowToHigh;
 
         // read in R+ tree header - verify the R+ tree info exits
-        rpTreeHeader = new RPTreeHeader(fis, rpTreeOffset,isLowToHigh);
+        rpTreeHeader = new RPTreeHeader(fis, rpTreeOffset, isLowToHigh);
 
         // log error if header not found and throw exception
-        if(!rpTreeHeader.isHeaderOK()){
+        if (!rpTreeHeader.isHeaderOK()) {
             int badMagic = rpTreeHeader.getMagic();
             log.error("Error reading R+ tree header: bad magic = " + badMagic);
-            throw new RuntimeException("Error reading R+ tree header: bad magic = " +  badMagic);
+            throw new RuntimeException("Error reading R+ tree header: bad magic = " + badMagic);
         }
 
         // assigns R+ tree organization from the header
         order = rpTreeHeader.getBlockSize();
         chromosomeBounds = new RPChromosomeRegion(rpTreeHeader.getStartChromID(), rpTreeHeader.getStartBase(),
-            rpTreeHeader.getEndChromID(), rpTreeHeader.getEndBase());
+                rpTreeHeader.getEndChromID(), rpTreeHeader.getEndBase());
 
         // populate the tree - read in the nodes
         long nodeOffset = rpTreeOffset + rpTreeHeader.getHeaderSize();
         RPTreeNode parentNode = null;      // parent node of the root is itself, or null
 
         // start constructing the R+ tree - get the root node
-        rootNode =  readRPTreeNode(fis, nodeOffset, isLowToHigh);
+        rootNode = readRPTreeNode(fis, nodeOffset, isLowToHigh, forceDescend);
     }
 
     /*
@@ -134,6 +135,7 @@ public class RPTree {
      *      where any node must have at least m/2 items and no more than m items.
      *      keySize - the number of significant bytes in a item key.
      * */
+
     public RPTree(int order) {
 
         // R+ tree node specification
@@ -150,9 +152,10 @@ public class RPTree {
     *   Returns:
     *       Data decompression buffer size in bytes; else 0 for uncompressed data in file.
     * */
+
     public int getUncompressBuffSize() {
-          return uncompressBuffSize;
-     }
+        return uncompressBuffSize;
+    }
 
     /*
     *   Method returns if file contains formatted data in low to high byte order.
@@ -160,9 +163,10 @@ public class RPTree {
     *   Returns:
     *       Returns true if data ordered in low to high byte order; false if high to low.
     * */
-     public boolean isIsLowToHigh() {
-          return isLowToHigh;
-     }
+
+    public boolean isIsLowToHigh() {
+        return isLowToHigh;
+    }
 
     /*
     *   Method returns the R+ tree order, the maximum number of leaf items per node.
@@ -170,6 +174,7 @@ public class RPTree {
     *   Returns:
     *       Maximum number of leaf items per node..
     * */
+
     public int getOrder() {
         return order;
     }
@@ -180,6 +185,7 @@ public class RPTree {
     *   Returns:
     *       R+ tree index header.
     * */
+
     public RPTreeHeader getRPTreeHeader() {
         return rpTreeHeader;
     }
@@ -190,6 +196,7 @@ public class RPTree {
     *   Returns:
     *       Total number of chromosomes or contigs in the R+ tree.
     * */
+
     public long getItemCount() {
         return rpTreeHeader.getItemCount();
     }
@@ -200,6 +207,7 @@ public class RPTree {
     *   Returns:
     *       chromosome bounding region for all R+ tree data
     * */
+
     public RPChromosomeRegion getChromosomeBounds() {
         return chromosomeBounds;
     }
@@ -210,9 +218,10 @@ public class RPTree {
     *   Returns:
     *       Node count for R+ tree; or 0 if tree was constructed without nodes.
     * */
-     public long getNodeCount() {
+
+    public long getNodeCount() {
         return nodeCount;
-     }
+    }
 
     /*
     *   Method finds the bounding chromosome region in R+ tree for a chromosome ID range.
@@ -224,7 +233,8 @@ public class RPTree {
     *   Returns:
     *       Region which bounds the extremes of chromosome ID range
     * */
-    public RPChromosomeRegion getChromosomeRegion(int startChromID, int endChromID){
+
+    public RPChromosomeRegion getChromosomeRegion(int startChromID, int endChromID) {
 
         RPChromosomeRegion region;
 
@@ -232,7 +242,7 @@ public class RPTree {
         RPTreeNode thisNode = rootNode;
         RPChromosomeRegion seedRegion = null;  // null until a chromosome match
 
-        region =  findChromosomeRegion(thisNode, startChromID, endChromID, seedRegion);
+        region = findChromosomeRegion(thisNode, startChromID, endChromID, seedRegion);
 
         return region;
     }
@@ -243,7 +253,8 @@ public class RPTree {
     *   Returns:
     *       List of all chromosome regions in the chromosome ID range.
     * */
-    public ArrayList<RPChromosomeRegion> getAllChromosomeRegions(){
+
+    public ArrayList<RPChromosomeRegion> getAllChromosomeRegions() {
 
         // Search the R+ tree to extract the chromosome regions
         RPTreeNode thisNode = rootNode;
@@ -278,13 +289,14 @@ public class RPTree {
     *
     *       Check returned leaf item bounds for cutoff limits on selection region due to maxLeafHits.
     * */
+
     public ArrayList<RPTreeLeafNodeItem> getChromosomeDataHits(RPChromosomeRegion selectionRegion,
-                                                    boolean contained) {
+                                                               boolean contained) {
 
         ArrayList<RPTreeLeafNodeItem> leafHitItems = new ArrayList<RPTreeLeafNodeItem>();
 
         // check for valid selection region - return empty collection if null
-        if(selectionRegion == null)
+        if (selectionRegion == null)
             return leafHitItems;
 
         // limit the hit list size
@@ -302,20 +314,21 @@ public class RPTree {
     }
 
     // prints out the R+ tree  header, nodes, and leaves
+
     public void print() {
 
-       // check if read in
-       if(!rpTreeHeader.isHeaderOK()){
+        // check if read in
+        if (!rpTreeHeader.isHeaderOK()) {
             int badMagic = rpTreeHeader.getMagic();
             log.error("Error reading R+ tree header: bad magic = " + badMagic);
-           return;
-       }
+            return;
+        }
 
         // print R+ tree header
         rpTreeHeader.print();
 
         // print  R+ tree node and leaf items - recursively
-        if(rootNode != null)
+        if (rootNode != null)
             rootNode.printItems();
 
     }
@@ -338,55 +351,54 @@ public class RPTree {
     *       Chromosome region if found in the R+ tree node passed in;
     *       else null region
     * */
+
     private RPChromosomeRegion findChromosomeRegion(RPTreeNode thisNode,
-            int startChromID, int endChromID, RPChromosomeRegion region){
+                                                    int startChromID, int endChromID, RPChromosomeRegion region) {
 
         int hitValue;
         RPChromosomeRegion bounds;
 
         // search down the tree recursively starting with the root node
-        if(thisNode.isLeaf())
-        {
-           int nLeaves = thisNode.getItemCount();
-           for(int index = 0; index < nLeaves; ++index){
+        if (thisNode.isLeaf()) {
+            int nLeaves = thisNode.getItemCount();
+            for (int index = 0; index < nLeaves; ++index) {
 
-               RPTreeLeafNodeItem leaf = (RPTreeLeafNodeItem)thisNode.getItem(index);
+                RPTreeLeafNodeItem leaf = (RPTreeLeafNodeItem) thisNode.getItem(index);
 
-               // get leaf region bounds
-               bounds = leaf.getChromosomeBounds();
+                // get leaf region bounds
+                bounds = leaf.getChromosomeBounds();
 
-               // test this leaf's chromosome ID's for chromosome hit, then include its base bounds
-               if(startChromID >= bounds.getStartChromID() && startChromID <= bounds.getEndChromID() ||
-                        endChromID  >= bounds.getStartChromID() && endChromID <= bounds.getEndChromID() ){
+                // test this leaf's chromosome ID's for chromosome hit, then include its base bounds
+                if (startChromID >= bounds.getStartChromID() && startChromID <= bounds.getEndChromID() ||
+                        endChromID >= bounds.getStartChromID() && endChromID <= bounds.getEndChromID()) {
 
-                   // Note: need a start region before comparing other regions for extremes
-                   if(region == null)
-                       region = new RPChromosomeRegion(bounds); // seed extreme region
-                   else
-                       region = region.getExtremes(bounds); // update seed extreme region
-               }
-           }
-        }
-        else {
-           // check all child nodes
-           int nNodes = thisNode.getItemCount();
-           for(int index = 0; index < nNodes; ++index){
+                    // Note: need a start region before comparing other regions for extremes
+                    if (region == null)
+                        region = new RPChromosomeRegion(bounds); // seed extreme region
+                    else
+                        region = region.getExtremes(bounds); // update seed extreme region
+                }
+            }
+        } else {
+            // check all child nodes
+            int nNodes = thisNode.getItemCount();
+            for (int index = 0; index < nNodes; ++index) {
 
-               RPTreeChildNodeItem childItem = (RPTreeChildNodeItem)thisNode.getItem(index);
+                RPTreeChildNodeItem childItem = (RPTreeChildNodeItem) thisNode.getItem(index);
 
-               // get bounding region and compare chromosome ID's
-               bounds = childItem.getChromosomeBounds();
+                // get bounding region and compare chromosome ID's
+                bounds = childItem.getChromosomeBounds();
 
-               // test node chromosome ID range for any leaf hits for either startChromID or endChromID
-               if(startChromID >= bounds.getStartChromID() && startChromID <= bounds.getEndChromID() ||
-                       endChromID  >= bounds.getStartChromID() && endChromID <= bounds.getEndChromID() ){
+                // test node chromosome ID range for any leaf hits for either startChromID or endChromID
+                if (startChromID >= bounds.getStartChromID() && startChromID <= bounds.getEndChromID() ||
+                        endChromID >= bounds.getStartChromID() && endChromID <= bounds.getEndChromID()) {
 
                     RPTreeNode childNode = childItem.getChildNode();
-                    region = findChromosomeRegion(childNode,  startChromID, endChromID, region);
-               }
+                    region = findChromosomeRegion(childNode, startChromID, endChromID, region);
+                }
 
-               // check next node
-           }
+                // check next node
+            }
         }
 
         return region;
@@ -402,32 +414,31 @@ public class RPTree {
     *   Returns:
     *       Adds chromosome regions if found in the chromosome region list passed in.
     * */
+
     private void findAllChromosomeRegions(RPTreeNode thisNode,
-                                         ArrayList<RPChromosomeRegion> regionList){
+                                          ArrayList<RPChromosomeRegion> regionList) {
 
         // search down the tree recursively starting with the root node
-        if(thisNode.isLeaf())
-        {
-           int nLeaves = thisNode.getItemCount();
-           for(int index = 0; index < nLeaves; ++index){
+        if (thisNode.isLeaf()) {
+            int nLeaves = thisNode.getItemCount();
+            for (int index = 0; index < nLeaves; ++index) {
 
-               RPTreeLeafNodeItem leaf = (RPTreeLeafNodeItem)thisNode.getItem(index);
+                RPTreeLeafNodeItem leaf = (RPTreeLeafNodeItem) thisNode.getItem(index);
 
-               // add all leaf regions
-               RPChromosomeRegion region = leaf.getChromosomeBounds();
-               regionList.add(region);
-           }
-        }
-        else {
-           // get all child nodes
-           int nNodes = thisNode.getItemCount();
-           for(int index = 0; index < nNodes; ++index){
+                // add all leaf regions
+                RPChromosomeRegion region = leaf.getChromosomeBounds();
+                regionList.add(region);
+            }
+        } else {
+            // get all child nodes
+            int nNodes = thisNode.getItemCount();
+            for (int index = 0; index < nNodes; ++index) {
 
-               RPTreeChildNodeItem childItem = (RPTreeChildNodeItem)thisNode.getItem(index);
-               RPTreeNode childNode = childItem.getChildNode();
+                RPTreeChildNodeItem childItem = (RPTreeChildNodeItem) thisNode.getItem(index);
+                RPTreeNode childNode = childItem.getChildNode();
 
-               findAllChromosomeRegions(childNode, regionList);
-           }
+                findAllChromosomeRegions(childNode, regionList);
+            }
         }
 
     }
@@ -454,61 +465,60 @@ public class RPTree {
     *       ArrayList of leaf hit items containing updated hit regions and data offsets;
     *       else an empty array if hit regions not found.
     * */
-    private void findChromosomeRegionItems( RPTreeNode thisNode,  RPChromosomeRegion selectionRegion,
-                                          ArrayList<RPTreeLeafNodeItem>leafHitItems){
+
+    private void findChromosomeRegionItems(RPTreeNode thisNode, RPChromosomeRegion selectionRegion,
+                                           ArrayList<RPTreeLeafNodeItem> leafHitItems) {
 
         int hitValue;
 
         // check for valid selection region - ignore request if null
-        if(selectionRegion == null)
+        if (selectionRegion == null)
             return;
 
         // check if node is disjoint
         hitValue = thisNode.compareRegions(selectionRegion);
-        if(Math.abs(hitValue) >= 2)
+        if (Math.abs(hitValue) >= 2)
             return;
 
         // search down the tree recursively starting with the root node
-        if(thisNode.isLeaf())
-        {
-           int nLeaves = thisNode.getItemCount();
-           for(int index = 0; index < nLeaves; ++index){
-                RPTreeLeafNodeItem leafItem = (RPTreeLeafNodeItem)thisNode.getItem(index);
-               
-               // compute the region hit value
-               hitValue = leafItem.compareRegions(selectionRegion);
+        if (thisNode.isLeaf()) {
+            int nLeaves = thisNode.getItemCount();
+            for (int index = 0; index < nLeaves; ++index) {
+                RPTreeLeafNodeItem leafItem = (RPTreeLeafNodeItem) thisNode.getItem(index);
 
-               // select contained or intersected leaf regions - item selection is by iterator
-               if(Math.abs(hitValue) < 2){
-                   leafHitItems.add(leafItem);
-               }
+                // compute the region hit value
+                hitValue = leafItem.compareRegions(selectionRegion);
 
-               // ascending regions will continue to be disjoint so terminate nodal search
-               else if(hitValue > 1)
-                   break;
-  
-               // check next leaf
-           }
-        }
-        else {
-           // check all child nodes
-           int nNodes = thisNode.getItemCount();
-           for(int index = 0; index < nNodes; ++index){
-               RPTreeChildNodeItem childItem = (RPTreeChildNodeItem)thisNode.getItem(index);
-               
-               // check for region intersection at the node level
-               hitValue = childItem.compareRegions(selectionRegion);
-               
-               // test this node and get any leaf hits; intersections and containing
-               if(Math.abs(hitValue) < 2){
-                   RPTreeNode childNode = childItem.getChildNode();
-                   findChromosomeRegionItems(childNode, selectionRegion, leafHitItems);
-               }
+                // select contained or intersected leaf regions - item selection is by iterator
+                if (Math.abs(hitValue) < 2) {
+                    leafHitItems.add(leafItem);
+                }
 
-               // ascending regions will continue to be disjoint so terminate nodal search
-               else if(hitValue > 1)
-                   break;
-           }
+                // ascending regions will continue to be disjoint so terminate nodal search
+                else if (hitValue > 1)
+                    break;
+
+                // check next leaf
+            }
+        } else {
+            // check all child nodes
+            int nNodes = thisNode.getItemCount();
+            for (int index = 0; index < nNodes; ++index) {
+                RPTreeChildNodeItem childItem = (RPTreeChildNodeItem) thisNode.getItem(index);
+
+                // check for region intersection at the node level
+                hitValue = childItem.compareRegions(selectionRegion);
+
+                // test this node and get any leaf hits; intersections and containing
+                if (Math.abs(hitValue) < 2) {
+                    RPTreeNode childNode = childItem.getChildNode();
+                    findChromosomeRegionItems(childNode, selectionRegion, leafHitItems);
+                }
+
+                // ascending regions will continue to be disjoint so terminate nodal search
+                else if (hitValue > 1)
+                    break;
+            }
         }
     }
 
@@ -529,66 +539,60 @@ public class RPTree {
     *       A tree node, for success, or null for failure to find the node information.
 
     * */
-    private RPTreeNode readRPTreeNode(SeekableStream fis, long fileOffset, boolean isLowToHigh){
+
+    static RPTreeNode readRPTreeNode(SeekableStream fis, long fileOffset, boolean isLowToHigh, boolean forceDescend) {
 
         LittleEndianInputStream lbdis = null; // low o high byte stream reader
         DataInputStream bdis = null;    // high to low byte stream reader
 
         byte[] buffer = new byte[RPTREE_NODE_FORMAT_SIZE];
         RPTreeNode thisNode = null;
-        RPTreeNode childNode = null;
-        byte type;
-
-
-        boolean isLeaf;
-        byte bval;
-        int itemCount;
-        int itemSize;
-        long dataOffset;
-        long dataSize;
 
         try {
 
-           // Read node format into a buffer
-           fis.seek(fileOffset);
-           fis.readFully(buffer);
+            // Read node format into a buffer
+            fis.seek(fileOffset);
+            fis.readFully(buffer);
 
-           if(isLowToHigh)
-               lbdis = new LittleEndianInputStream(new ByteArrayInputStream(buffer));
-           else
-               bdis = new DataInputStream(new ByteArrayInputStream(buffer));
+            if (isLowToHigh)
+                lbdis = new LittleEndianInputStream(new ByteArrayInputStream(buffer));
+            else
+                bdis = new DataInputStream(new ByteArrayInputStream(buffer));
 
-           // find node type
-           if(isLowToHigh)
-               type = lbdis.readByte();
-           else
-               type = bdis.readByte();
+            // find node type
+            byte type;
+            if (isLowToHigh)
+                type = lbdis.readByte();
+            else
+                type = bdis.readByte();
 
-           if(type == 1) {
-               isLeaf = true;
-               itemSize =  RPTREE_NODE_LEAF_ITEM_SIZE;
-               thisNode = new RPTreeLeafNode();
-           }
-           else {
-               isLeaf = false;
-               itemSize =  RPTREE_NODE_CHILD_ITEM_SIZE;            
-               thisNode = new RPTreeChildNode();
-           }
-            nodeCount++;
 
-           if(isLowToHigh){
-               bval = lbdis.readByte();          // reserved - not currently used
-               itemCount = lbdis.readShort();
-           }
-           else {
-               bval = bdis.readByte();          // reserved - not currently used
-               itemCount = bdis.readShort();
+            boolean isLeaf;
+            int itemSize;
+            if (type == 1) {
+                isLeaf = true;
+                itemSize = RPTREE_NODE_LEAF_ITEM_SIZE;
+                thisNode = new RPTreeLeafNode();
+            } else {
+                isLeaf = false;
+                itemSize = RPTREE_NODE_CHILD_ITEM_SIZE;
+                thisNode = new RPTreeChildNode();
+            }
+            //nodeCount++;
+
+            int itemCount;
+            if (isLowToHigh) {
+                lbdis.readByte();          // reserved - not currently used
+                itemCount = lbdis.readShort();
+            } else {
+                bdis.readByte();          // reserved - not currently used
+                itemCount = bdis.readShort();
             }
 
             int itemBlockSize = itemCount * itemSize;
             buffer = new byte[itemBlockSize];            // allocate buffer for item sisze
             fis.readFully(buffer);
-            if(isLowToHigh)
+            if (isLowToHigh)
                 lbdis = new LittleEndianInputStream(new ByteArrayInputStream(buffer));
             else
                 bdis = new DataInputStream(new ByteArrayInputStream(buffer));
@@ -596,62 +600,71 @@ public class RPTree {
             // get the node items - leaves or child nodes
             int startChromID, endChromID;
             int startBase, endBase;
-            for(int item = 0; item < itemCount; ++item) {
+            for (int item = 0; item < itemCount; ++item) {
 
 
                 // always extract the bounding rectangle
-                if(isLowToHigh){
+                if (isLowToHigh) {
                     startChromID = lbdis.readInt();
-                    startBase =  lbdis.readInt();
-                    endChromID =  lbdis.readInt();
-                    endBase =  lbdis.readInt();
-                }
-                else {
+                    startBase = lbdis.readInt();
+                    endChromID = lbdis.readInt();
+                    endBase = lbdis.readInt();
+                } else {
                     startChromID = bdis.readInt();
-                    startBase =  bdis.readInt();
-                    endChromID =  bdis.readInt();
-                    endBase =  bdis.readInt();
+                    startBase = bdis.readInt();
+                    endChromID = bdis.readInt();
+                    endBase = bdis.readInt();
                 }
 
-               if(isLeaf) {
-                    if(isLowToHigh) {
+                if (isLeaf) {
+                    long dataOffset;
+                    long dataSize;
+                    if (isLowToHigh) {
                         dataOffset = lbdis.readLong();
                         dataSize = lbdis.readLong();
-                    }
-                   else {
+                    } else {
                         dataOffset = bdis.readLong();
                         dataSize = bdis.readLong();
                     }
 
-                   // insert leaf node items
-                    RPTreeLeafNodeItem leafItem = new RPTreeLeafNodeItem(startChromID,  startBase,
-                            endChromID, endBase, dataOffset, dataSize);
-                    thisNode.insertItem(leafItem);
-               }
-               else {
-                   // get the child node pointed to in the node item
-                   if(isLowToHigh)
-                       dataOffset =  lbdis.readLong();
-                   else
-                       dataOffset =  bdis.readLong();
+                    thisNode.insertItem(new RPTreeLeafNodeItem(startChromID, startBase, endChromID, endBase,
+                            dataOffset, dataSize));
+                } else {
+                    // get the child node pointed to in the node item
+                    long nodeOffset;
+                    if (isLowToHigh) {
+                        nodeOffset = lbdis.readLong();
+                    } else {
+                        nodeOffset = bdis.readLong();
+                    }
 
-                   childNode = readRPTreeNode(fis, dataOffset, isLowToHigh);
+                    // Recursive call to read next child node
+                    // The test on chromIds is designed to stop the descent when the tree reaches the level of an
+                    // individual chromosome.  These are loaded later on demand.
+                    RPTreeNode childNode;
+                    if (startChromID != endChromID || forceDescend) {
+                        childNode = readRPTreeNode(fis, nodeOffset, isLowToHigh, forceDescend);
+                    } else {
+                        childNode = new RPTreeNodeProxy(fis, nodeOffset, isLowToHigh, startChromID);
+                    }
 
-                   // insert child node item
-                   RPTreeChildNodeItem childItem = new RPTreeChildNodeItem(startChromID, startBase,
-                        endChromID, endBase, childNode);
-                    thisNode.insertItem(childItem);
+
+                    // insert child node item
+                    thisNode.insertItem(new RPTreeChildNodeItem(startChromID, startBase, endChromID,
+                            endBase, childNode));
+
+
                 }
 
                 fileOffset += itemSize;
-           }
+            }
 
-        }catch(IOException ex) {
-           log.error("Error reading in R+ tree nodes: " + ex);
-           throw new RuntimeException("Error reading R+ tree nodes: \n", ex);
+        } catch (IOException ex) {
+            log.error("Error reading in R+ tree nodes: " + ex);
+            throw new RuntimeException("Error reading R+ tree nodes: \n", ex);
         }
 
         // return success
         return thisNode;
-   }
+    }
 }

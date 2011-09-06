@@ -34,11 +34,11 @@ import java.util.ArrayList;
  */
 public class BigBedIterator implements Iterator<BedFeature> {
 
-    private static Logger log = Logger.getLogger(BigBedIterator.class);
+     private static Logger log = Logger.getLogger(BigBedIterator.class);
 
     //specification of chromosome selection region
     private RPChromosomeRegion selectionRegion;  // selection region for iterator
-    private boolean isContained; // if true, features must be fully contained by extraction region
+    private boolean contained; // if true, features must be fully contained by extraction region
     private RPChromosomeRegion hitRegion;  // hit selection region for iterator
 
     // File access variables for reading Bed data block
@@ -58,52 +58,49 @@ public class BigBedIterator implements Iterator<BedFeature> {
     private ArrayList<BedFeature> bedFeatureList; // array of selected  Bed features
     private int bedFeatureIndex;       // index of next Bed feature from the list
 
-    boolean empty = false;
+    private boolean empty = false;
 
     /**
-     * Constructor for a BigBed iterator over the specified chromosome region
-     * <p/>
+     *  Constructor for a BigBed iterator over the specified chromosome region
+     *
      * Parameters:
-     * fis - file input stream handle
-     * chromIDTree - B+ index tree returns chromomosme ID's for chromosome names
-     * chromDataTree - R+ chromosome data locations tree
-     * selectionRegion - chromosome region for selection of Bed feature extraction
-     * consists of:
-     * startChromID - ID of start chromosome
-     * startBase - starting base position for features
-     * endChromID - ID of end chromosome
-     * endBase - starting base position for features
-     * contained - specifies bed features must be contained by region, if true;
-     * else return any intersecting region features
+     *      fis - file input stream handle
+     *      chromIDTree - B+ index tree returns chromomosme ID's for chromosome names
+     *      chromDataTree - R+ chromosome data locations tree
+     *      selectionRegion - chromosome region for selection of Bed feature extraction
+     *      consists of:
+     *          startChromID - ID of start chromosome
+     *          startBase - starting base position for features
+     *          endChromID - ID of end chromosome
+     *          endBase - starting base position for features
+     *      contained - specifies bed features must be contained by region, if true;
+     *          else return any intersecting region features
      */
-    public BigBedIterator(SeekableStream fis, BPTree chromIDTree, RPTree chromDataTree,
-                          RPChromosomeRegion selectionRegion, boolean contained) {
+     public BigBedIterator(SeekableStream fis, BPTree chromIDTree, RPTree chromDataTree,
+            RPChromosomeRegion selectionRegion, boolean contained) {
 
         // check for valid selection region
-        if (selectionRegion == null)
+        if(selectionRegion == null)
             throw new RuntimeException("Error: BigBedIterator selection region is null\n");
 
         this.fis = fis;
         this.chromIDTree = chromIDTree;
         this.chromDataTree = chromDataTree;
         this.selectionRegion = selectionRegion;
-        isContained = contained;
+        this.contained = contained;
 
         // set up hit list and first data block read
         int hitCount = getHitRegion(selectionRegion, contained);
-        if (hitCount == 0) { // no hits - no point in fetching data
+        if(hitCount == 0)   // no hits - no point in fetching data
             empty = true;
-        }
 
         // Ready for next() data extraction
 
     }
 
-
     public BigBedIterator() {
         empty = true;
     }
-
 
     /*
    *  Method returns status on a "next item" being available.
@@ -114,48 +111,48 @@ public class BigBedIterator implements Iterator<BedFeature> {
    *  Note: If "next" method is called for a false condition,
    *      an UnsupportedOperationException will be thrown.
    * */
-
-    public boolean hasNext() {
+     public boolean hasNext() {
 
         if(empty) return false;
-
+         
         // first check if current data block can be read for next
-        if (bedFeatureIndex < bedFeatureList.size())
+        if(bedFeatureIndex < bedFeatureList.size())
             return true;
 
-            // need to fetch next data block
-        else if (leafItemIndex < leafHitList.size())
+        // need to fetch next data block
+        else if(leafItemIndex < leafHitList.size())
             return true;
-
-        else
+ 
+         else
             return false;
     }
 
     /**
-     * Method returns the current bed feature and advances to the next bed record.
-     * <p/>
-     * Returns:
-     * Bed feature for current BigBed data record.
-     * <p/>
-     * Note: If "next" method is called when a "next item" does not exist,
-     * an UnsupportedOperationException will be thrown.
-     */
+     *  Method returns the current bed feature and advances to the next bed record.
+     *
+     *  Returns:
+     *      Bed feature for current BigBed data record.
+     *
+     *  Note: If "next" method is called when a "next item" does not exist,
+     *      an UnsupportedOperationException will be thrown.
+    */
     public BedFeature next() {
 
         // Is there a need to fetch next data block?
-        if (bedFeatureIndex < bedFeatureList.size())
-            return (bedFeatureList.get(bedFeatureIndex++));
+        if(bedFeatureIndex < bedFeatureList.size())
+            return(bedFeatureList.get(bedFeatureIndex++));
 
-            // attempt to get next leaf item data block
+        // attempt to get next leaf item data block
         else {
-            int nHits = getHitRegion(selectionRegion, isContained);
+            int nHits = getHitRegion(selectionRegion, contained);
 
-            if (nHits > 0) {
+            if(nHits > 0){
                 // Note: getDataBlock initializes bed feature index to 0
-                return (bedFeatureList.get(bedFeatureIndex++)); // return 1st Data Block item
-            } else {
-                String result = String.format("Failed to find data for bed region (%d,%d,%d,%d)\n",
-                        hitRegion.getStartChromID(), hitRegion.getStartBase(),
+                return(bedFeatureList.get(bedFeatureIndex++)); // return 1st Data Block item
+            }
+            else{
+                 String result = String.format("Failed to find data for bed region (%d,%d,%d,%d)\n",
+                    hitRegion.getStartChromID(),  hitRegion.getStartBase(),
                         hitRegion.getEndChromID(), hitRegion.getEndBase());
                 log.error(result);
 
@@ -174,7 +171,6 @@ public class BigBedIterator implements Iterator<BedFeature> {
     /*
     *   Method returns the iterator selection region.
     * */
-
     public RPChromosomeRegion getSelectionRegion() {
         return selectionRegion;
     }
@@ -195,15 +191,19 @@ public class BigBedIterator implements Iterator<BedFeature> {
     *   Returns:
     *       number of chromosome regions found in the selection region
     * */
-
     public int setSelectionRegion(RPChromosomeRegion selectionRegion,
-                                  boolean contained) {
+                                                 boolean contained) {
         this.selectionRegion = selectionRegion;
-        isContained = contained;
+        this.contained = contained;
 
         // set up hit list and first data block read
         leafHitList = null;    // Must nullify existing hit list first!
         int hitCount = getHitRegion(selectionRegion, contained);
+        if(hitCount == 0)   // no hits - no point in fetching data
+            throw new RuntimeException("No wig data found in the selection region");
+
+        // Ready for next() data extraction
+
         return hitCount;
     }
 
@@ -215,9 +215,8 @@ public class BigBedIterator implements Iterator<BedFeature> {
     *       Boolean indicates items must be contained in selection region if true,
     *       else may intersect the selection region if false
     * */
-
     public boolean isContained() {
-        return isContained;
+        return contained;
     }
 
     /*
@@ -226,7 +225,6 @@ public class BigBedIterator implements Iterator<BedFeature> {
     *   Returns:
     *       File input stream handle
     * */
-
     public SeekableStream getBBFis() {
         return fis;
     }
@@ -238,7 +236,6 @@ public class BigBedIterator implements Iterator<BedFeature> {
     *   Returns:
     *       B+ chromosome index tree
     * */
-
     public BPTree getChromosomeIDTree() {
         return chromIDTree;
     }
@@ -250,7 +247,6 @@ public class BigBedIterator implements Iterator<BedFeature> {
     *   Returns:
     *       R+ chromosome data locations tree
     * */
-
     public RPTree getChromosomeDataTree() {
         return chromDataTree;
     }
@@ -261,7 +257,6 @@ public class BigBedIterator implements Iterator<BedFeature> {
     *   Returns:
     *       List of leaf items with data locations for the selection region.
     * */
-
     public ArrayList<RPTreeLeafNodeItem> getLeafItems() {
         return leafHitList;
     }
@@ -281,19 +276,19 @@ public class BigBedIterator implements Iterator<BedFeature> {
     *   Returns:
     *       number of R+ chromosome data hits
     * */
-
     private int getHitRegion(RPChromosomeRegion hitRegion, boolean contained) {
 
         int hitCount = 0;
 
         // check if new hit list is needed
-        if (leafHitList == null) {
+        if(leafHitList == null){
             hitCount = getHitList(hitRegion, contained);
-            if (hitCount == 0)
+            if(hitCount == 0)
                 return 0;   // no hit data found
-        } else {
-            hitCount = leafHitList.size() - leafItemIndex;
-            if (hitCount == 0)
+        }
+         else {
+            hitCount =  leafHitList.size() - leafItemIndex;
+            if(hitCount == 0)
                 return 0;   // hit list exhausted
         }
 
@@ -302,7 +297,7 @@ public class BigBedIterator implements Iterator<BedFeature> {
 
         // try next item - probably intersection issue
         // Note: recursive call until a block is valid or hit list exhuasted
-        if (!dataBlockRead)
+        if(!dataBlockRead)
             hitCount = getHitRegion(hitRegion, contained);
 
         return hitCount;
@@ -323,46 +318,44 @@ public class BigBedIterator implements Iterator<BedFeature> {
     *   Returns:
     *       number of R+ chromosome data hits
     * */
-
     private int getHitList(RPChromosomeRegion hitRegion, boolean contained) {
 
         // hit list for hit region; subject to mMaxLeafHits limitation
-        leafHitList = chromDataTree.getChromosomeDataHits(hitRegion, contained);
+         leafHitList = chromDataTree.getChromosomeDataHits(hitRegion, contained);
 
         // check if any leaf items were selected
         int nHits = leafHitList.size();
-        if (nHits == 0)
+        if(nHits == 0)
             return 0;   // no data hits found
         else
-            leafItemIndex = 0;    // reset hit item index to start of list
+             leafItemIndex = 0;    // reset hit item index to start of list
 
         // find hit bounds
         int startChromID = leafHitList.get(0).getChromosomeBounds().getStartChromID();
         int startBase = leafHitList.get(0).getChromosomeBounds().getStartBase();
-        int endChromID = leafHitList.get(nHits - 1).getChromosomeBounds().getEndChromID();
-        int endBase = leafHitList.get(nHits - 1).getChromosomeBounds().getEndBase();
+        int endChromID = leafHitList.get(nHits-1).getChromosomeBounds().getEndChromID();
+        int endBase = leafHitList.get(nHits-1).getChromosomeBounds().getEndBase();
 
         // save hit region definition; not currently used but useful for debug
-        this.hitRegion = new RPChromosomeRegion(startChromID, startBase, endChromID, endBase);
+        this.hitRegion = new  RPChromosomeRegion(startChromID, startBase, endChromID, endBase);
 
         return nHits;
     }
 
-    /*
-   *   Method sets up a decompressed data block of big bed features for iteration.
-   *
-   *   Parameters:
-   *       leafItemIndex - leaf item index in the hit list referencing the data block
-   *
-   *   Returns:
-   *       Successful Bed feature data block set up: true or false.
-   * */
-
-    private boolean getDataBlock(int leafItemIndex) {
+     /*
+    *   Method sets up a decompressed data block of big bed features for iteration.
+    *
+    *   Parameters:
+    *       leafItemIndex - leaf item index in the hit list referencing the data block
+    *
+    *   Returns:
+    *       Successful Bed feature data block set up: true or false.
+    * */
+    private boolean getDataBlock(int leafItemIndex){
 
         // check for valid data block
-        if (leafItemIndex >= leafHitList.size())
-            return false;
+        if(leafItemIndex >= leafHitList.size())
+                return false;
 
         // Perform a block read for indexed leaf item
         leafHitItem = leafHitList.get(leafItemIndex);
@@ -380,11 +373,11 @@ public class BigBedIterator implements Iterator<BedFeature> {
                 uncompressBufSize);
 
         // get data block Bed feature list and set next index to first item
-        bedFeatureList = bedDataBlock.getBedData(selectionRegion, isContained);
+        bedFeatureList =  bedDataBlock.getBedData(selectionRegion, contained);
         bedFeatureIndex = 0;
 
-        // data block items available for iterator
-        if (bedFeatureList.size() > 0)
+         // data block items available for iterator
+        if(bedFeatureList.size() > 0)
             return true;
         else
             return false;
