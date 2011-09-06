@@ -190,6 +190,15 @@ public class BBFileReader {
             chromosomeIDTree = new BPTree(fis, fileOffset, isLowToHigh);
         }
 
+        // get R+ chromosome data location tree (Tables K, L, M, N)
+        chromDataTreeOffset = fileHeader.getFullIndexOffset();
+        if (chromDataTreeOffset != 0) {
+            fileOffset = chromDataTreeOffset;
+            boolean forceDescend = false;
+            chromosomeDataTree = new RPTree(fis, fileOffset, isLowToHigh, uncompressBufSize, forceDescend);
+        }
+
+
         // get number of data records indexed by the R+ chromosome data location tree
         fileOffset = fileHeader.getFullDataOffset();
         dataCount = getDataCount(fis, fileOffset);
@@ -563,15 +572,7 @@ public class BBFileReader {
         if (!isBigBedFile())
             return null;
 
-        if (chromosomeDataTree == null) {
-            // get R+ chromosome data location tree (Tables K, L, M, N)
-            chromDataTreeOffset = fileHeader.getFullIndexOffset();
-            if (chromDataTreeOffset != 0) {
-                fileOffset = chromDataTreeOffset;
-                chromosomeDataTree = new RPTree(fis, fileOffset, isLowToHigh, uncompressBufSize);
-            }
 
-        }
         // go from chromosome names to chromosome ID region
         RPChromosomeRegion selectionRegion = getChromosomeBounds(startChromosome, startBase,
                 endChromosome, endBase);
@@ -603,15 +604,6 @@ public class BBFileReader {
         if (!isBigBedFile())
             return null;
 
-        if (chromosomeDataTree == null) {
-            // get R+ chromosome data location tree (Tables K, L, M, N)
-            chromDataTreeOffset = fileHeader.getFullIndexOffset();
-            if (chromDataTreeOffset != 0) {
-                fileOffset = chromDataTreeOffset;
-                chromosomeDataTree = new RPTree(fis, fileOffset, isLowToHigh, uncompressBufSize);
-            }
-
-        }
 
         // get all region bounds
         RPChromosomeRegion selectionRegion = chromosomeDataTree.getChromosomeBounds();
@@ -623,7 +615,6 @@ public class BBFileReader {
 
         return bedIterator;
     }
-
 
 
     /**
@@ -648,15 +639,6 @@ public class BBFileReader {
     public BigWigIterator getBigWigIterator(String startChromosome, int startBase,
                                             String endChromosome, int endBase, boolean contained) {
 
-        if (chromosomeDataTree == null) {
-            // get R+ chromosome data location tree (Tables K, L, M, N)
-            chromDataTreeOffset = fileHeader.getFullIndexOffset();
-            if (chromDataTreeOffset != 0) {
-                fileOffset = chromDataTreeOffset;
-                chromosomeDataTree = new RPTree(fis, fileOffset, isLowToHigh, uncompressBufSize);
-            }
-
-        }
 
         if (!isBigWigFile())
             return null;
@@ -665,7 +647,7 @@ public class BBFileReader {
         RPChromosomeRegion selectionRegion = getChromosomeBounds(startChromosome, startBase,
                 endChromosome, endBase);
 
-        // check for valid selection region
+        // check for valid selection region, return empty iterator if null
         if (selectionRegion == null)
             return new BigWigIterator();
 
@@ -692,15 +674,6 @@ public class BBFileReader {
         if (!isBigWigFile())
             return null;
 
-        if (chromosomeDataTree == null) {
-            // get R+ chromosome data location tree (Tables K, L, M, N)
-            chromDataTreeOffset = fileHeader.getFullIndexOffset();
-            if (chromDataTreeOffset != 0) {
-                fileOffset = chromDataTreeOffset;
-                chromosomeDataTree = new RPTree(fis, fileOffset, isLowToHigh, uncompressBufSize);
-            }
-
-        }
         // get all regions bounds
         RPChromosomeRegion selectionRegion = chromosomeDataTree.getChromosomeBounds();
 
@@ -711,7 +684,6 @@ public class BBFileReader {
 
         return wigIterator;
     }
-
 
 
     /**
@@ -848,7 +820,7 @@ public class BBFileReader {
                                                    String endChromosome, int endBase) {
 
         // If the chromosome name length is > the key size we can't distinguish it
-        if(startChromosome.length() > chromosomeIDTree.getKeySize()) {
+        if (startChromosome.length() > chromosomeIDTree.getKeySize()) {
             return null;
         }
 
