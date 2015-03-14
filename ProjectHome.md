@@ -1,0 +1,3 @@
+This project provides java readers for the [UCSC's BigWig and BigBed](http://genome.ucsc.edu/goldenPath/help/bigWig.html) formats.  It was originally developed by Martin Decautis and Jim Robinson for the Integrative Genomics Viewer (http://www.broadinstitute.org/igv).  Thanks to Jim Kent and Ann Zweig and from  UCSC for their assistance.
+
+To contribute or inquire about this project please send email to igv-team at broadinstitute.org.
